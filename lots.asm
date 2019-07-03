@@ -770,7 +770,7 @@ _LABEL_82:
 	ld (_RAM_FFFD), a
 	ld a, $01
 	ld (_RAM_FFFE), a
-	ld a, $02
+	ld a, :Bank2
 	ld (_RAM_FFFF), a
 	ld hl, _RAM_C000
 	ld de, _RAM_C000 + 1
@@ -789,7 +789,7 @@ _LABEL_C2:
 	ld bc, $8001
 	call _LABEL_302
 	call _LABEL_38E
-	ld a, $03
+	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	call _LABEL_C989
 	call _LABEL_209
@@ -900,7 +900,7 @@ _LABEL_125:
 _LABEL_1A6:
 	xor a
 	ld (_RAM_C0A4), a
-	ld a, $03
+	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	call _LABEL_C000
 _LABEL_1B2:
@@ -1347,7 +1347,7 @@ _LABEL_40C:
 .db $ED $6A $EB $30 $04 $09 $30 $01 $13 $3D $20 $F2 $C9
 
 _LABEL_467:
-	ld a, $02
+	ld a, :Bank2
 	ld (_RAM_FFFF), a
 	ld hl, _RAM_C300
 	ld (_RAM_C0A8), hl
@@ -1449,7 +1449,7 @@ _LABEL_508:
 	ld (_RAM_C100), a
 	ld hl, $0340
 	ld (_RAM_DEMO_TIMER), hl
-	ld a, $05
+	ld a, :Bank5
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_15549
 	ld de, $4000
@@ -1531,7 +1531,7 @@ _LABEL_56F:
 ++:
 	ld bc, $C001
 	call _LABEL_302
-	ld a, $03
+	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	call _LABEL_C989
 	ld hl, _RAM_CC00
@@ -1599,7 +1599,7 @@ _LABEL_635:
 	call _LABEL_302
 	ld a, $01
 	ld (_RAM_C176), a
-	ld a, $02
+	ld a, :Bank2
 	ld (_RAM_FFFF), a
 	call _LABEL_3C2
 	ld hl, _DATA_B603
@@ -1999,7 +1999,7 @@ _DATA_9BC:
 .db $00 $2A $25 $0B $17 $09 $05 $02 $00 $00 $00 $00 $00 $00 $00 $00
 
 _LABEL_9DC:
-	ld a, $03
+	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_ED05
 	ld de, $42C0
@@ -2008,7 +2008,7 @@ _LABEL_9DC:
 	ld de, $6000
 	call _LABEL_1DC8
 _LABEL_9F3:
-	ld a, $03
+	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_EEA2
 	ld de, $7800
@@ -2019,7 +2019,7 @@ _LABEL_A04:
 	ld a, (_RAM_C420)
 	or a
 	ret z
-	ld a, $05
+	ld a, :Bank5
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_14000
 	ld a, (_RAM_MOVEMENT_STATE)
@@ -4073,7 +4073,7 @@ _LABEL_19AF:
 
 +:
 	ld ix, _RAM_D420
-	ld a, $0F
+	ld a, :Bank15
 	ld (_RAM_FFFF), a
 	ld a, (_RAM_C10B)
 	srl a
@@ -4311,7 +4311,7 @@ _LABEL_1B32:
 	ret
 
 +:
-	ld a, $0F
+	ld a, :Bank15
 	ld (_RAM_FFFF), a
 	push de
 	ld a, (_RAM_C10B)
@@ -4415,7 +4415,7 @@ _LABEL_1BBD:
 	ret
 
 +:
-	ld a, $0F
+	ld a, :Bank15
 	ld (_RAM_FFFF), a
 	push de
 	ld a, (_RAM_C10B)
@@ -4950,7 +4950,7 @@ _LABEL_1F39:
 	call _LABEL_302
 	ld bc, $FF0A
 	call _LABEL_302
-	ld a, $03
+	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	call _LABEL_C989
 	ld a, $8A
@@ -4959,7 +4959,7 @@ _LABEL_1F39:
 	ld a, $D0
 	ld (_RAM_C300), a
 	call _LABEL_316
-	ld a, $06
+	ld a, :Bank6
 	ld (_RAM_FFFF), a
 	ld a, $01
 	ld (_RAM_C13F), a
@@ -4975,7 +4975,7 @@ _LABEL_1F39:
 	ld hl, $2000
 	ld bc, $0300
 	call _LABEL_331
-	ld hl, _DATA_1806A
+	ld hl, _DATA_COMPRESSED_FONT_TILES_
 	ld de, $4400
 	call _LABEL_1E25
 	ld hl, _DATA_19F31
@@ -5100,7 +5100,7 @@ _LABEL_20A2:
 	ld a, (_RAM_C13F)
 	or a
 	ret z
-	ld a, $06
+	ld a, :Bank6
 	ld (_RAM_FFFF), a
 	ld a, (_RAM_C135)
 	or a
@@ -5235,7 +5235,7 @@ _LABEL_218C:
 	ret z
 	xor a
 	ld (_RAM_C16D), a
-	ld a, $03
+	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_EF2B
 	ld de, $782C
@@ -10900,7 +10900,7 @@ _LABEL_50CB:
 	jp _LABEL_8AC
 
 _LABEL_5115:
-	ld a, $0A
+	ld a, :Bank10
 	ld (_RAM_FFFF), a
 	ld a, (_RAM_CURRENT_MAP)
 	ld l, a
@@ -10979,7 +10979,7 @@ _LABEL_516A:
 	call _LABEL_1DC8
 	pop hl
 	inc hl
-	ld a, $0A
+	ld a, :Bank10
 	ld (_RAM_FFFF), a
 	ld a, (hl)
 	or a
@@ -11005,7 +11005,7 @@ _LABEL_516A:
 -:
 	pop bc
 	djnz _LABEL_516A
-	ld a, $08
+	ld a, :Bank8
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_21268
 	ld bc, $0008
@@ -11143,7 +11143,7 @@ _LABEL_52BC:
 	ld bc, $FF0A
 	call _LABEL_302
 	ld a, a
-	ld a, $03
+	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	call _LABEL_C9C8
 	ld de, $7F00
@@ -11197,11 +11197,11 @@ _LABEL_52BC:
 	jp _LABEL_302
 
 _LABEL_535B:
-	ld c, $0B
+	ld c, :Bank11
 	ld a, (_RAM_CURRENT_MAP)
 	cp $44
 	jp c, +
-	ld c, $0C
+	ld c, :Bank12
 +:
 	ld a, c
 	ld (_RAM_FFFF), a
@@ -11268,11 +11268,11 @@ _LABEL_535B:
 _LABEL_53D3:
 	ld hl, (_RAM_C10C)
 	call _LABEL_1E50
-	ld c, $0D
+	ld c, :Bank13
 	ld a, (_RAM_C118)
 	cp $06
 	jr c, +
-	ld c, $0E
+	ld c, :Bank14
 +:
 	ld a, c
 	ld (_RAM_FFFF), a
@@ -11339,7 +11339,7 @@ _LABEL_543A:
 	jp _LABEL_346
 
 _LABEL_544F:
-	ld a, $03
+	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	ld c, $85
 	ld a, (_RAM_C118)
@@ -11379,7 +11379,7 @@ _LABEL_5483:
 	ld (_RAM_C48A), a
 	ld a, $FF
 	ld (_RAM_C48B), a
-	ld a, $03
+	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_EE5B
 	ld de, $5F80
@@ -11436,7 +11436,7 @@ _LABEL_54D5:
 	ret
 
 _LABEL_550F:
-	ld a, $04
+	ld a, :Bank4
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_137E0
 	ld de, $43C0
@@ -11770,7 +11770,7 @@ _LABEL_586E:
 	ld (_RAM_C4CE), a
 	ld a, $05
 	ld (_RAM_C4C0), a
-	ld a, $06
+	ld a, :Bank6
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_1AD9F
 	ld de, $4400
@@ -11782,7 +11782,7 @@ _LABEL_589F:
 	ld (_RAM_C4CE), a
 	ld a, $05
 	ld (_RAM_C4C0), a
-	ld a, $06
+	ld a, :Bank6
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_1B418
 	ld de, $5A00
@@ -11800,7 +11800,7 @@ _LABEL_58B7:
 	call _LABEL_302
 	ld bc, $FF0A
 	call _LABEL_302
-	ld a, $03
+	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	call _LABEL_C989
 	ld a, $01
@@ -11819,7 +11819,7 @@ _LABEL_58B7:
 	ld a, $D0
 	ld (_RAM_C300), a
 	call _LABEL_316
-	ld a, $0E
+	ld a, :Bank14
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_3ADF1
 	ld de, $4400
@@ -11935,7 +11935,7 @@ _LABEL_59CF:
 	ld a, $D0
 	ld (_RAM_C300), a
 	call _LABEL_316
-	ld a, $03
+	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	call _LABEL_C989
 	ld a, $86
@@ -12008,7 +12008,7 @@ _LABEL_59CF:
 	inc hl
 	ld h, (hl)
 	ld l, a
-	ld a, $0F
+	ld a, :Bank15
 	ld (_RAM_FFFF), a
 	push bc
 	push de
@@ -12018,7 +12018,7 @@ _LABEL_59CF:
 	ld de, $6800
 	call _LABEL_1DC8
 	pop bc
-	ld a, $0C
+	ld a, :Bank12
 	ld (_RAM_FFFF), a
 	ld h, b
 	ld l, c
@@ -12069,7 +12069,7 @@ _LABEL_5ADA:
 	jp z, _LABEL_5AC4
 	ld hl, _DATA_2624D
 	ld bc, $0000
-	ld a, $09
+	ld a, :Bank9
 	ld e, $2B
 	jp _LABEL_5BF6
 
@@ -12086,7 +12086,7 @@ _LABEL_5AFA:
 	ld (hl), $01
 	ld hl, _DATA_26E3E
 	ld bc, $0000
-	ld a, $09
+	ld a, :Bank9
 	ld e, $37
 	jp _LABEL_5BF6
 
@@ -12097,7 +12097,7 @@ _LABEL_5B1C:
 	jp nz, _LABEL_5AC4
 	ld hl, _DATA_1C000
 	ld bc, $0000
-	ld a, $07
+	ld a, :Bank7
 	ld e, $36
 	call _LABEL_5BF6
 	ld hl, _DATA_5B54
@@ -12130,7 +12130,7 @@ _LABEL_5B59:
 	jp z, _LABEL_5AC4
 	ld hl, _DATA_1D1AC
 	ld bc, $6484
-	ld a, $07
+	ld a, :Bank7
 	ld e, $2E
 	jp _LABEL_5BF6
 
@@ -12144,7 +12144,7 @@ _LABEL_5B74:
 	jp z, _LABEL_5AC4
 	ld hl, _DATA_25AF3
 	ld bc, $4E6E
-	ld a, $09
+	ld a, :Bank9
 	ld e, $3A
 	jp _LABEL_5BF6
 
@@ -12155,7 +12155,7 @@ _LABEL_5B8F:
 	jr nz, +
 	ld hl, _DATA_24717
 	ld bc, $0000
-	ld a, $09
+	ld a, :Bank9
 	ld e, $34
 	jp _LABEL_5BF6
 
@@ -12176,14 +12176,14 @@ _LABEL_5BA8:
 	ld de, $C018
 	ld bc, $0005
 	call _LABEL_346
-	ld a, $03
+	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_EDAC
 	ld de, $5F80
 	call _LABEL_1DC8
 	ld hl, _DATA_29FDA
 	ld bc, $5C7C
-	ld a, $0A
+	ld a, :Bank10
 	ld e, $30
 	jp _LABEL_5BF6
 
@@ -12198,7 +12198,7 @@ _LABEL_5BE2:
 	jp nz, _LABEL_5AC4
 	ld hl, _DATA_2AF80
 	ld bc, $609E
-	ld a, $0A
+	ld a, :Bank10
 	ld e, $42
 	jp _LABEL_5BF6
 
@@ -12443,7 +12443,7 @@ _LABEL_5D59:
 _LABEL_5DA6:
 	ld bc, $8201
 	call _LABEL_302
-	ld a, $03
+	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	call _LABEL_C9C8
 	ld iy, _RAM_C400
@@ -12478,7 +12478,7 @@ _LABEL_5DA6:
 	jr z, +
 	ld hl, _DATA_2A731
 	ld bc, $5676
-	ld a, $0A
+	ld a, :Bank10
 	ld e, $33
 +:
 	call _LABEL_5BF6
@@ -13837,7 +13837,7 @@ _LABEL_69D4:
 	ld (_RAM_C175), a
 	ld a, $93
 	ld (_RAM_DE04), a
-	ld a, $03
+	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_EF22
 	ld de, $7838
@@ -14014,12 +14014,12 @@ _LABEL_6B3F:
 	ld (_RAM_C172), a
 	ld a, $82
 	ld (_RAM_DE04), a
-	ld a, $06
+	ld a, :Bank6
 	ld (_RAM_FFFF), a
-	ld hl, _DATA_1806A
+	ld hl, _DATA_COMPRESSED_FONT_TILES_
 	ld de, $4400
 	call _LABEL_1E25
-	ld a, $0F
+	ld a, :Bank15
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_3FF8F
 	ld de, $53E0
@@ -14031,7 +14031,7 @@ _LABEL_6B3F:
 	ld de, $7800
 	ld a, $20
 	call _LABEL_1E9A
-	ld a, $05
+	ld a, :Bank5
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_16A89
 	ld de, $78CA
@@ -14050,7 +14050,7 @@ _DATA_6BBA:
 _LABEL_6BDA:
 	ld a, $02
 	ld (_RAM_C172), a
-	ld a, $05
+	ld a, :Bank5
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_16C23
 	ld de, $78CA
@@ -14182,23 +14182,23 @@ _LABEL_6E95:
 	ld (_RAM_C180), a
 	ld a, $88
 	ld (_RAM_DE04), a
-	ld a, $0F
+	ld a, :Bank15
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_3F49C
 	ld de, $53E0
 	call _LABEL_1DC8
-	ld a, $0B
+	ld a, :Bank11
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_2FA57
 	ld de, $7800
 	ld a, $20
 	call _LABEL_1E9A
-	ld a, $06
+	ld a, :Bank6
 	ld (_RAM_FFFF), a
-	ld hl, _DATA_1806A
+	ld hl, _DATA_COMPRESSED_FONT_TILES_
 	ld de, $4400
 	call _LABEL_1E25
-	ld a, $0B
+	ld a, :Bank11
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_2F83D
 	ld de, $4000
@@ -14227,7 +14227,7 @@ _LABEL_6F08:
 	jp z, +
 	ld bc, $8001
 	call _LABEL_302
-	ld a, $0B
+	ld a, :Bank11
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_70D3
 	ld de, $7C4C
@@ -14294,7 +14294,7 @@ _LABEL_6F08:
 	ld d, $00
 	ld hl, _DATA_702F
 	add hl, de
-	ld a, $05
+	ld a, :Bank5
 	ld (_RAM_FFFF), a
 	ld a, (hl)
 	inc hl
@@ -14450,6 +14450,7 @@ _DATA_7F60:
 
 .BANK 2
 .ORG $0000
+Bank2:
 
 ; Pointer Table from 8000 to 800D (7 entries, indexed by unknown)
 _DATA_8000:
@@ -15380,6 +15381,7 @@ _DATA_B801:
 
 .BANK 3
 .ORG $0000
+Bank3:
 
 _LABEL_C000:
 	exx
@@ -18578,6 +18580,7 @@ _DATA_EF3D:
 
 .BANK 4
 .ORG $0000
+Bank4:
 
 ; Data from 10000 to 10007 (8 bytes)
 .db $00 $00 $00 $1E $1E $1E $7F $7F
@@ -18644,6 +18647,7 @@ _DATA_137E0:
 
 .BANK 5
 .ORG $0000
+Bank5:
 
 ; Pointer Table from 14000 to 14027 (20 entries, indexed by _RAM_MOVEMENT_STATE)
 _DATA_14000:
@@ -18861,6 +18865,7 @@ _DATA_16DC2:
 
 .BANK 6
 .ORG $0000
+Bank6:
 
 ; Data from 18000 to 18007 (8 bytes)
 .db $2E $A0 $6D $A0 $EF $A0 $28 $A1
@@ -18877,7 +18882,7 @@ _DATA_18008:
 .db $8B $AB
 
 ; Data from 1806A to 18226 (445 bytes)
-_DATA_1806A:
+_DATA_COMPRESSED_FONT_TILES_:
 .db $20 $00 $04 $38 $04 $6C $08 $C6 $04 $FE $08 $C6 $04 $00 $04 $FC
 .db $08 $C6 $04 $FC $08 $C6 $04 $FC $04 $00 $04 $3C $04 $66 $0C $C0
 .db $04 $66 $04 $3C $04 $00 $04 $F8 $04 $CC $0C $C6 $04 $CC $04 $F8
@@ -19439,6 +19444,7 @@ _DATA_1B418:
 
 .BANK 7
 .ORG $0000
+Bank7:
 
 ; Data from 1C000 to 1D1AB (4524 bytes)
 _DATA_1C000:
@@ -19454,6 +19460,7 @@ _DATA_1DBAF:
 
 .BANK 8
 .ORG $0000
+Bank8:
 
 ; Data from 20000 to 204F3 (1268 bytes)
 .incbin "banks\lots_DATA_20000.inc"
@@ -19486,6 +19493,7 @@ _DATA_21268:
 
 .BANK 9
 .ORG $0000
+Bank9:
 
 ; Data from 24000 to 24716 (1815 bytes)
 .incbin "banks\lots_DATA_24000.inc"
@@ -19512,6 +19520,7 @@ _DATA_26E3E:
 
 .BANK 10
 .ORG $0000
+Bank10:
 
 ; 95th entry of Pointer Table from 28FA8 (indexed by _RAM_CURRENT_MAP)
 ; Data from 28000 to 28005 (6 bytes)
@@ -20485,6 +20494,7 @@ _DATA_2B028:
 
 .BANK 11
 .ORG $0000
+Bank11:
 
 ; 2nd entry of Pointer Table from 5546 (indexed by _RAM_CURRENT_MAP)
 ; Data from 2C000 to 2C00B (12 bytes)
@@ -20974,12 +20984,14 @@ _DATA_2FCA3:
 
 .BANK 12
 .ORG $0000
+Bank12:
 
 ; Data from 30000 to 33FFF (16384 bytes)
 .incbin "banks\lots_DATA_30000.inc"
 
 .BANK 13
 .ORG $0000
+Bank13:
 
 ; 1st entry of Pointer Table from 5520 (indexed by _RAM_C118)
 ; Data from 34000 to 34287 (648 bytes)
@@ -21366,6 +21378,7 @@ _DATA_36C9B:
 
 .BANK 14
 .ORG $0000
+Bank14:
 
 ; Data from 38000 to 3AABB (10940 bytes)
 .incbin "banks\lots_DATA_38000.inc"
@@ -21434,6 +21447,7 @@ _DATA_3ADF1:
 
 .BANK 15
 .ORG $0000
+Bank15:
 
 ; Data from 3C000 to 3C001 (2 bytes)
 .db $21 $01
