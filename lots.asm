@@ -8,6 +8,7 @@ SLOTSIZE $4000
 SLOT 2 $8000
 DEFAULTSLOT 2
 .ENDME
+
 .ROMBANKMAP
 BANKSTOTAL 16
 BANKSIZE $7FF0
@@ -17,6 +18,8 @@ BANKS 1
 BANKSIZE $4000
 BANKS 14
 .ENDRO
+
+.EMPTYFILL $FF
 
 .enum $C000 export
 _RAM_C000 db
@@ -46,8 +49,8 @@ _RAM_C0A2 db
 
 .enum $C0A4 export
 _RAM_C0A4 db
-_RAM_C0A5 db
-_RAM_C0A6 db
+_RAM_CONTROLLER_INPUT db
+_RAM_NEW_CONTROLLER_INPUT db
 _RAM_C0A7 db
 _RAM_C0A8 dw
 _RAM_C0AA dw
@@ -1142,7 +1145,7 @@ _LABEL_2AA:
 	ld a, (_RAM_MAP_STATUS)
 	cp $04
 	jr z, +
-	ld hl, _RAM_C0A5
+	ld hl, _RAM_CONTROLLER_INPUT
 	in a, (Port_IOPort1)
 	or $C0
 -:
@@ -1173,14 +1176,14 @@ _LABEL_2AA:
 	ld de, _DATA_6C95
 	add hl, de
 	ld a, (hl)
-	ld hl, _RAM_C0A5
+	ld hl, _RAM_CONTROLLER_INPUT
 	jr -
 
 _LABEL_2E5:
 	ld a, (_RAM_C108)
 	cp $02
 	jr z, +
-	ld a, (_RAM_C0A6)
+	ld a, (_RAM_NEW_CONTROLLER_INPUT)
 	and $30
 	jr nz, ++
 +:
@@ -1573,10 +1576,10 @@ _LABEL_508:
 	jp _LABEL_F7
 
 _LABEL_56F:
-	ld a, (_RAM_C0A6)
+	ld a, (_RAM_NEW_CONTROLLER_INPUT)
 	and $30
 	jr nz, ++
-	ld a, (_RAM_C0A6)
+	ld a, (_RAM_NEW_CONTROLLER_INPUT)
 	ld c, a
 	bit 0, c
 	call nz, _LABEL_5F8
@@ -1708,7 +1711,7 @@ _LABEL_635:
 	jp _LABEL_F7
 
 +:
-	ld a, (_RAM_C0A6)
+	ld a, (_RAM_NEW_CONTROLLER_INPUT)
 	and $30
 	jr nz, +
 	ld hl, _RAM_C177
@@ -2841,7 +2844,7 @@ _LABEL_FC1:
 	ld hl, $FF00
 	ld (_RAM_C413), hl
 	ld (iy+21), h
-	ld a, (_RAM_C0A5)
+	ld a, (_RAM_CONTROLLER_INPUT)
 	bit 2, a
 	jp nz, _LABEL_1071
 	bit 3, a
@@ -2853,17 +2856,17 @@ _LABEL_FC1:
 	call _LABEL_15CA
 	ld c, $04
 	jr nc, +
-	ld a, (_RAM_C0A6)
-	ld c, $0A
+	ld a, (_RAM_NEW_CONTROLLER_INPUT)
+	ld c, $0A ; BOW L?
 	bit 4, a
 	jr nz, +
-	ld c, $08
+	ld c, $08 ; SWORD L?
 	bit 5, a
 	jr nz, +
-	ld c, $02
+	ld c, $02 ; JUMPING L?
 	rrca
 	jr c, +
-	ld c, $06
+	ld c, $06 ; CROUCHING L?
 	rrca
 	jr c, +
 	xor a
@@ -2891,7 +2894,7 @@ _LABEL_101D:
 	ld hl, $0100
 	ld (_RAM_C413), hl
 	ld (iy+21), l
-	ld a, (_RAM_C0A5)
+	ld a, (_RAM_CONTROLLER_INPUT)
 	bit 3, a
 	jp nz, _LABEL_1071
 	bit 2, a
@@ -2903,17 +2906,17 @@ _LABEL_101D:
 	call _LABEL_15CA
 	ld c, $05
 	jr nc, +
-	ld a, (_RAM_C0A6)
-	ld c, $0B
+	ld a, (_RAM_NEW_CONTROLLER_INPUT)
+	ld c, $0B ; BOW R?
 	bit 4, a
 	jr nz, +
-	ld c, $09
+	ld c, $09 ; SWORD R?
 	bit 5, a
 	jr nz, +
-	ld c, $03
+	ld c, $03 ; JUMPING R?
 	rrca
 	jr c, +
-	ld c, $07
+	ld c, $07 ; CROUCHING R?
 	rrca
 	jr c, +
 	xor a
@@ -3027,8 +3030,8 @@ _LABEL_1112:
 	or a
 	jr z, -
 	ld c, $00
-	ld a, (_RAM_C0A5)
-	bit 1, a
+	ld a, (_RAM_CONTROLLER_INPUT)
+	bit 1, a ; DPAD_UP Uncrouch?
 	jp z, _LABEL_1096
 	ld c, $07
 	bit 3, a
@@ -3047,8 +3050,8 @@ _LABEL_1136:
 	or a
 	jr z, -
 	ld c, $01
-	ld a, (_RAM_C0A5)
-	bit 1, a
+	ld a, (_RAM_CONTROLLER_INPUT)
+	bit 1, a ; DPAD_UP Uncrouch?
 	jp z, _LABEL_1096
 	ld c, $06
 	bit 2, a
@@ -3056,10 +3059,10 @@ _LABEL_1136:
 	ld c, $0D
 	ld b, $13
 +:
-	ld a, (_RAM_C0A6)
+	ld a, (_RAM_NEW_CONTROLLER_INPUT)
 	bit 4, a
 	jp nz, +
-	bit 5, a
+	bit 5, a ; SWORD CROUCH
 	ret z
 	ld c, b
 +:
@@ -3119,11 +3122,11 @@ _LABEL_117F:
 	ret
 
 ++:
-	ld a, (_RAM_C0A5)
-	bit 5, a
+	ld a, (_RAM_CONTROLLER_INPUT)
+	bit 5, a ; UNKNOWN DPAD/BUTTON2
 	jr z, _LABEL_1220
-	ld a, (_RAM_C0A5)
-	bit 1, a
+	ld a, (_RAM_CONTROLLER_INPUT)
+	bit 1, a ; UNKNOWN DPAD/BUTTON2
 	jp nz, +
 	ld a, (_RAM_C423)
 	or a
@@ -3162,11 +3165,11 @@ _LABEL_1220:
 	ret
 
 _LABEL_1222:
-	ld a, (_RAM_C0A6)
-	bit 5, a
+	ld a, (_RAM_NEW_CONTROLLER_INPUT)
+	bit 5, a ; UNKNOWN BUTTON 2
 	jr z, +++
 	ld (iy+38), $01
-	ld a, (_RAM_C0A5)
+	ld a, (_RAM_CONTROLLER_INPUT)
 	ld bc, $1208
 	bit 2, a
 	jr nz, +
@@ -3232,7 +3235,7 @@ _LABEL_1265:
 	ld a, (_RAM_C427)
 	or a
 	jp z, _LABEL_14D8
-	ld a, (_RAM_C0A5)
+	ld a, (_RAM_CONTROLLER_INPUT)
 	bit 4, a
 	ret nz
 	ld (iy+39), $00
@@ -3241,8 +3244,8 @@ _LABEL_1265:
 ++:
 	bit 0, (iy+35)
 	jp nz, +
-	ld a, (_RAM_C0A5)
-	bit 1, a
+	ld a, (_RAM_CONTROLLER_INPUT)
+	bit 1, a ; DPAD DOWN: Uncrouch from bow ready?
 	ret z
 	set 0, (iy+35)
 	ld (iy+33), e
@@ -3250,8 +3253,8 @@ _LABEL_1265:
 
 +:
 	ld c, b
-	ld a, (_RAM_C0A5)
-	bit 1, a
+	ld a, (_RAM_CONTROLLER_INPUT)
+	bit 1, a ; DPAD DOWN: Uncrouch from bow ready?
 	ret nz
 	res 0, (iy+35)
 	ld (iy+33), d
@@ -3261,7 +3264,7 @@ _LABEL_12DE:
 	ld c, (iy+1)
 	bit 0, c
 	jp nz, +
-	ld a, (_RAM_C0A5)
+	ld a, (_RAM_CONTROLLER_INPUT)
 	bit 3, a
 	ret z
 	inc (iy+33)
@@ -3269,7 +3272,7 @@ _LABEL_12DE:
 	jp _LABEL_1096
 
 +:
-	ld a, (_RAM_C0A5)
+	ld a, (_RAM_CONTROLLER_INPUT)
 	bit 2, a
 	ret z
 	dec (iy+33)
@@ -3416,7 +3419,7 @@ _LABEL_1429:
 	jp _LABEL_13DF
 
 _LABEL_142F:
-	ld a, (_RAM_C0A6)
+	ld a, (_RAM_NEW_CONTROLLER_INPUT)
 	bit 5, a
 	jr nz, +
 	xor a
@@ -3538,7 +3541,7 @@ _LABEL_14F8:
 	jp _LABEL_316
 
 _LABEL_1521:
-	ld a, (_RAM_C0A5)
+	ld a, (_RAM_CONTROLLER_INPUT)
 	bit 2, a
 	jr nz, +
 	bit 3, a
@@ -3559,7 +3562,7 @@ _LABEL_1521:
 	jp _LABEL_1569
 
 _LABEL_1545:
-	ld a, (_RAM_C0A5)
+	ld a, (_RAM_CONTROLLER_INPUT)
 	bit 3, a
 	jr nz, +
 	bit 2, a
@@ -4721,7 +4724,7 @@ _LABEL_1D0B:
 	ld (_RAM_C429), a
 	ld a, $08
 	ld (_RAM_C42A), a
-	ld a, $10
+	ld a, $10 ; MOVEMENT_STATE_DAMAGED
 	ld (_RAM_MOVEMENT_STATE), a
 	ld a, $01
 	ld (_RAM_RECOVERY_STATUS), a
@@ -5105,7 +5108,7 @@ _LABEL_1FEA:
 	jp ++
 
 +:
-	ld a, (_RAM_C0A6)
+	ld a, (_RAM_NEW_CONTROLLER_INPUT)
 	and $30
 	ret z
 	ld a, $02
@@ -6914,7 +6917,7 @@ _LABEL_2D88:
 	ld a, (_RAM_C422)
 	or a
 	jr nz, +
-	ld a, (_RAM_C0A5)
+	ld a, (_RAM_CONTROLLER_INPUT)
 	ld b, $F4
 	bit 1, a
 	jr nz, ++
@@ -11563,8 +11566,8 @@ _LABEL_5654:
 	ld a, (_RAM_C118)
 	cp $07
 	jp nz, +
-	ld a, (_RAM_C0A5)
-	bit 0, a
+	ld a, (_RAM_CONTROLLER_INPUT)
+	bit 0, a ; DPAD UP - Enter Door
 	jr z, +
 	ld iy, _RAM_C400
 	ld de, $F000
@@ -14158,7 +14161,7 @@ _LABEL_6BDA:
 	jp _LABEL_302
 
 _LABEL_6C0B:
-	ld a, (_RAM_C0A6)
+	ld a, (_RAM_NEW_CONTROLLER_INPUT)
 	and $30
 	jp nz, +
 	ld hl, (_RAM_C173)
