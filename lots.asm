@@ -23,11 +23,6 @@ BANKS 14
 
 .enum $C000 export
 _RAM_C000 db
-_RAM_C001 db
-.ende
-
-.enum $C080 export
-_RAM_C080 db
 .ende
 
 .enum $C093 export
@@ -67,10 +62,6 @@ _RAM_C0B6 dw
 _RAM_C0B8 dw
 _RAM_C0BA dw
 _RAM_C0BC db
-.ende
-
-.enum $C0C0 export
-_RAM_C0C0 db
 .ende
 
 .enum $C100 export
@@ -675,90 +666,6 @@ _RAM_DECE db
 _RAM_DEEE db
 .ende
 
-.enum $E024 export
-_RAM_E024 db
-.ende
-
-.enum $E062 export
-_RAM_E062 db
-.ende
-
-.enum $E0FF export
-_RAM_E0FF db
-.ende
-
-.enum $E854 export
-_RAM_E854 db
-.ende
-
-.enum $F0F8 export
-_RAM_F0F8 db
-.ende
-
-.enum $F801 export
-_RAM_F801 db
-.ende
-
-.enum $F807 export
-_RAM_F807 db
-.ende
-
-.enum $FB40 export
-_RAM_FB40 db
-.ende
-
-.enum $FB98 export
-_RAM_FB98 db
-.ende
-
-.enum $FBB0 export
-_RAM_FBB0 db
-.ende
-
-.enum $FBD0 export
-_RAM_FBD0 db
-.ende
-
-.enum $FC10 export
-_RAM_FC10 db
-.ende
-
-.enum $FC18 export
-_RAM_FC18 db
-.ende
-
-.enum $FC50 export
-_RAM_FC50 db
-.ende
-
-.enum $FD00 export
-_RAM_FD00 db
-.ende
-
-.enum $FDF0 export
-_RAM_FDF0 db
-.ende
-
-.enum $FE80 export
-_RAM_FE80 db
-.ende
-
-.enum $FE90 export
-_RAM_FE90 db
-.ende
-
-.enum $FEC0 export
-_RAM_FEC0 db
-.ende
-
-.enum $FED0 export
-_RAM_FED0 db
-.ende
-
-.enum $FEF0 export
-_RAM_FEF0 db
-.ende
-
 .enum $FFFB export
 _RAM_FFFB db
 _RAM_FFFC db
@@ -816,7 +723,7 @@ _DATA_15:
 _DATA_30:
 .db $FF $FF $FF $FF $FF $FF $FF $FF
 
-_LABEL_38:
+_IRQ_HANDLER:
 	jp _LABEL_125
 
 ; Data from 3B to 3F (5 bytes)
@@ -835,7 +742,7 @@ _DATA_53:
 _DATA_63:
 .db $FF $FF $FF
 
-_LABEL_66:
+_NMI_HANDLER:
 	push af
 	ld a, (_RAM_C118)
 	cp $07
@@ -8802,7 +8709,7 @@ _LABEL_3EFC:
 	ld (_RAM_C503), a
 	ld a, $06
 	ld (_RAM_C538), a
-	ld a, $14
+	ld a, $14 ; TREE BOSS NAMO HEALTH
 	ld (_RAM_C534), a
 	ret
 
@@ -14546,7 +14453,7 @@ _DATA_7F60:
 
 ; Pointer Table from 8000 to 800D (7 entries, indexed by unknown)
 _DATA_8000:
-.dw _DATA_18008 _DATA_18008 _DATA_18008 _DATA_18008 _RAM_F801 _RAM_FFFC _DATA_1900
+.dw _DATA_18008 _DATA_18008 _DATA_18008 _DATA_18008 $F801 _RAM_FFFC _DATA_1900
 
 ; Data from 800E to 804E (65 bytes)
 .db $80 $36 $80 $36 $80 $19 $80 $36 $80 $36 $80 $07 $D0 $FC $FF $02
@@ -18690,25 +18597,25 @@ _DATA_10008:
 .dw _DATA_10080
 
 ; Pointer Table from 10044 to 10045 (1 entries, indexed by _RAM_C40E)
-.dw _RAM_C080
+.dw $C080
 
 ; Pointer Table from 10046 to 10047 (1 entries, indexed by _RAM_C40E)
-.dw _RAM_C0C0
+.dw $C0C0
 
 ; Pointer Table from 10048 to 10049 (1 entries, indexed by _RAM_C40E)
-.dw _RAM_C0C0
+.dw $C0C0
 
 ; Pointer Table from 1004A to 1004B (1 entries, indexed by _RAM_C40E)
-.dw _RAM_C0C0
+.dw $C0C0
 
 ; Pointer Table from 1004C to 10053 (4 entries, indexed by _RAM_C40E)
-.dw _RAM_C0C0 _RAM_E062 _RAM_C4E0 _RAM_E024
+.dw $C0C0 $E062 _RAM_C4E0 $E024
 
 ; Data from 10054 to 1005B (8 bytes)
 .db $EA $18 $F8 $E4 $1C $F0 $E8 $1C
 
 ; Pointer Table from 1005C to 1005F (2 entries, indexed by _RAM_C40E)
-.dw _RAM_F0F8 _DATA_10008
+.dw $F0F8 _DATA_10008
 
 ; Data from 10060 to 1007F (32 bytes)
 .db $59 $26 $3E $5C $23 $3F $1E $21 $3F $2E $11 $1F $2C $13 $1F $20
@@ -18726,7 +18633,7 @@ _DATA_10080:
 .db $BE $41 $7F $9F
 
 ; Pointer Table from 10088 to 1008D (3 entries, indexed by _RAM_C40E)
-.dw _DATA_7F60 _RAM_F807 _RAM_E0FF
+.dw _DATA_7F60 $F807 $E0FF
 
 ; Data from 1008E to 137DF (14162 bytes)
 .incbin "banks\lots_DATA_1008E.inc"
@@ -19961,7 +19868,7 @@ _DATA_28717:
 .db $10 $1F $70 $F0 $FB $00
 
 ; Pointer Table from 2871D to 28720 (2 entries, indexed by unknown)
-.dw _DATA_2A81A _RAM_FB40
+.dw _DATA_2A81A $FB40
 
 ; Data from 28721 to 28769 (73 bytes)
 .db $00 $12 $30 $E0 $FB $00 $12 $50 $B8 $FC $00 $12 $50 $90 $FC $00
@@ -19976,7 +19883,7 @@ _DATA_2876A:
 .db $10 $12 $30 $50 $FB $00
 
 ; Pointer Table from 28770 to 28773 (2 entries, indexed by unknown)
-.dw $9014 _RAM_FC10
+.dw $9014 $FC10
 
 ; Data from 28774 to 287BC (73 bytes)
 .db $00 $14 $90 $08 $FC $00 $21 $68 $50 $FC $00 $1F $48 $F0 $FC $00
@@ -19991,7 +19898,7 @@ _DATA_287BD:
 .db $0D $1D $40 $90 $FB $00
 
 ; Pointer Table from 287C3 to 287C6 (2 entries, indexed by unknown)
-.dw _DATA_29821 _RAM_FC18
+.dw _DATA_29821 $FC18
 
 ; Data from 287C7 to 28800 (58 bytes)
 .db $00 $14 $C0 $50 $FC $00 $14 $C0 $88 $FC $00 $14 $C0 $C0 $FC $00
@@ -20005,7 +19912,7 @@ _DATA_28801:
 .db $0C $1D $48 $70 $FD $00
 
 ; Pointer Table from 28807 to 2880A (2 entries, indexed by unknown)
-.dw _DATA_2A81A _RAM_FD00
+.dw _DATA_2A81A $FD00
 
 ; Data from 2880B to 28822 (24 bytes)
 .db $00 $1D $48 $48 $FE $00 $1D $60 $80 $FE $01 $21 $A8 $F0 $FE $01
@@ -20031,7 +19938,7 @@ _DATA_2887A:
 .db $09 $1D $48 $60 $FE $00
 
 ; Pointer Table from 28880 to 28883 (2 entries, indexed by unknown)
-.dw _DATA_781F _RAM_FEF0
+.dw _DATA_781F $FEF0
 
 ; Data from 28884 to 288A9 (38 bytes)
 .db $00 $16 $98 $E0 $FE $00 $1A $98 $E0 $FE $00 $1D $48 $80 $FF $00
@@ -20059,7 +19966,7 @@ _DATA_28914:
 .db $0E $1F $80 $20 $FD $00
 
 ; Pointer Table from 2891A to 2891D (2 entries, indexed by unknown)
-.dw _DATA_2A817 _RAM_FDF0
+.dw _DATA_2A817 $FDF0
 
 ; Data from 2891E to 2895C (63 bytes)
 .db $00 $12 $40 $20 $FD $00 $21 $A8 $20 $FE $01 $14 $C0 $40 $FE $00
@@ -20081,7 +19988,7 @@ _DATA_2899C:
 .db $0D $1F $70 $40 $FD $00
 
 ; Pointer Table from 289A2 to 289A5 (2 entries, indexed by unknown)
-.dw _DATA_2A017 _RAM_FDF0
+.dw _DATA_2A017 $FDF0
 
 ; Data from 289A6 to 289DF (58 bytes)
 .db $00 $21 $A0 $C0 $FD $00 $12 $28 $18 $FE $00 $1A $A0 $80 $FD $00
@@ -20095,7 +20002,7 @@ _DATA_289E0:
 .db $0B $1F $88 $50 $FB $00
 
 ; Pointer Table from 289E6 to 289E9 (2 entries, indexed by unknown)
-.dw _DATA_2B028 _RAM_FBD0
+.dw _DATA_2B028 $FBD0
 
 ; Data from 289EA to 28A19 (48 bytes)
 .db $00 $1F $88 $20 $FC $00 $10 $30 $50 $FC $00 $10 $30 $90 $FC $00
@@ -20116,7 +20023,7 @@ _DATA_28A4F:
 .db $0A $25 $B0 $18 $FD $00
 
 ; Pointer Table from 28A55 to 28A58 (2 entries, indexed by unknown)
-.dw $901F _RAM_FDF0
+.dw $901F $FDF0
 
 ; Data from 28A59 to 28A83 (43 bytes)
 .db $00 $1D $48 $10 $FE $00 $25 $B0 $80 $FE $00 $1D $48 $F0 $FE $00
@@ -20129,7 +20036,7 @@ _DATA_28A84:
 .db $10 $24 $90 $B0 $FB $00
 
 ; Pointer Table from 28A8A to 28A8D (2 entries, indexed by unknown)
-.dw _DATA_781F _RAM_FC50
+.dw _DATA_781F $FC50
 
 ; Data from 28A8E to 28AD6 (73 bytes)
 .db $00 $20 $70 $70 $FC $00 $20 $60 $A0 $FC $00 $1F $78 $E0 $FC $00
@@ -20189,7 +20096,7 @@ _DATA_28C3A:
 .db $08 $1F $70 $60 $FE $00
 
 ; Pointer Table from 28C40 to 28C43 (2 entries, indexed by unknown)
-.dw _DATA_2B025 _RAM_FED0
+.dw _DATA_2B025 $FED0
 
 ; Data from 28C44 to 28C64 (33 bytes)
 .db $00 $13 $28 $20 $FF $00 $15 $88 $48 $FF $00 $1F $70 $80 $FF $00
@@ -20209,7 +20116,7 @@ _DATA_28C8B:
 .db $0E $1F $70 $40 $FB $00
 
 ; Pointer Table from 28C91 to 28C96 (3 entries, indexed by unknown)
-.dw _DATA_2A015 _RAM_FBB0 _DATA_1900
+.dw _DATA_2A015 $FBB0 _DATA_1900
 
 ; Data from 28C97 to 28CD3 (61 bytes)
 .db $70 $20 $FC $00 $1F $70 $60 $FC $00 $15 $B0 $80 $FC $00 $18 $88
@@ -20223,7 +20130,7 @@ _DATA_28CD4:
 .db $10 $1F $48 $20 $FB $00
 
 ; Pointer Table from 28CDA to 28CDD (2 entries, indexed by unknown)
-.dw _DATA_29815 _RAM_FB98
+.dw _DATA_29815 $FB98
 
 ; Data from 28CDE to 28D26 (73 bytes)
 .db $00 $23 $50 $10 $FC $00 $15 $A8 $B8 $FC $00 $1F $70 $E0 $FC $00
@@ -20252,7 +20159,7 @@ _DATA_28D7D:
 .db $0C $12 $40 $10 $FE $00
 
 ; Pointer Table from 28D83 to 28D86 (2 entries, indexed by unknown)
-.dw $9023 _RAM_FE80
+.dw $9023 $FE80
 
 ; Data from 28D87 to 28DBB (53 bytes)
 .db $00 $1F $78 $F8 $FE $00 $12 $30 $10 $FF $00 $23 $90 $10 $FF $00
@@ -20266,7 +20173,7 @@ _DATA_28DBC:
 .db $0B $1F $40 $10 $FE $00
 
 ; Pointer Table from 28DC2 to 28DC5 (2 entries, indexed by unknown)
-.dw _DATA_7815 _RAM_FEC0
+.dw _DATA_7815 $FEC0
 
 ; Data from 28DC6 to 28DF5 (48 bytes)
 .db $00 $13 $40 $40 $FE $00 $13 $40 $20 $FF $00 $18 $80 $88 $FF $00
@@ -20329,7 +20236,7 @@ _DATA_28F6B:
 .db $0C $20 $30 $78 $FE $00
 
 ; Pointer Table from 28F71 to 28F74 (2 entries, indexed by unknown)
-.dw _DATA_2981B _RAM_FE90
+.dw _DATA_2981B $FE90
 
 ; Data from 28F75 to 28FA7 (51 bytes)
 .db $00 $11 $98 $90 $FE $00 $1F $90 $08 $FF $00 $10 $70 $28 $FF $00
