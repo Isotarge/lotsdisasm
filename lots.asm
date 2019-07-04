@@ -564,9 +564,9 @@ _RAM_CCA4 db
 .enum $CCA8 export
 _RAM_SWORD_DAMAGE db
 _RAM_BOW_DAMAGE db
-_RAM_CCAA db
-_RAM_CCAB db
-_RAM_CCAC db
+_RAM_INVENTORY_BOOK db
+_RAM_INVENTORY_TREE_LIMB db
+_RAM_INVENTORY_HERB db
 _RAM_CCAD db
 _RAM_CONTINUE_MAP db
 _RAM_CONTINUES_USED db
@@ -1602,7 +1602,7 @@ _LABEL_635:
 	ld a, :Bank2
 	ld (_RAM_FFFF), a
 	call _LABEL_3C2
-	ld hl, _DATA_B603
+	ld hl, _DATA_SEGA_LOGO_TILES_
 	ld de, $4000
 	call _LABEL_1DC8
 	ld hl, _DATA_B801
@@ -2004,7 +2004,7 @@ _LABEL_9DC:
 	ld hl, _DATA_ED05
 	ld de, $42C0
 	call _LABEL_1DC8
-	ld hl, _DATA_EAED
+	ld hl, _DATA_COMPRESSED_HUD_TILES_
 	ld de, $6000
 	call _LABEL_1DC8
 _LABEL_9F3:
@@ -4656,14 +4656,14 @@ _LABEL_1D0B:
 	ld a, (iy+56)
 	or a
 	ret z
-	ld a, (_RAM_CCAA)
+	ld a, (_RAM_INVENTORY_BOOK)
 	or a
 	ret z
 	ld a, $01
 	ld (iy+29), a
 	ld (_RAM_C16D), a
 	xor a
-	ld (_RAM_CCAA), a
+	ld (_RAM_INVENTORY_BOOK), a
 	ld (_RAM_CCAD), a
 	ld (_RAM_C178), a
 	ld a, $93
@@ -5133,7 +5133,7 @@ _LABEL_20A2:
 	cp $13
 	ret nz
 	ld a, $01
-	ld (_RAM_CCAC), a
+	ld (_RAM_INVENTORY_HERB), a
 	ld (_RAM_C16D), a
 	ld a, $93
 	ld (_RAM_DE04), a
@@ -5141,7 +5141,7 @@ _LABEL_20A2:
 
 +:
 	ld a, $01
-	ld (_RAM_CCAA), a
+	ld (_RAM_INVENTORY_BOOK), a
 	ld (_RAM_CCAD), a
 	ld (_RAM_C16D), a
 	ld a, $93
@@ -5239,15 +5239,15 @@ _LABEL_218C:
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_EF2B
 	ld de, $782C
-	ld a, (_RAM_CCAA)
+	ld a, (_RAM_INVENTORY_BOOK)
 	call +
 	ld hl, _DATA_EF3D
 	ld de, $7832
-	ld a, (_RAM_CCAB)
+	ld a, (_RAM_INVENTORY_TREE_LIMB)
 	call +
 	ld hl, _DATA_EF34
 	ld de, $7838
-	ld a, (_RAM_CCAC)
+	ld a, (_RAM_INVENTORY_HERB)
 +:
 	or a
 	jr z, +
@@ -5452,7 +5452,7 @@ _LABEL_230B:
 +:
 	ld a, $01
 	ld (_RAM_CC12), a
-	ld (_RAM_CCAA), a
+	ld (_RAM_INVENTORY_BOOK), a
 	ld (_RAM_CCAD), a
 	ld (_RAM_C16D), a
 	ld b, $08
@@ -5652,7 +5652,7 @@ _LABEL_2430:
 	ld a, $02
 	ld (_RAM_CCAD), a
 	xor a
-	ld (_RAM_CCAA), a
+	ld (_RAM_INVENTORY_BOOK), a
 	ret
 
 _LABEL_2444:
@@ -5684,7 +5684,7 @@ _LABEL_2459:
 	ld a, $01
 	ld (_RAM_CC17), a
 	ld (_RAM_C16D), a
-	ld (_RAM_CCAC), a
+	ld (_RAM_INVENTORY_HERB), a
 	ret
 
 _LABEL_247F:
@@ -8615,7 +8615,7 @@ _LABEL_3DF2:
 	or a
 	jr z, +
 	ld a, $01
-	ld (_RAM_CCAA), a
+	ld (_RAM_INVENTORY_BOOK), a
 	ld (_RAM_CCAD), a
 	ld (_RAM_C16D), a
 	ld a, $93
@@ -12109,7 +12109,7 @@ _LABEL_5B1C:
 	ld a, (_RAM_CC19)
 	or a
 	jp z, _LABEL_5AC4
-	ld a, (_RAM_CCAC)
+	ld a, (_RAM_INVENTORY_HERB)
 	or a
 	jp z, _LABEL_5AC4
 	xor a
@@ -12281,7 +12281,7 @@ _LABEL_5C72:
 	ld (_RAM_CC49), a
 	ld (_RAM_CC4A), a
 	ld (_RAM_CC4B), a
-	ld a, (_RAM_CCAA)
+	ld a, (_RAM_INVENTORY_BOOK)
 	or a
 	jp z, _LABEL_5D42
 	ld a, $0A
@@ -13814,7 +13814,7 @@ _LABEL_69B2:
 	ld c, $0A
 	call _LABEL_175F
 	xor a
-	ld (_RAM_CCAC), a
+	ld (_RAM_INVENTORY_HERB), a
 	jp _LABEL_8AC
 
 _LABEL_69D4:
@@ -13905,7 +13905,7 @@ _LABEL_6A47:
 	ld a, $01
 	ld (_RAM_CC14), a
 	ld (_RAM_C16D), a
-	ld (_RAM_CCAB), a
+	ld (_RAM_INVENTORY_TREE_LIMB), a
 	ld hl, _RAM_CC00
 	ld c, $04
 	jr _LABEL_6AC2
@@ -15341,7 +15341,7 @@ _DATA_B367:
 .db $F0 $00 $00 $F0 $F0 $08 $00 $F2 $F0 $10 $00 $E8
 
 ; Data from B603 to B800 (510 bytes)
-_DATA_B603:
+_DATA_SEGA_LOGO_TILES_:
 .db $08 $00 $89 $07 $1C $30 $60 $41 $C6 $84 $88 $FF $03 $00 $81 $FF
 .db $03 $00 $89 $E1 $26 $2C $30 $F0 $21 $21 $22 $FF $03 $00 $95 $7F
 .db $80 $00 $00 $F8 $09 $0B $0E $FC $0C $08 $08 $7F $C0 $00 $00 $1F
@@ -18479,7 +18479,7 @@ _DATA_EAE1:
 .db $01 $51 $11 $53 $05 $53 $01 $50 $01 $52 $04 $82
 
 ; Data from EAED to ED04 (536 bytes)
-_DATA_EAED:
+_DATA_COMPRESSED_HUD_TILES_:
 .db $09 $00 $81 $3C $04 $66 $85 $3C $00 $00 $18 $38 $03 $18 $AE $3C
 .db $00 $00 $3C $66 $66 $0C $30 $7E $00 $00 $3C $66 $0C $06 $66 $3C
 .db $00 $00 $0C $1C $2C $4C $7E $0C $00 $00 $7C $60 $7C $06 $66 $3C
