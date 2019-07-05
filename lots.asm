@@ -200,8 +200,8 @@ _RAM_MOVEMENT_STATE db
 _RAM_C402 db
 _RAM_C403 db
 _RAM_C404 dw
-_RAM_C406 db
-_RAM_C407 db
+_RAM_Y_POSITION_SUB db
+_RAM_Y_POSITION_MINOR db
 .ende
 
 .enum $C409 export
@@ -1956,7 +1956,7 @@ _LABEL_946:
 	ld a, $01
 	ld (_RAM_C400), a
 	ld a, $A0
-	ld (_RAM_C407), a
+	ld (_RAM_Y_POSITION_MINOR), a
 	ld a, $80
 	ld (_RAM_X_POSITION_MINOR), a
 	ld de, $4000
@@ -3291,12 +3291,12 @@ _LABEL_13A2:
 	jr nz, +
 	ld (iy+1), c
 	ld (iy+2), $00
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	and $F8
-	ld (_RAM_C407), a
+	ld (_RAM_Y_POSITION_MINOR), a
 	xor a
 	ld (_RAM_C422), a
-	ld (_RAM_C406), a
+	ld (_RAM_Y_POSITION_SUB), a
 	ld (_RAM_C425), a
 _LABEL_13DF:
 	xor a
@@ -3307,12 +3307,12 @@ _LABEL_13DF:
 	ret
 
 +:
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	and $F8
-	ld (_RAM_C407), a
+	ld (_RAM_Y_POSITION_MINOR), a
 	xor a
 	ld (_RAM_C422), a
-	ld (_RAM_C406), a
+	ld (_RAM_Y_POSITION_SUB), a
 	ret
 
 _LABEL_13FD:
@@ -3557,7 +3557,7 @@ _LABEL_1569:
 	ret
 
 _LABEL_15CA:
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	cp $BF
 	jr nc, +
 	ld de, $00F8
@@ -4572,7 +4572,7 @@ _LABEL_1C8C:
 	ld h, a
 	add a, (iy+23)
 	ld l, a
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	add a, (ix+22)
 	ld d, a
 	add a, $18
@@ -4610,7 +4610,7 @@ _LABEL_1D0B:
 	ld h, a
 	add a, (iy+23)
 	ld l, a
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	add a, $E0
 	ld d, a
 	add a, $20
@@ -5992,7 +5992,7 @@ _LABEL_2621:
 	or a
 	ret nz
 	call _LABEL_813
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	ld b, a
 	ld a, (iy+7)
 	add a, $18
@@ -6363,7 +6363,7 @@ _LABEL_2A05:
 	ld a, (iy+39)
 	or a
 	ret nz
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	add a, $E8
 	cp (iy+7)
 	ret nc
@@ -6376,7 +6376,7 @@ _LABEL_2A20:
 	ld a, (iy+43)
 	or a
 	ret nz
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	add a, $E8
 	cp (iy+7)
 	ret nc
@@ -6854,7 +6854,7 @@ _LABEL_2D88:
 	jr z, ++
 	ld b, $E8
 ++:
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	add a, b
 	ld (iy+7), a
 	ret
@@ -11235,7 +11235,7 @@ _LABEL_535B:
 	ld a, $01
 	ld (_RAM_C400), a
 	ld a, (hl)
-	ld (_RAM_C407), a
+	ld (_RAM_Y_POSITION_MINOR), a
 	inc hl
 	ld a, (hl)
 	ld (_RAM_X_POSITION_MINOR), a
@@ -11539,7 +11539,7 @@ _LABEL_5695:
 	cp $FF
 	jr z, +
 	ld c, l
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	cp $78
 	jp c, _LABEL_56C3
 	ld c, h
@@ -11566,7 +11566,7 @@ _LABEL_56C3:
 	ret
 
 _LABEL_56E5:
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	cp $08
 	jp c, +
 	cp $B8
@@ -11655,7 +11655,7 @@ _LABEL_577D:
 	jr z, -
 	cp $40
 	ret nz
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	cp $51
 	ret nc
 	ld a, (_RAM_X_POSITION_MINOR)
@@ -11731,7 +11731,7 @@ _LABEL_5808:
 	ld a, (_RAM_C164)
 	ld (_RAM_X_POSITION_MINOR), a
 	ld a, (_RAM_C165)
-	ld (_RAM_C407), a
+	ld (_RAM_Y_POSITION_MINOR), a
 	ret
 
 _LABEL_5820:
@@ -12005,7 +12005,7 @@ _LABEL_59CF:
 	ld de, $5E08
 	add hl, de
 	ld a, (hl)
-	ld (_RAM_C407), a
+	ld (_RAM_Y_POSITION_MINOR), a
 	inc hl
 	ld a, (hl)
 	ld (_RAM_X_POSITION_MINOR), a
@@ -12340,7 +12340,7 @@ _LABEL_5CC5:
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp $E0
 	ret c
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	cp $8C
 	ret nc
 	xor a
@@ -12363,7 +12363,7 @@ _LABEL_5CEE:
 	jp c, _LABEL_5D59
 	cp $E0
 	ret c
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	cp $8C
 	ret nc
 	ld a, $08
@@ -12447,7 +12447,7 @@ _LABEL_5D59:
 	ld (_RAM_C164), a
 	xor a
 	ld (_RAM_X_POSITION_SUB), a
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	ld (_RAM_C165), a
 	ld a, $01
 	ld (_RAM_C161), a
@@ -12468,7 +12468,7 @@ _LABEL_5DA6:
 	ld a, $01
 	ld (_RAM_C400), a
 	ld a, $A0
-	ld (_RAM_C407), a
+	ld (_RAM_Y_POSITION_MINOR), a
 	ld a, $40
 	ld (_RAM_X_POSITION_MINOR), a
 	ld a, (_RAM_C153)
@@ -13457,7 +13457,7 @@ _LABEL_6660:
 	call _LABEL_84C
 	call _LABEL_827
 	call _LABEL_671A
-	ld a, (_RAM_C407)
+	ld a, (_RAM_Y_POSITION_MINOR)
 	cp $9C
 	jp c, _LABEL_6384
 	ld a, (_RAM_C522)
