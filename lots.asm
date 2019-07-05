@@ -225,7 +225,7 @@ _RAM_X_VELOCITY_MAJOR db
 .enum $C420 export
 _RAM_C420 db
 _RAM_C421 db
-_RAM_C422 db
+_RAM_PLAYER_IN_AIR db
 _RAM_C423 db
 .ende
 
@@ -1166,7 +1166,7 @@ _LABEL_331:
 	jp nz, -
 	ret
 
-_LABEL_346:
+LoadVDPData:
 	ld a, e
 	out (Port_VDPAddress), a
 	ld a, d
@@ -1302,17 +1302,17 @@ _LABEL_3CE:
 _LABEL_3D1:
 	ld de, $C000
 	ld bc, $0020
-	jp _LABEL_346
+	jp LoadVDPData
 
 _LABEL_3DA:
 	ld de, $C000
 	ld bc, $0010
-	jp _LABEL_346
+	jp LoadVDPData
 
 _LABEL_3E3:
 	ld de, $C010
 	ld bc, $0010
-	jp _LABEL_346
+	jp LoadVDPData
 
 ; Data from 3EC to 3FA (15 bytes)
 _DATA_3EC:
@@ -1451,7 +1451,7 @@ _LABEL_508:
 	ld (_RAM_DEMO_TIMER), hl
 	ld a, :Bank5
 	ld (_RAM_FFFF), a
-	ld hl, _DATA_15549
+	ld hl, _DATA_COMPRESSED_TITLE_SCREEN_TILES_
 	ld de, $4000
 	call _LABEL_1DC8
 	ld hl, _DATA_152F8
@@ -1602,7 +1602,7 @@ _LABEL_635:
 	ld a, :Bank2
 	ld (_RAM_FFFF), a
 	call _LABEL_3C2
-	ld hl, _DATA_SEGA_LOGO_TILES_
+	ld hl, _DATA_COMPRESSED_SEGA_LOGO_TILES_
 	ld de, $4000
 	call _LABEL_1DC8
 	ld hl, _DATA_B801
@@ -1994,6 +1994,7 @@ _LABEL_946:
 	ret
 
 ; Data from 9BC to 9DB (32 bytes)
+; Pallete
 _DATA_9BC:
 .db $00 $3F $00 $0B $17 $2A $24 $02 $00 $00 $00 $00 $00 $00 $00 $00
 .db $00 $2A $25 $0B $17 $09 $05 $02 $00 $00 $00 $00 $00 $00 $00 $00
@@ -2013,7 +2014,7 @@ _LABEL_9F3:
 	ld hl, _DATA_EEA2
 	ld de, $7800
 	ld bc, $0080
-	jp _LABEL_346
+	jp LoadVDPData
 
 _LABEL_A04:
 	ld a, (_RAM_C420)
@@ -2739,19 +2740,19 @@ MovementStateHandlers:
 .dw Handle_Movement_Falling_Left
 .dw Handle_Movement_Falling_Right
 .dw Handle_Movement_Crouching_Left
-.dw _LABEL_1136
-.dw _LABEL_116A
-.dw _LABEL_117F
-.dw _LABEL_124C
-.dw _LABEL_1265
-.dw _LABEL_124C
-.dw _LABEL_1265
-.dw _LABEL_1300
-.dw _LABEL_130D
-.dw _LABEL_1328
-.dw _LABEL_1328
-.dw _LABEL_116A
-.dw _LABEL_117F
+.dw Handle_Movement_Crouching_Right
+.dw Handle_Movement_Sword_Left
+.dw Handle_Movement_Sword_Right
+.dw Handle_Movement_Bow_Left
+.dw Handle_Movement_Bow_Right
+.dw Handle_Movement_Bow_Left
+.dw Handle_Movement_Bow_Right
+.dw Handle_Movement_Death
+.dw Handle_Movement_Death_0F
+.dw Handle_Movement_Damaged
+.dw Handle_Movement_Damaged
+.dw Handle_Movement_Sword_Left
+.dw Handle_Movement_Sword_Right
 
 -:
 	ld hl, $800D
@@ -2969,7 +2970,7 @@ Handle_Movement_Crouching_Left:
 	jp _LABEL_1429
 
 ; 8th entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
-_LABEL_1136:
+Handle_Movement_Crouching_Right:
 	ld a, (_RAM_C402)
 	or a
 	jr z, -
@@ -2996,7 +2997,7 @@ _LABEL_1136:
 	jp SetMovementState
 
 ; 9th entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
-_LABEL_116A:
+Handle_Movement_Sword_Left:
 	ld a, (_RAM_C402)
 	or a
 	jp nz, +
@@ -3007,7 +3008,7 @@ _LABEL_116A:
 	jp _LABEL_1441
 
 ; 10th entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
-_LABEL_117F:
+Handle_Movement_Sword_Right:
 	ld a, (_RAM_C402)
 	or a
 	jp nz, +
@@ -3116,7 +3117,7 @@ _LABEL_1222:
 	ret
 
 ; 11th entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
-_LABEL_124C:
+Handle_Movement_Bow_Left:
 	ld bc, $0A0C
 	ld de, $0006
 	ld a, (_RAM_C402)
@@ -3128,7 +3129,7 @@ _LABEL_124C:
 	jp _LABEL_1486
 
 ; 12th entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
-_LABEL_1265:
+Handle_Movement_Bow_Right:
 	ld bc, $0B0D
 	ld de, $0107
 	ld a, (_RAM_C402)
@@ -3204,7 +3205,7 @@ _LABEL_12DE:
 	jp SetMovementState
 
 ; 15th entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
-_LABEL_1300:
+Handle_Movement_Death:
 	ld a, (_RAM_C402)
 	or a
 	jp nz, +
@@ -3212,7 +3213,7 @@ _LABEL_1300:
 	jp _LABEL_14AE
 
 ; 16th entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
-_LABEL_130D:
+Handle_Movement_Death_0F:
 	ld a, (_RAM_C402)
 	or a
 	jp nz, +
@@ -3228,7 +3229,7 @@ _LABEL_130D:
 	ret
 
 ; 17th entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
-_LABEL_1328:
+Handle_Movement_Damaged:
 	call _LABEL_1569
 	dec (iy+42)
 	ret nz
@@ -3261,7 +3262,7 @@ _LABEL_1328:
 _LABEL_1387:
 	call _LABEL_14CC
 	call _LABEL_13DF
-	ld a, (_RAM_C422)
+	ld a, (_RAM_PLAYER_IN_AIR)
 	or a
 	ret nz
 	ld (iy+34), $01
@@ -3272,7 +3273,7 @@ _LABEL_1387:
 	ret
 
 _LABEL_13A2:
-	ld a, (_RAM_C422)
+	ld a, (_RAM_PLAYER_IN_AIR)
 	or a
 	ret z
 	ld de, $0040
@@ -3295,7 +3296,7 @@ _LABEL_13A2:
 	and $F8
 	ld (_RAM_Y_POSITION_MINOR), a
 	xor a
-	ld (_RAM_C422), a
+	ld (_RAM_PLAYER_IN_AIR), a
 	ld (_RAM_Y_POSITION_SUB), a
 	ld (_RAM_C425), a
 _LABEL_13DF:
@@ -3311,7 +3312,7 @@ _LABEL_13DF:
 	and $F8
 	ld (_RAM_Y_POSITION_MINOR), a
 	xor a
-	ld (_RAM_C422), a
+	ld (_RAM_PLAYER_IN_AIR), a
 	ld (_RAM_Y_POSITION_SUB), a
 	ret
 
@@ -3330,7 +3331,7 @@ _LABEL_13FD:
 _LABEL_1413:
 	call _LABEL_14CC
 	call _LABEL_13DF
-	ld a, (_RAM_C422)
+	ld a, (_RAM_PLAYER_IN_AIR)
 	or a
 	ret nz
 	ld (iy+34), $01
@@ -3378,7 +3379,7 @@ _LABEL_146A:
 	call _LABEL_13DF
 	ld (iy+13), b
 	ld (iy+36), c
-	ld a, (_RAM_C422)
+	ld a, (_RAM_PLAYER_IN_AIR)
 	or a
 	ret nz
 	xor a
@@ -3389,7 +3390,7 @@ _LABEL_146A:
 
 _LABEL_1486:
 	xor a
-	ld (_RAM_C422), a
+	ld (_RAM_PLAYER_IN_AIR), a
 	bit 0, (iy+35)
 	jr z, +
 	ex de, hl
@@ -3942,7 +3943,7 @@ _LABEL_188D:
 	ld b, $00
 	add hl, bc
 	ld bc, $000C
-	call _LABEL_346
+	call LoadVDPData
 	ld de, $6228
 	ld a, (_RAM_HEALTH)
 	and $07
@@ -3981,7 +3982,7 @@ _LABEL_18EB:
 	ld hl, _DATA_18FC
 +:
 	ld bc, $000C
-	jp _LABEL_346
+	jp LoadVDPData
 
 ; Data from 18F4 to 18FB (8 bytes)
 _DATA_18F4:
@@ -6838,7 +6839,7 @@ _LABEL_2D88:
 	ld a, c
 	add a, b
 	ld (iy+10), a
-	ld a, (_RAM_C422)
+	ld a, (_RAM_PLAYER_IN_AIR)
 	or a
 	jr nz, +
 	ld a, (_RAM_CONTROLLER_INPUT)
@@ -11027,7 +11028,7 @@ _LABEL_516A:
 	ld hl, _DATA_21268
 	ld bc, $0008
 	ld de, $C018
-	call _LABEL_346
+	call LoadVDPData
 	ld a, (_RAM_C500)
 	cp $2B
 	ret nc
@@ -11353,7 +11354,7 @@ _LABEL_543A:
 	ld hl, (_RAM_C14F)
 	ld bc, $0003
 	ld de, $C00D
-	jp _LABEL_346
+	jp LoadVDPData
 
 _LABEL_544F:
 	ld a, :Bank3
@@ -11458,7 +11459,7 @@ _LABEL_550F:
 	ld hl, _DATA_137E0
 	ld de, $43C0
 	ld bc, $0040
-	jp _LABEL_346
+	jp LoadVDPData
 
 ; Pointer Table from 5520 to 5545 (19 entries, indexed by _RAM_C118)
 _DATA_5520:
@@ -12120,7 +12121,7 @@ _LABEL_5B1C:
 	ld hl, _DATA_5B54
 	ld de, $C018
 	ld bc, $0005
-	call _LABEL_346
+	call LoadVDPData
 	ld a, $02
 	ld (_RAM_C502), a
 	ld a, (_RAM_CC19)
@@ -12192,7 +12193,7 @@ _LABEL_5BA8:
 	ld hl, _DATA_5BDD
 	ld de, $C018
 	ld bc, $0005
-	call _LABEL_346
+	call LoadVDPData
 	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_EDAC
@@ -13877,7 +13878,7 @@ _LABEL_69D4:
 	add hl, de
 	ld de, $C018
 	ld bc, $0005
-	call _LABEL_346
+	call LoadVDPData
 	ld hl, _RAM_C523
 	dec (hl)
 	ret nz
@@ -15358,7 +15359,7 @@ _DATA_B367:
 .db $F0 $00 $00 $F0 $F0 $08 $00 $F2 $F0 $10 $00 $E8
 
 ; Data from B603 to B800 (510 bytes)
-_DATA_SEGA_LOGO_TILES_:
+_DATA_COMPRESSED_SEGA_LOGO_TILES_:
 .db $08 $00 $89 $07 $1C $30 $60 $41 $C6 $84 $88 $FF $03 $00 $81 $FF
 .db $03 $00 $89 $E1 $26 $2C $30 $F0 $21 $21 $22 $FF $03 $00 $95 $7F
 .db $80 $00 $00 $F8 $09 $0B $0E $FC $0C $08 $08 $7F $C0 $00 $00 $1F
@@ -18807,7 +18808,7 @@ _DATA_15539:
 .db $00 $3F $00 $0B $06 $01 $0F $03 $02 $2A $07 $15 $2F $0C $0A $29
 
 ; Data from 15549 to 16A88 (5440 bytes)
-_DATA_15549:
+_DATA_COMPRESSED_TITLE_SCREEN_TILES_:
 .incbin "banks\lots_DATA_15549.inc"
 
 ; Data from 16A89 to 16C22 (410 bytes)

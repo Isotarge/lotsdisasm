@@ -29,6 +29,8 @@
 .define	Movement_Crouching_Bow_Left $0C
 .define	Movement_Crouching_Bow_Right $0D
 .define	Movement_Death $0E
+.define	Movement_Death_0F $0F
 .define	Movement_Damaged $10
+.define	Movement_Damaged_11 $11
 .define	Movement_Crouching_Sword_Left $12
 .define	Movement_Crouching_Sword_Right $13
