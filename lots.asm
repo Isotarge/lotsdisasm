@@ -236,7 +236,7 @@ _RAM_C425 db
 _RAM_C426 db
 _RAM_C427 db
 _RAM_C428 db
-_RAM_C429 db
+_RAM_PRE_DAMAGE_MOVEMENT_STATE db
 _RAM_C42A db
 _RAM_C42B db
 _RAM_C42C db
@@ -817,7 +817,7 @@ _LABEL_F7:
 	jp nz, -
 	ld a, (_RAM_MAP_STATUS)
 	ld hl, _DATA_114
-_LABEL_10A:
+CallFunctionFromPointerTable:
 	add a, a
 	ld e, a
 	ld d, $00
@@ -1010,7 +1010,7 @@ _LABEL_250:
 
 +:
 	ld hl, _DATA_26E - 2
-	jp _LABEL_10A
+	jp CallFunctionFromPointerTable
 
 ; Jump Table from 26E to 279 (6 entries, indexed by _RAM_BUILDING_STATUS)
 _DATA_26E:
@@ -1664,7 +1664,7 @@ _LABEL_6AC:
 +:
 	ld a, (iy+0)
 	ld hl, _DATA_6E4 - 2
-	jp _LABEL_10A
+	jp CallFunctionFromPointerTable
 
 ; Jump Table from 6E4 to 767 (66 entries, indexed by _RAM_C400)
 _DATA_6E4:
@@ -2052,7 +2052,7 @@ _LABEL_A2D:
 	ld (_RAM_C420), a
 	ld a, (_RAM_MOVEMENT_STATE)
 	ld b, $04
-	cp $0E
+	cp Movement_Death
 	jp c, +
 	ld b, $05
 +:
@@ -2728,15 +2728,32 @@ _LABEL_F55:
 
 +:
 	call _LABEL_13A2
-	ld hl, _DATA_F91
+	ld hl, MovementStateHandlers
 	ld a, (_RAM_MOVEMENT_STATE)
-	jp _LABEL_10A
+	jp CallFunctionFromPointerTable
 
 ; Jump Table from F91 to FB8 (20 entries, indexed by _RAM_MOVEMENT_STATE)
-_DATA_F91:
-.dw _LABEL_FC1 _LABEL_101D _LABEL_10B6 _LABEL_10CD _LABEL_10E4 _LABEL_10FB _LABEL_1112 _LABEL_1136
-.dw _LABEL_116A _LABEL_117F _LABEL_124C _LABEL_1265 _LABEL_124C _LABEL_1265 _LABEL_1300 _LABEL_130D
-.dw _LABEL_1328 _LABEL_1328 _LABEL_116A _LABEL_117F
+MovementStateHandlers:
+.dw Handle_Movement_Walking_Left
+.dw Handle_Movement_Walking_Right
+.dw Handle_Movement_Jumping_Left
+.dw Handle_Movement_Jumping_Right
+.dw Handle_Movement_Falling_Left
+.dw Handle_Movement_Falling_Right
+.dw Handle_Movement_Crouching_Left
+.dw _LABEL_1136
+.dw _LABEL_116A
+.dw _LABEL_117F
+.dw _LABEL_124C
+.dw _LABEL_1265
+.dw _LABEL_124C
+.dw _LABEL_1265
+.dw _LABEL_1300
+.dw _LABEL_130D
+.dw _LABEL_1328
+.dw _LABEL_1328
+.dw _LABEL_116A
+.dw _LABEL_117F
 
 -:
 	ld hl, $800D
@@ -2744,7 +2761,7 @@ _DATA_F91:
 	jp _LABEL_109E
 
 ; 1st entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
-_LABEL_FC1:
+Handle_Movement_Walking_Left:
 	ld a, (_RAM_C402)
 	or a
 	jr z, -
@@ -2758,31 +2775,31 @@ _LABEL_FC1:
 	jp nz, _LABEL_1071
 	bit ButtonRight, a
 	jp z, _LABEL_1077
-	ld c, $01
-	jp _LABEL_1096
+	ld c, Movement_Walking_Right
+	jp SetMovementState
 
 +:
 	call _LABEL_15CA
-	ld c, $04
+	ld c, Movement_Falling_Left
 	jr nc, +
 	ld a, (_RAM_NEW_CONTROLLER_INPUT)
-	ld c, $0A ; BOW L?
+	ld c, Movement_Bow_Left
 	bit Button_1, a
 	jr nz, +
-	ld c, $08 ; SWORD L?
+	ld c, Movement_Sword_Left
 	bit Button_2, a
 	jr nz, +
-	ld c, $02 ; JUMPING L?
+	ld c, Movement_Jumping_Left
 	rrca
 	jr c, +
-	ld c, $06 ; CROUCHING L?
+	ld c, Movement_Crouching_Left
 	rrca
 	jr c, +
 	xor a
 	ret
 
 +:
-	call _LABEL_1096
+	call SetMovementState
 	ld (iy+33), $00
 	ld (iy+35), $00
 	scf
@@ -2794,7 +2811,7 @@ _LABEL_FC1:
 	jp _LABEL_109E
 
 ; 2nd entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
-_LABEL_101D:
+Handle_Movement_Walking_Right:
 	ld a, (_RAM_C402)
 	or a
 	jr z, -
@@ -2808,31 +2825,31 @@ _LABEL_101D:
 	jp nz, _LABEL_1071
 	bit ButtonLeft, a
 	jp z, _LABEL_1077
-	ld c, $00
-	jp _LABEL_1096
+	ld c, Movement_Walking_Left
+	jp SetMovementState
 
 +:
 	call _LABEL_15CA
-	ld c, $05
+	ld c, Movement_Falling_Right
 	jr nc, +
 	ld a, (_RAM_NEW_CONTROLLER_INPUT)
-	ld c, $0B ; BOW R?
+	ld c, Movement_Bow_Right
 	bit Button_1, a
 	jr nz, +
-	ld c, $09 ; SWORD R?
+	ld c, Movement_Sword_Right
 	bit Button_2, a
 	jr nz, +
-	ld c, $03 ; JUMPING R?
+	ld c, Movement_Jumping_Right
 	rrca
 	jr c, +
-	ld c, $07 ; CROUCHING R?
+	ld c, Movement_Crouching_Right
 	rrca
 	jr c, +
 	xor a
 	ret
 
 +:
-	call _LABEL_1096
+	call SetMovementState
 	ld (iy+33), $01
 	ld (iy+35), $00
 	scf
@@ -2856,7 +2873,7 @@ _LABEL_1077:
 	ld (iy+14), $02
 	ret
 
-_LABEL_1096:
+SetMovementState:
 	ld (iy+1), c
 	ld (iy+2), $00
 	ret
@@ -2874,14 +2891,14 @@ _LABEL_109E:
 	jp _LABEL_1387
 
 ; 3rd entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
-_LABEL_10B6:
+Handle_Movement_Jumping_Left:
 	ld a, (_RAM_C402)
 	or a
 	jr z, -
-	ld c, $08
-	call _LABEL_142F
+	ld c, Movement_Sword_Left
+	call SetMovementStateIfButton2NewlyPressed
 	ret c
-	ld c, $03
+	ld c, Movement_Jumping_Right
 	jp _LABEL_1521
 
 -:
@@ -2889,14 +2906,14 @@ _LABEL_10B6:
 	jp _LABEL_1387
 
 ; 4th entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
-_LABEL_10CD:
+Handle_Movement_Jumping_Right:
 	ld a, (_RAM_C402)
 	or a
 	jr z, -
-	ld c, $09
-	call _LABEL_142F
+	ld c, Movement_Sword_Right
+	call SetMovementStateIfButton2NewlyPressed
 	ret c
-	ld c, $02
+	ld c, Movement_Jumping_Left
 	jp _LABEL_1545
 
 -:
@@ -2904,14 +2921,14 @@ _LABEL_10CD:
 	jp _LABEL_1413
 
 ; 5th entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
-_LABEL_10E4:
+Handle_Movement_Falling_Left:
 	ld a, (_RAM_C402)
 	or a
 	jr z, -
-	ld c, $09
-	call _LABEL_142F
+	ld c, Movement_Sword_Right
+	call SetMovementStateIfButton2NewlyPressed
 	ret c
-	ld c, $05
+	ld c, Movement_Falling_Right
 	jp _LABEL_1521
 
 -:
@@ -2919,14 +2936,14 @@ _LABEL_10E4:
 	jp _LABEL_1413
 
 ; 6th entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
-_LABEL_10FB:
+Handle_Movement_Falling_Right:
 	ld a, (_RAM_C402)
 	or a
 	jr z, -
-	ld c, $09
-	call _LABEL_142F
+	ld c, Movement_Sword_Right
+	call SetMovementStateIfButton2NewlyPressed
 	ret c
-	ld c, $04
+	ld c, Movement_Falling_Left
 	jp _LABEL_1545
 
 -:
@@ -2934,19 +2951,19 @@ _LABEL_10FB:
 	jp _LABEL_1429
 
 ; 7th entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
-_LABEL_1112:
+Handle_Movement_Crouching_Left:
 	ld a, (_RAM_C402)
 	or a
 	jr z, -
-	ld c, $00
+	ld c, Movement_Walking_Left
 	ld a, (_RAM_CONTROLLER_INPUT)
 	bit ButtonDown, a
-	jp z, _LABEL_1096
-	ld c, $07
+	jp z, SetMovementState
+	ld c, Movement_Crouching_Right
 	bit ButtonRight, a
-	jp nz, _LABEL_1096
-	ld c, $0C
-	ld b, $12
+	jp nz, SetMovementState
+	ld c, Movement_Crouching_Bow_Left
+	ld b, Movement_Crouching_Sword_Left
 	jp +
 
 -:
@@ -2958,15 +2975,15 @@ _LABEL_1136:
 	ld a, (_RAM_C402)
 	or a
 	jr z, -
-	ld c, $01
+	ld c, Movement_Walking_Right
 	ld a, (_RAM_CONTROLLER_INPUT)
 	bit ButtonDown, a
-	jp z, _LABEL_1096
-	ld c, $06
+	jp z, SetMovementState
+	ld c, Movement_Crouching_Left
 	bit ButtonLeft, a
-	jp nz, _LABEL_1096
-	ld c, $0D
-	ld b, $13
+	jp nz, SetMovementState
+	ld c, Movement_Crouching_Bow_Right
+	ld b, Movement_Crouching_Sword_Right
 +:
 	ld a, (_RAM_NEW_CONTROLLER_INPUT)
 	bit Button_1, a
@@ -2978,7 +2995,7 @@ _LABEL_1136:
 	ld (iy+35), $01
 	ld a, (_RAM_MOVEMENT_STATE)
 	ld (_RAM_C421), a
-	jp _LABEL_1096
+	jp SetMovementState
 
 ; 9th entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
 _LABEL_116A:
@@ -3015,7 +3032,7 @@ _LABEL_117F:
 	dec (iy+36)
 	ret nz
 	ld c, (iy+33)
-	jp _LABEL_1096
+	jp SetMovementState
 
 +:
 	ld (iy+37), $00
@@ -3025,7 +3042,7 @@ _LABEL_117F:
 	ld (iy+37), $01
 	ld (iy+22), $D0
 	ld a, (_RAM_MOVEMENT_STATE)
-	cp $0A
+	cp Movement_Bow_Left
 	ret c
 	ld (iy+22), $E8
 	ret
@@ -3091,7 +3108,7 @@ _LABEL_1222:
 	jr z, +
 	ld c, b
 +:
-	call _LABEL_1096
+	call SetMovementState
 ++:
 	scf
 	ret
@@ -3136,7 +3153,7 @@ _LABEL_1265:
 	ret nz
 	ld (iy+40), $00
 	ld c, (iy+33)
-	jp _LABEL_1096
+	jp SetMovementState
 
 +:
 	cp $02
@@ -3158,7 +3175,7 @@ _LABEL_1265:
 	ret z
 	set 0, (iy+35)
 	ld (iy+33), e
-	jp _LABEL_1096
+	jp SetMovementState
 
 +:
 	ld c, b
@@ -3167,7 +3184,7 @@ _LABEL_1265:
 	ret nz
 	res 0, (iy+35)
 	ld (iy+33), d
-	jp _LABEL_1096
+	jp SetMovementState
 
 _LABEL_12DE:
 	ld c, (iy+1)
@@ -3178,7 +3195,7 @@ _LABEL_12DE:
 	ret z
 	inc (iy+33)
 	inc c
-	jp _LABEL_1096
+	jp SetMovementState
 
 +:
 	ld a, (_RAM_CONTROLLER_INPUT)
@@ -3186,7 +3203,7 @@ _LABEL_12DE:
 	ret z
 	dec (iy+33)
 	dec c
-	jp _LABEL_1096
+	jp SetMovementState
 
 ; 15th entry of Jump Table from F91 (indexed by _RAM_MOVEMENT_STATE)
 _LABEL_1300:
@@ -3217,10 +3234,10 @@ _LABEL_1328:
 	call _LABEL_1569
 	dec (iy+42)
 	ret nz
-	ld a, (_RAM_C429)
+	ld a, (_RAM_PRE_DAMAGE_MOVEMENT_STATE)
 	ld (_RAM_MOVEMENT_STATE), a
 	xor a
-	ld (_RAM_C429), a
+	ld (_RAM_PRE_DAMAGE_MOVEMENT_STATE), a
 	ld (_RAM_C42A), a
 	ld (_RAM_C413), a
 	ld (_RAM_C414), a
@@ -3327,7 +3344,7 @@ _LABEL_1429:
 	call _LABEL_14CC
 	jp _LABEL_13DF
 
-_LABEL_142F:
+SetMovementStateIfButton2NewlyPressed:
 	ld a, (_RAM_NEW_CONTROLLER_INPUT)
 	bit Button_2, a
 	jr nz, +
@@ -3335,7 +3352,7 @@ _LABEL_142F:
 	ret
 
 +:
-	call _LABEL_1096
+	call SetMovementState
 	ld (iy+35), $00
 	scf
 	ret
@@ -3455,7 +3472,7 @@ _LABEL_1521:
 	jr nz, +
 	bit ButtonRight, a
 	jr z, ++
-	jp _LABEL_1096
+	jp SetMovementState
 
 +:
 	ld a, (_RAM_C413)
@@ -3476,7 +3493,7 @@ _LABEL_1545:
 	jr nz, +
 	bit ButtonLeft, a
 	jr z, ++
-	jp _LABEL_1096
+	jp SetMovementState
 
 +:
 	ld a, (_RAM_C413)
@@ -4630,10 +4647,10 @@ _LABEL_1D0B:
 	ld a, c
 	ld (_RAM_C415), a
 	ld a, (_RAM_MOVEMENT_STATE)
-	ld (_RAM_C429), a
+	ld (_RAM_PRE_DAMAGE_MOVEMENT_STATE), a
 	ld a, $08
 	ld (_RAM_C42A), a
-	ld a, $10 ; MOVEMENT_STATE_DAMAGED
+	ld a, Movement_Damaged
 	ld (_RAM_MOVEMENT_STATE), a
 	ld a, $01
 	ld (_RAM_RECOVERY_STATUS), a
@@ -5420,7 +5437,7 @@ _DATA_22D6:
 _LABEL_22DA:
 	ld a, (_RAM_C169)
 	ld hl, _DATA_22E3 - 2
-	jp _LABEL_10A
+	jp CallFunctionFromPointerTable
 
 ; Jump Table from 22E3 to 22F2 (8 entries, indexed by _RAM_C169)
 _DATA_22E3:
@@ -12034,7 +12051,7 @@ _LABEL_5A9D:
 	ld hl, _DATA_5AAC - 2
 	ld a, (_RAM_C152)
 	and $7F
-	jp _LABEL_10A
+	jp CallFunctionFromPointerTable
 
 ; Jump Table from 5AAC to 5AC3 (12 entries, indexed by _RAM_C152)
 _DATA_5AAC:
@@ -12241,7 +12258,7 @@ _LABEL_5C2B:
 	ld hl, _DATA_5C36 - 2
 	ld a, (_RAM_C152)
 	and $7F
-	jp _LABEL_10A
+	jp CallFunctionFromPointerTable
 
 ; Jump Table from 5C36 to 5C4D (12 entries, indexed by _RAM_C152)
 _DATA_5C36:
@@ -14126,7 +14143,7 @@ _LABEL_6C2F:
 _LABEL_6C7B:
 	in a, (Port_IOPort1)
 	cpl
-	and $30
+	and Button_1_Mask|Button_2_Mask
 	jr nz, +
 	ld hl, (_RAM_C17E)
 	dec hl
