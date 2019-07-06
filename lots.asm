@@ -1987,7 +1987,7 @@ Handle_Map_Status_Start_Game:
 	jp _LABEL_F7
 
 +:
-	ld c, $5E
+	ld c, $5E ; Harfoot (L)
 	ld a, (_RAM_C170)
 	or a
 	jr z, +
@@ -5701,7 +5701,7 @@ _LABEL_2459:
 +:
 	ld a, Building_Status_Load_Map
 	ld (_RAM_BUILDING_STATUS), a
-	ld a, $78
+	ld a, $78 ; Castle Elder
 	ld (_RAM_CURRENT_MAP), a
 	xor a
 	ld (_RAM_C155), a
@@ -11385,15 +11385,15 @@ _LABEL_5467:
 +:
 	ld c, $84
 	ld a, (_RAM_CURRENT_MAP)
-	cp $7E
+	cp $7E ; Dark Suma's Dungeon 1F (DL)
 	jp z, _LABEL_5467
-	cp $82
+	cp $82 ; Ra Goan's Dungeon Entrance
 	jp z, _LABEL_5467
 	jp _LABEL_C9C8
 
 _LABEL_5483:
 	ld a, (_RAM_CURRENT_MAP)
-	cp $82
+	cp $82 ; Ra Goan's Dungeon Entrance
 	ret nz
 	ld a, $04
 	ld (_RAM_C480), a
@@ -11417,9 +11417,9 @@ _LABEL_54AB:
 	jr nz, ++
 +:
 	ld a, (_RAM_CURRENT_MAP)
-	cp $7E
+	cp $7E ; Dark Suma's Dungeon 1F (DL)
 	jr z, ++
-	cp $82
+	cp $82 ; Ra Goan's Dungeon Entrance
 	jr z, ++
 	ld a, $01
 	ld (_RAM_C16E), a
@@ -11507,13 +11507,13 @@ _LABEL_5654:
 	jp c, _LABEL_57B1
 +:
 	ld a, (_RAM_CURRENT_MAP)
-	cp $7E
+	cp $7E ; Dark Suma's Dungeon 1F (DL)
 	jp nc, _LABEL_56E5
-	cp $78
+	cp $78 ; Castle Elder
 	jp z, _LABEL_57DF
-	cp $7C
+	cp $7C ; Castle Varlin (DL, Open)
 	jp z, _LABEL_57C7
-	cp $7D
+	cp $7D ; Castle Varlin (UL, Open)
 	jp z, _LABEL_57C7
 	ld hl, (_RAM_C115)
 	ld a, (_RAM_SCREEN_X_TILE)
@@ -11579,15 +11579,15 @@ _LABEL_56E5:
 	cp $B8
 	jp nc, ++
 	ld a, (_RAM_CURRENT_MAP)
-	cp $81
+	cp $81 ; Dark Suma's Dungeon 3F
 	jp z, _LABEL_5740
-	cp $7F
+	cp $7F ; Dark Suma's Dungeon 1F (UL)
 	jp z, _LABEL_575F
-	cp $7E
+	cp $7E ; Dark Suma's Dungeon 1F (DL)
 	jp z, _LABEL_575F
-	cp $83
+	cp $83 ; Ra Goan's Dungeon Boss Room
 	jp z, _LABEL_577D
-	cp $82
+	cp $82 ; Ra Goan's Dungeon Entrance
 	jp z, _LABEL_577D
 	ret
 
@@ -11668,7 +11668,7 @@ _LABEL_577D:
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp $EC
 	ret c
-	ld a, $74
+	ld a, $74 ; Shagart (Open) (L)
 	ld (_RAM_CURRENT_MAP), a
 	ld a, Building_Status_Load_Map
 	ld (_RAM_BUILDING_STATUS), a
@@ -11683,9 +11683,9 @@ _LABEL_577D:
 
 _LABEL_57B1:
 	ld a, (_RAM_CURRENT_MAP)
-	cp $74
+	cp $74 ; Shagart (Open) (L)
 	jr z, +
-	cp $75
+	cp $75 ; Shagart (Open) (Door)
 	jr z, +
 	ld a, Building_Status_Building
 	ld (_RAM_BUILDING_STATUS), a
@@ -11761,7 +11761,7 @@ _LABEL_5820:
 	cp $07
 	ret nz
 	ld a, (_RAM_CURRENT_MAP)
-	sub $5E
+	sub $5E ; Harfoot (L)
 	ld e, a
 	ld d, $00
 	ld hl, _DATA_5854
@@ -11785,7 +11785,7 @@ _LABEL_586E:
 	ret nz
 	ld c, $09
 	ld a, (_RAM_CURRENT_MAP)
-	cp $78
+	cp $78 ; Castle Elder
 	jr z, +
 	ld c, $08
 +:
@@ -11915,9 +11915,9 @@ _LABEL_595A:
 
 _LABEL_599E:
 	ld a, (_RAM_CURRENT_MAP)
-	cp $76
+	cp $76 ; Lindon (L)
 	jr z, +
-	cp $77
+	cp $77 ; Lindon (R)
 	ret nz
 +:
 	ld a, (_RAM_CCA2)
@@ -11930,11 +11930,11 @@ _LABEL_599E:
 
 _LABEL_59B6:
 	ld a, (_RAM_CURRENT_MAP)
-	ld c, $7C
-	cp $7A
+	ld c, $7C ; Varlin (DL, Open)
+	cp $7A ; Varlin (DL, Closed)
 	jr z, +
-	ld c, $7D
-	cp $7B
+	ld c, $7D ; Varlin (UL, Open)
+	cp $7B ; Varlin (UL, Closed)
 	ret nz
 +:
 	ld hl, (_RAM_CC1D)
@@ -12434,20 +12434,20 @@ _LABEL_5D59:
 	ld a, Building_Status_Load_Map
 	ld (_RAM_BUILDING_STATUS), a
 	ld a, (_RAM_CURRENT_MAP)
-	cp $81
+	cp $81 ; Dark Suma's Dungeon 3F
 	jr z, +
-	cp $83
+	cp $83 ; Ra Goan's Dungeon Boss Room
 	jr z, ++
 	ld a, (_RAM_C154)
 	ld (_RAM_CURRENT_MAP), a
 	ret
 
 +:
-	ld a, $81
+	ld a, $81 ; Dark Suma's Dungeon 3F
 	jp +++
 
 ++:
-	ld a, $83
+	ld a, $83 ; Ra Goan's Dungeon Boss Room
 +++:
 	ld (_RAM_CURRENT_MAP), a
 	ld a, (_RAM_X_POSITION_MINOR)
@@ -14139,7 +14139,7 @@ Handle_Map_Status_Demo:
 	ld (_RAM_BUILDING_STATUS), a
 	ld hl, $0480
 	ld (_RAM_C17E), hl
-	ld a, $07
+	ld a, $07 ; Swamp (Harfoot +1R) (Amon +2L) (L) (Demo)
 	ld (_RAM_CURRENT_MAP), a
 	ld bc, $E201
 	call _LABEL_302
