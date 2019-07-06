@@ -91,10 +91,10 @@ _RAM_C115 db
 _RAM_C116 db
 _RAM_C117 db
 _RAM_C118 db
-_RAM_C119 db
-_RAM_C11A db
-_RAM_C11B db
-_RAM_C11C db
+_RAM_WARP_DESTINATION_TOP_RIGHT db
+_RAM_WARP_DESTINATION_BOTTOM_RIGHT db
+_RAM_WARP_DESTINATION_TOP_LEFT db
+_RAM_WARP_DESTINATION_BOTTOM_LEFT db
 _RAM_C11D db
 .ende
 
@@ -783,7 +783,7 @@ _LABEL_82:
 	ld a, $01
 	ld (_RAM_SWORD_DAMAGE), a
 	ld (_RAM_BOW_DAMAGE), a
-	ld a, $5E
+	ld a, $5E ; Harfoot (L)
 	ld (_RAM_CONTINUE_MAP), a
 _LABEL_C2:
 	ld bc, $8001
@@ -1551,7 +1551,7 @@ _LABEL_56F:
 	ld a, $01
 	ld (_RAM_SWORD_DAMAGE), a
 	ld (_RAM_BOW_DAMAGE), a
-	ld a, $5E
+	ld a, $5E ; Harfoot (L)
 	ld (_RAM_CONTINUE_MAP), a
 	ld bc, $E001
 	jp _LABEL_302
@@ -11266,16 +11266,16 @@ _LABEL_535B:
 	ld (_RAM_C116), a
 	inc hl
 	ld a, (hl)
-	ld (_RAM_C119), a
+	ld (_RAM_WARP_DESTINATION_TOP_RIGHT), a
 	inc hl
 	ld a, (hl)
-	ld (_RAM_C11A), a
+	ld (_RAM_WARP_DESTINATION_BOTTOM_RIGHT), a
 	inc hl
 	ld a, (hl)
-	ld (_RAM_C11B), a
+	ld (_RAM_WARP_DESTINATION_TOP_LEFT), a
 	inc hl
 	ld a, (hl)
-	ld (_RAM_C11C), a
+	ld (_RAM_WARP_DESTINATION_BOTTOM_LEFT), a
 	ld hl, $C07E
 	ld (_RAM_C112), hl
 	ld a, $01
@@ -11530,7 +11530,7 @@ _LABEL_5695:
 	ld a, (_RAM_MOVEMENT_STATE)
 	or a
 	ret nz
-	ld hl, (_RAM_C11B)
+	ld hl, (_RAM_WARP_DESTINATION_TOP_LEFT)
 	jp ++
 
 +:
@@ -11540,7 +11540,7 @@ _LABEL_5695:
 	ld a, (_RAM_MOVEMENT_STATE)
 	dec a
 	ret nz
-	ld hl, (_RAM_C119)
+	ld hl, (_RAM_WARP_DESTINATION_TOP_RIGHT)
 ++:
 	ld a, l
 	cp $FF
@@ -11593,12 +11593,12 @@ _LABEL_56E5:
 
 +:
 	ld b, $B8
-	ld a, (_RAM_C119)
+	ld a, (_RAM_WARP_DESTINATION_TOP_RIGHT)
 	jp +++
 
 ++:
 	ld b, $08
-	ld a, (_RAM_C11A)
+	ld a, (_RAM_WARP_DESTINATION_BOTTOM_RIGHT)
 +++:
 	ld c, a
 	or a
@@ -11641,7 +11641,7 @@ _LABEL_575F:
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp $14
 	ret nc
-	ld a, (_RAM_C11B)
+	ld a, (_RAM_WARP_DESTINATION_TOP_LEFT)
 	ld (_RAM_CURRENT_MAP), a
 	ld a, Building_Status_Load_Map
 	ld (_RAM_BUILDING_STATUS), a
@@ -11744,11 +11744,11 @@ _LABEL_5808:
 _LABEL_5820:
 	ld a, (_RAM_CURRENT_MAP)
 	ld (_RAM_CONTINUE_MAP), a
-	ld c, $7E
+	ld c, $7E ; Dark Suma's Dungeon 1F (DL)
 	ld a, (_RAM_C118)
 	cp $09
 	jr z, +
-	ld c, $82
+	ld c, $82 ; Ra Goan's Dungeon Entrance
 	cp $0A
 	jr nz, ++
 +:
@@ -11924,8 +11924,8 @@ _LABEL_599E:
 	or a
 	ret z
 	ld a, $19
-	ld (_RAM_C119), a
-	ld (_RAM_C11A), a
+	ld (_RAM_WARP_DESTINATION_TOP_RIGHT), a
+	ld (_RAM_WARP_DESTINATION_BOTTOM_RIGHT), a
 	ret
 
 _LABEL_59B6:
