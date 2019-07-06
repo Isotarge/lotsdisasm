@@ -140,7 +140,7 @@ _RAM_C14D db
 
 .enum $C14F export
 _RAM_C14F dw
-_RAM_C151 db
+_RAM_BOSS_FIGHT_INITIALIZED db
 _RAM_C152 db
 _RAM_C153 db
 _RAM_C154 db
@@ -236,7 +236,7 @@ _RAM_C427 db
 _RAM_C428 db
 _RAM_PRE_DAMAGE_MOVEMENT_STATE db
 _RAM_C42A db
-_RAM_C42B db
+_RAM_INCOMING_PLAYER_DAMAGE db
 _RAM_C42C db
 .ende
 
@@ -3249,7 +3249,7 @@ Handle_Movement_Damaged:
 	ld (_RAM_X_VELOCITY_MINOR), a
 	ld (_RAM_X_VELOCITY_MAJOR), a
 	ld c, (iy+43)
-	call _LABEL_1869
+	call ApplyPlayerHealOrDamageFromC
 	ret nc
 	ld (iy+44), $01
 	xor a
@@ -3521,7 +3521,7 @@ _LABEL_1569:
 	call _LABEL_15E5
 	bit 6, l
 	ret nz
-	ld a, (_RAM_C151)
+	ld a, (_RAM_BOSS_FIGHT_INITIALIZED)
 	or a
 	jr nz, +
 	ld a, (_RAM_SCREEN_X_TILE)
@@ -3545,7 +3545,7 @@ _LABEL_1569:
 	call _LABEL_15E5
 	bit 6, l
 	ret nz
-	ld a, (_RAM_C151)
+	ld a, (_RAM_BOSS_FIGHT_INITIALIZED)
 	or a
 	jr nz, +
 	ld a, (_RAM_SCREEN_X_TILE)
@@ -3902,7 +3902,7 @@ _LABEL_17E6:
 .db $F5 $F1 $3E $09 $D3 $BE $F5 $F1 $79 $C6 $01 $D3 $BE $F5 $F1 $3E
 .db $09 $D3 $BE $C9
 
-_LABEL_1869:
+ApplyPlayerHealOrDamageFromC:
 	ld a, $01
 	ld (_RAM_C12A), a
 	ld a, (_RAM_HEALTH)
@@ -4665,14 +4665,14 @@ _LABEL_1D0B:
 	ld a, (iy+27)
 	and $0F
 	ld c, a
-	ld a, (_RAM_C151)
+	ld a, (_RAM_BOSS_FIGHT_INITIALIZED)
 	or a
 	jr z, +
 	ld c, (iy+56)
 +:
 	ld a, c
 	neg
-	ld (_RAM_C42B), a
+	ld (_RAM_INCOMING_PLAYER_DAMAGE), a
 	ld a, $91
 	ld (_RAM_DE04), a
 	ld a, (iy+0)
@@ -5083,7 +5083,7 @@ _LABEL_201D:
 	ld a, $01
 	ld (_RAM_C155), a
 	xor a
-	ld (_RAM_C151), a
+	ld (_RAM_BOSS_FIGHT_INITIALIZED), a
 	ld (_RAM_C13F), a
 	ld (_RAM_C140), a
 	ld (_RAM_C141), a
@@ -5455,7 +5455,7 @@ _LABEL_22F3:
 	ld c, $30
 	ld a, (_RAM_C142)
 	cp $07
-	jp nz, _LABEL_1869
+	jp nz, ApplyPlayerHealOrDamageFromC
 	ld a, $01
 	ld (_RAM_CC19), a
 	ld hl, _RAM_CC27
@@ -5554,7 +5554,7 @@ _LABEL_2370:
 
 +++:
 	ld c, $30
-	jp _LABEL_1869
+	jp ApplyPlayerHealOrDamageFromC
 
 ; 5th entry of Jump Table from 22E3 (indexed by _RAM_C169)
 _LABEL_2394:
@@ -5625,7 +5625,7 @@ _LABEL_23C4:
 
 +++:
 	ld c, $30
-	jp _LABEL_1869
+	jp ApplyPlayerHealOrDamageFromC
 
 ; 8th entry of Jump Table from 22E3 (indexed by _RAM_C169)
 _LABEL_23F0:
@@ -5648,7 +5648,7 @@ _LABEL_23F0:
 
 _LABEL_2408:
 	ld c, $08
-	jp _LABEL_1869
+	jp ApplyPlayerHealOrDamageFromC
 
 _LABEL_240D:
 	call _LABEL_21DA
@@ -11947,11 +11947,11 @@ _LABEL_59B6:
 	ret
 
 _LABEL_59CF:
-	ld a, (_RAM_C151)
+	ld a, (_RAM_BOSS_FIGHT_INITIALIZED)
 	or a
 	jp nz, _LABEL_5C2B
 	ld a, $01
-	ld (_RAM_C151), a
+	ld (_RAM_BOSS_FIGHT_INITIALIZED), a
 	ld bc, $8201
 	call _LABEL_302
 	ld bc, $4600
@@ -12332,7 +12332,7 @@ _LABEL_5CA1:
 +:
 	ld (_RAM_C169), a
 	xor a
-	ld (_RAM_C151), a
+	ld (_RAM_BOSS_FIGHT_INITIALIZED), a
 	ld (_RAM_C153), a
 	ld (_RAM_C155), a
 	ld (_RAM_C140), a
@@ -12352,7 +12352,7 @@ _LABEL_5CC5:
 	cp $8C
 	ret nc
 	xor a
-	ld (_RAM_C151), a
+	ld (_RAM_BOSS_FIGHT_INITIALIZED), a
 	ld (_RAM_C153), a
 	ld (_RAM_C155), a
 	ld (_RAM_C140), a
@@ -12377,7 +12377,7 @@ _LABEL_5CEE:
 	ld a, $08
 	ld (_RAM_C152), a
 	xor a
-	ld (_RAM_C151), a
+	ld (_RAM_BOSS_FIGHT_INITIALIZED), a
 	ld (_RAM_C153), a
 	ld (_RAM_C155), a
 	ret
@@ -12394,7 +12394,7 @@ _LABEL_5D14:
 	ld a, $89
 	ld (_RAM_C152), a
 	xor a
-	ld (_RAM_C151), a
+	ld (_RAM_BOSS_FIGHT_INITIALIZED), a
 	ld (_RAM_C153), a
 	ld (_RAM_C155), a
 	ret
@@ -12428,7 +12428,7 @@ _LABEL_5D42:
 	ret c
 _LABEL_5D59:
 	xor a
-	ld (_RAM_C151), a
+	ld (_RAM_BOSS_FIGHT_INITIALIZED), a
 	ld (_RAM_C152), a
 	ld (_RAM_C153), a
 	ld (_RAM_C155), a
@@ -12671,7 +12671,7 @@ _LABEL_5FB9:
 	ld a, $01
 	ld (_RAM_C153), a
 	ld c, $10
-	call _LABEL_1869
+	call ApplyPlayerHealOrDamageFromC
 	ld c, $07
 	call _LABEL_175F
 	jp _LABEL_8AC
@@ -12861,7 +12861,7 @@ _LABEL_6177:
 	ld a, $02
 	ld (_RAM_C153), a
 	ld c, $10
-	call _LABEL_1869
+	call ApplyPlayerHealOrDamageFromC
 	ld c, $07
 	call _LABEL_175F
 	jp _LABEL_8AC
@@ -13046,7 +13046,7 @@ _LABEL_6312:
 	ld a, $03
 	ld (_RAM_C153), a
 	ld c, $10
-	call _LABEL_1869
+	call ApplyPlayerHealOrDamageFromC
 	ld c, $07
 	call _LABEL_175F
 	jp _LABEL_8AC
@@ -13398,7 +13398,7 @@ _LABEL_65F5:
 	ld a, $04
 	ld (_RAM_C153), a
 	ld c, $10
-	call _LABEL_1869
+	call ApplyPlayerHealOrDamageFromC
 	ld c, $07
 	call _LABEL_175F
 	jp _LABEL_8AC
@@ -13563,7 +13563,7 @@ _LABEL_674A:
 	ld a, $01
 	ld (_RAM_CC04), a
 	ld c, $10
-	call _LABEL_1869
+	call ApplyPlayerHealOrDamageFromC
 	ld c, $07
 	call _LABEL_175F
 	jp _LABEL_8AC
@@ -13803,7 +13803,7 @@ _LABEL_6960:
 	ld (_RAM_DE04), a
 	ld (iy+1), $FF
 	ld c, $10
-	call _LABEL_1869
+	call ApplyPlayerHealOrDamageFromC
 +:
 	scf
 	ret
@@ -13970,7 +13970,7 @@ _LABEL_6AC2:
 	ld (_RAM_C153), a
 	call _LABEL_175F
 	ld c, $10
-	call _LABEL_1869
+	call ApplyPlayerHealOrDamageFromC
 	ld ix, _RAM_C540
 	call _LABEL_8A6
 	ld ix, _RAM_C580
