@@ -596,8 +596,8 @@ _RAM_D70D db
 _RAM_DE00 db
 _RAM_DE01 db
 _RAM_DE02 db
-_RAM_DE03 db ; MUSIC INDEX?
-_RAM_DE04 db
+_RAM_DE03 db ; Currently Playing Sound?
+_RAM_SOUND_TO_PLAY db ; Used to queue new sound/music to play by the game
 .ende
 
 .enum $DE07 export
@@ -1484,7 +1484,7 @@ Handle_Map_Status_Title_Screen:
 	ld a, c
 	ld (_RAM_C170), a
 	ld a, $81
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld bc, $E001
 	call _LABEL_302
 	jp _LABEL_F7
@@ -1725,7 +1725,7 @@ _LABEL_775:
 	ld a, $02
 	ld (_RAM_SWORD_DAMAGE), a
 	ld a, $95
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	jp _LABEL_8AC
 
 ; 4th entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -1742,7 +1742,7 @@ _LABEL_7C3:
 	ld a, $03
 	ld (_RAM_BOW_DAMAGE), a
 	ld a, $95
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	jp _LABEL_8AC
 
 ; 5th entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -3276,7 +3276,7 @@ _LABEL_1387:
 	ld hl, $FB00
 	ld (_RAM_Y_VELOCITY_SUB), hl
 	ld a, $A2
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ret
 
 _LABEL_13A2:
@@ -3373,7 +3373,7 @@ _LABEL_1441:
 	ld (iy+37), $00
 	call _LABEL_146A
 	ld a, $92
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld a, (_RAM_C426)
 	or a
 	ret z
@@ -3425,7 +3425,7 @@ _LABEL_14AE:
 	ld hl, $0280
 	ld (_RAM_C107), hl
 	ld a, $89
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ret
 
 _LABEL_14CC:
@@ -3662,7 +3662,7 @@ _LABEL_161E:
 	ld (ix+24), $F9
 	ld (ix+25), $0E
 	ld a, $90
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ret
 
 ; 2nd entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -3724,7 +3724,7 @@ _LABEL_168E:
 	ld (_RAM_C453), hl
 	ld (iy+21), h
 	ld a, $A4
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld (iy+33), $01
 	ld (iy+34), $08
 	ld a, (_RAM_C500)
@@ -4674,7 +4674,7 @@ _LABEL_1D0B:
 	neg
 	ld (_RAM_INCOMING_PLAYER_DAMAGE), a
 	ld a, $91
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld a, (iy+0)
 	cp $21 ; Book Thief
 	ret nz
@@ -4692,7 +4692,7 @@ _LABEL_1D0B:
 	ld (_RAM_CCAD), a
 	ld (_RAM_C178), a
 	ld a, $93
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ret
 
 _LABEL_1DBE:
@@ -4979,7 +4979,7 @@ _LABEL_1F39:
 	ld (_RAM_FFFF), a
 	call _LABEL_C989
 	ld a, $8A
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld de, $7F00
 	ld a, $D0
 	ld (_RAM_C300), a
@@ -5161,7 +5161,7 @@ _LABEL_20A2:
 	ld (_RAM_INVENTORY_HERB), a
 	ld (_RAM_C16D), a
 	ld a, $93
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ret
 
 +:
@@ -5170,7 +5170,7 @@ _LABEL_20A2:
 	ld (_RAM_CCAD), a
 	ld (_RAM_C16D), a
 	ld a, $93
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ret
 
 _LABEL_2102:
@@ -5199,7 +5199,7 @@ _LABEL_2102:
 	cp $FF
 	ret nz
 	ld a, $B0
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld a, $40
 	ld (_RAM_C139), a
 	ret
@@ -8605,7 +8605,7 @@ _LABEL_3DF2:
 	ld b, $A3
 +:
 	ld a, b
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld (iy+53), $20
 	ld a, (iy+4)
 	ld (iy+8), a
@@ -8644,7 +8644,7 @@ _LABEL_3DF2:
 	ld (_RAM_CCAD), a
 	ld (_RAM_C16D), a
 	ld a, $93
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 +:
 	ld a, (iy+27)
 	and $F0
@@ -8774,7 +8774,7 @@ _LABEL_3F46:
 +:
 	ld (iy+62), $01
 	ld a, $A5
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld (iy+31), $60
 	jp -
 
@@ -9465,7 +9465,7 @@ _LABEL_450F:
 	ret nz
 +:
 	ld a, $A5
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ret
 
 _LABEL_4552:
@@ -11380,7 +11380,7 @@ _LABEL_5467:
 	call _LABEL_C989
 	pop bc
 	ld a, c
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ret
 
 +:
@@ -11856,7 +11856,7 @@ _LABEL_58B7:
 	ld hl, _DATA_3ADE1
 	call _LABEL_3DA
 	ld a, $A1
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld bc, $E201
 	jp _LABEL_302
 
@@ -11964,7 +11964,7 @@ _LABEL_59CF:
 	ld (_RAM_FFFF), a
 	call _LABEL_C989
 	ld a, $86
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld a, (_RAM_C162)
 	or a
 	jr nz, +
@@ -12068,7 +12068,7 @@ _LABEL_5AC4:
 	ld a, $01
 	ld (_RAM_C153), a
 	ld a, $83
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ret
 
 ; 8th entry of Jump Table from 5AAC (indexed by _RAM_C152)
@@ -12078,7 +12078,7 @@ _LABEL_5ACF:
 ; 1st entry of Jump Table from 5AAC (indexed by _RAM_C152)
 _LABEL_5AD0:
 	ld a, $83
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld c, $0A
 	jp _LABEL_589F
 
@@ -12462,7 +12462,7 @@ _LABEL_5D59:
 	xor a
 	ld (_RAM_C163), a
 	ld a, $84
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ret
 
 _LABEL_5DA6:
@@ -12508,7 +12508,7 @@ _LABEL_5DA6:
 +:
 	call _LABEL_5BF6
 	ld a, $86
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld bc, $E201
 	jp _LABEL_302
 
@@ -13123,7 +13123,7 @@ _LABEL_6388:
 	ld (iy+33), b
 	ld (iy+53), $08
 	ld a, $A3
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	scf
 	ret
 
@@ -13138,7 +13138,7 @@ _LABEL_63B5:
 	call _LABEL_5268
 	ret nc
 	ld a, $A5
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld (iy+1), $FF
 	ret
 
@@ -13321,7 +13321,7 @@ _LABEL_6543:
 	call _LABEL_5268
 	jr nc, +
 	ld a, $A5
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld (iy+1), $FF
 	ret
 
@@ -13796,11 +13796,11 @@ _LABEL_6960:
 	ld (iy+32), $01
 	ld (iy+33), $08
 	ld a, $A3
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	call _LABEL_5268
 	jr nc, +
 	ld a, $A5
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld (iy+1), $FF
 	ld c, $10
 	call ApplyPlayerHealOrDamageFromC
@@ -13861,7 +13861,7 @@ _LABEL_69D4:
 	ld a, $01
 	ld (_RAM_C175), a
 	ld a, $93
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_EF22
@@ -14038,7 +14038,7 @@ Handle_Map_Status_Story:
 	ld a, $01
 	ld (_RAM_C172), a
 	ld a, $82
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld a, :Bank6
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_COMPRESSED_FONT_TILES_
@@ -14206,7 +14206,7 @@ _LABEL_6E95:
 	ld a, $01
 	ld (_RAM_C180), a
 	ld a, $88
-	ld (_RAM_DE04), a
+	ld (_RAM_SOUND_TO_PLAY), a
 	ld a, :Bank15
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_3F49C
@@ -15526,7 +15526,7 @@ _LABEL_C0B4:
 	ret
 
 _LABEL_C0CD:
-	ld de, _RAM_DE04
+	ld de, _RAM_SOUND_TO_PLAY
 	call +
 	inc de
 	call +
@@ -16792,7 +16792,7 @@ _LABEL_C989:
 	push de
 	push bc
 	ld hl, _RAM_DE03
-	ld de, _RAM_DE04
+	ld de, _RAM_SOUND_TO_PLAY
 	ld (hl), $00
 	ldi
 	ldi
