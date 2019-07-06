@@ -1766,32 +1766,32 @@ _LABEL_7E3:
 	ret nz
 	jp _LABEL_8AC
 
-_LABEL_813:
-	ld d, (iy+17)
-	ld e, (iy+16)
+ApplyObjectYVelocity:
+	ld d, (iy+17) ; Read Object.YVelocity
+	ld e, (iy+16) ; Read Object.YVelocity
 _LABEL_819:
-	ld h, (iy+7)
-	ld l, (iy+6)
-	add hl, de
-	ld (iy+7), h
-	ld (iy+6), l
+	ld h, (iy+7) ; Read Object.YPosition
+	ld l, (iy+6) ; Read Object.YPosition
+	add hl, de ; Object.YPosition += Object.YVelocity
+	ld (iy+7), h ; Write Object.YPosition
+	ld (iy+6), l ; Write Object.YPosition
 	ret
 
-_LABEL_827:
+ApplyObjectXVelocity:
 	ld c, $00
 	bit 7, (iy+20)
 	jp z, +
 	ld c, $FF
 +:
-	ld a, (iy+19)
-	add a, (iy+9)
-	ld (iy+9), a
-	ld a, (iy+20)
-	adc a, (iy+10)
-	ld (iy+10), a
+	ld a, (iy+19) ; Read Object.XVelocity
+	add a, (iy+9) ; Read Object.XPosition and += XVelocity
+	ld (iy+9), a ; Write Object.XPosition
+	ld a, (iy+20) ; Read Object.XVelocity
+	adc a, (iy+10) ; Read Object.XPosition and += XVelocity
+	ld (iy+10), a ; Write Object.XPosition
 	ld a, c
-	adc a, (iy+11)
-	ld (iy+11), a
+	adc a, (iy+11) ; Write Object.XPosition
+	ld (iy+11), a ; Write Object.XPosition
 	ret
 
 _LABEL_84C:
@@ -1813,7 +1813,7 @@ _LABEL_869:
 	add hl, de
 	ld a, h
 	cp $06
-	jp z, _LABEL_813
+	jp z, ApplyObjectYVelocity
 	ld (iy+17), h
 	ld (iy+16), l
 	ex de, hl
@@ -3150,7 +3150,7 @@ Handle_Movement_Bow_Right:
 +:
 	call ++
 	call _LABEL_12DE
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld a, (_RAM_C40E)
 	cp $03
 	jr c, +
@@ -3531,13 +3531,13 @@ _LABEL_1569:
 	jr z, +
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp $61
-	jp nc, _LABEL_827
+	jp nc, ApplyObjectXVelocity
 	jp _LABEL_1914
 
 +:
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp $10
-	jp nc, _LABEL_827
+	jp nc, ApplyObjectXVelocity
 	ret
 
 ++:
@@ -3555,13 +3555,13 @@ _LABEL_1569:
 	jr z, +
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp $A0
-	jp c, _LABEL_827
+	jp c, ApplyObjectXVelocity
 	jp _LABEL_1914
 
 +:
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp $F0
-	jp c, _LABEL_827
+	jp c, ApplyObjectXVelocity
 	ret
 
 _LABEL_15CA:
@@ -3673,7 +3673,7 @@ _LABEL_168E:
 	ld a, (_RAM_C44B)
 	or a
 	jp nz, _LABEL_8AC
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld a, (_RAM_C44A)
 	cp $10
 	ret c
@@ -3698,7 +3698,7 @@ _LABEL_168E:
 	ld a, (_RAM_C461)
 	dec a
 	jr nz, +
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $0040
 	call _LABEL_869
 	ld a, (_RAM_C447)
@@ -5890,7 +5890,7 @@ _LABEL_2555:
 	ret
 
 ++:
-	call _LABEL_813
+	call ApplyObjectYVelocity
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
@@ -5924,7 +5924,7 @@ _LABEL_25DC:
 
 +:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	dec (iy+40)
 	ret nz
 	ld (iy+40), $30
@@ -5953,7 +5953,7 @@ _LABEL_2621:
 	jp _LABEL_249F
 
 ++:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_84C
 	ld a, (iy+1)
 	dec a
@@ -5999,7 +5999,7 @@ _LABEL_2621:
 	ld a, (iy+38)
 	or a
 	ret nz
-	call _LABEL_813
+	call ApplyObjectYVelocity
 	ld a, (_RAM_Y_POSITION_MINOR)
 	ld b, a
 	ld a, (iy+7)
@@ -6219,7 +6219,7 @@ _LABEL_286D:
 	ld e, (iy+39)
 	ld d, (iy+40)
 	call _LABEL_869
-	jp _LABEL_827
+	jp ApplyObjectXVelocity
 
 _LABEL_28DA:
 	ld a, (iy+14)
@@ -6241,14 +6241,14 @@ _LABEL_28DA:
 	ld a, (iy+7)
 	cp $C0
 	jp nc, _LABEL_8AC
-	call _LABEL_813
-	jp _LABEL_827
+	call ApplyObjectYVelocity
+	jp ApplyObjectXVelocity
 
 _LABEL_2909:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $0040
 	call _LABEL_3084
-	jp _LABEL_813
+	jp ApplyObjectYVelocity
 
 ; 19th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 _LABEL_2915:
@@ -6316,7 +6316,7 @@ _LABEL_2915:
 	ld a, (iy+39)
 	or a
 	jp nz, _LABEL_29F3
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	dec (iy+40)
 	jr z, +++
 	ld a, (iy+42)
@@ -6366,8 +6366,8 @@ _LABEL_29F3:
 	ret
 
 _LABEL_2A05:
-	call _LABEL_827
-	call _LABEL_813
+	call ApplyObjectXVelocity
+	call ApplyObjectYVelocity
 	ld a, (iy+39)
 	or a
 	ret nz
@@ -6379,8 +6379,8 @@ _LABEL_2A05:
 	jp _LABEL_24F3
 
 _LABEL_2A20:
-	call _LABEL_827
-	call _LABEL_813
+	call ApplyObjectXVelocity
+	call ApplyObjectYVelocity
 	ld a, (iy+43)
 	or a
 	ret nz
@@ -6441,7 +6441,7 @@ _LABEL_2A4E:
 +:
 	ld de, $0030
 	call _LABEL_869
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	bit 7, (iy+17)
 	ret nz
 	ld de, $0000
@@ -6459,7 +6459,7 @@ _LABEL_2A4E:
 
 _LABEL_2AE2:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $F80C
 	bit 7, (iy+20)
 	jr z, +
@@ -6525,13 +6525,13 @@ _LABEL_2B31:
 
 +:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld a, (iy+38)
 	or a
 	jp z, +
 	ld de, $0040
 	call _LABEL_3084
-	call _LABEL_813
+	call ApplyObjectYVelocity
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
@@ -6603,10 +6603,10 @@ _LABEL_2BF0:
 
 +:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $0040
 	call _LABEL_3084
-	call _LABEL_813
+	call ApplyObjectYVelocity
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
@@ -6689,7 +6689,7 @@ _LABEL_2CB1:
 	ret c
 	call _LABEL_173E
 	ret c
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_84C
 	ld a, (iy+10)
 	bit 7, (iy+20)
@@ -6820,7 +6820,7 @@ _LABEL_2D88:
 +:
 	ld de, $0040
 	call _LABEL_869
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
@@ -6942,8 +6942,8 @@ _LABEL_2EE9:
 	jp _LABEL_252E
 
 +:
-	call _LABEL_827
-	call _LABEL_813
+	call ApplyObjectXVelocity
+	call ApplyObjectYVelocity
 	ld a, (iy+42)
 	or a
 	jr nz, ++
@@ -7007,7 +7007,7 @@ _LABEL_2F9F:
 	ret c
 	call _LABEL_84C
 	call _LABEL_880
-	jp _LABEL_827
+	jp ApplyObjectXVelocity
 
 ; 24th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 _LABEL_2FB0:
@@ -7047,7 +7047,7 @@ _LABEL_2FB0:
 
 +:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $0020
 	call _LABEL_869
 	ld de, $0000
@@ -7166,7 +7166,7 @@ _LABEL_3092:
 
 ++:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $F80C
 	bit 7, (iy+20)
 	jr z, +
@@ -7211,11 +7211,11 @@ _LABEL_3152:
 	ret
 
 +:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_84C
 	ld de, $0040
 	call _LABEL_3084
-	call _LABEL_813
+	call ApplyObjectYVelocity
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
@@ -7257,7 +7257,7 @@ _LABEL_31AE:
 
 ++:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp $30
 	jp nc, +
@@ -7326,7 +7326,7 @@ _LABEL_321C:
 
 +:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $F820
 	bit 7, (iy+20)
 	jr z, +
@@ -7363,10 +7363,10 @@ _LABEL_321C:
 	ret
 
 ++:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $0040
 	call _LABEL_3084
-	call _LABEL_813
+	call ApplyObjectYVelocity
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
@@ -7396,7 +7396,7 @@ _LABEL_3303:
 	ret
 
 +:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $0020
 	call _LABEL_869
 	ld de, $0000
@@ -7466,7 +7466,7 @@ _LABEL_3389:
 	or a
 	jp nz, _LABEL_344D
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $F80C
 	bit 7, (iy+20)
 	jr z, +
@@ -7602,7 +7602,7 @@ _LABEL_34F0:
 	ret c
 	call _LABEL_173E
 	ret c
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld a, (iy+1)
 	dec a
 	jp z, +
@@ -7707,7 +7707,7 @@ _LABEL_35F9:
 	ld e, (iy+42)
 	ld d, $00
 	call _LABEL_3084
-	call _LABEL_813
+	call ApplyObjectYVelocity
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
@@ -7760,7 +7760,7 @@ _LABEL_3635:
 	dec a
 	jp z, _LABEL_3778
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld a, (_RAM_X_POSITION_MINOR)
 	bit 7, (iy+20)
 	jr z, +
@@ -7802,7 +7802,7 @@ _LABEL_36DA:
 	jp _LABEL_252E
 
 +:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $0040
 	call _LABEL_869
 	bit 7, (iy+17)
@@ -7842,7 +7842,7 @@ _LABEL_3732:
 
 +:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $0000
 	call _LABEL_15E5
 	ret nz
@@ -7914,7 +7914,7 @@ _LABEL_3785:
 	ret
 
 +:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_84C
 	call _LABEL_2C82
 	ld de, $F8F8
@@ -8003,7 +8003,7 @@ _LABEL_38A5:
 
 ++:
 	call ++
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call +
 	call _LABEL_84C
 	jp _LABEL_880
@@ -8091,7 +8091,7 @@ _LABEL_3930:
 	ret c
 	call _LABEL_173E
 	ret c
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld a, (iy+1)
 	dec a
 	jp z, _LABEL_3A0E
@@ -8273,7 +8273,7 @@ _LABEL_3ADD:
 	ld a, (iy+39)
 	or a
 	ret nz
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld a, (iy+10)
 	bit 7, (iy+20)
 	jr nz, +
@@ -8296,7 +8296,7 @@ _LABEL_3B39:
 	ld (iy+48), $60
 	ld (iy+2), $01
 +:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	dec (iy+48)
 	ret nz
 	call _LABEL_24E0
@@ -8419,7 +8419,7 @@ _LABEL_3C17:
 	ret
 
 +:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $0040
 	call _LABEL_869
 	ld de, $F810
@@ -8495,7 +8495,7 @@ _LABEL_3CD8:
 
 +:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld a, (iy+10)
 	bit 7, (iy+20)
 	jr z, +
@@ -8564,7 +8564,7 @@ _LABEL_3D54:
 
 ++:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld a, (iy+41)
 	or a
 	jr nz, +
@@ -8852,7 +8852,7 @@ _LABEL_400F:
 	dec a
 	jp z, _LABEL_406B
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	dec (iy+33)
 	ret nz
 	xor a
@@ -8866,7 +8866,7 @@ _LABEL_400F:
 
 +:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld hl, _RAM_C64A
 	ld b, $03
 	ld a, (_RAM_C50A)
@@ -9046,7 +9046,7 @@ _LABEL_4178:
 	ret
 
 +:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $0010
 	jp _LABEL_869
 
@@ -9095,10 +9095,10 @@ _LABEL_41FE:
 	ld a, (iy+11)
 	or a
 	jp nz, _LABEL_8AC
-	jp _LABEL_827
+	jp ApplyObjectXVelocity
 
 +:
-	call _LABEL_813
+	call ApplyObjectYVelocity
 	ld a, (iy+7)
 	cp $A8
 	ret c
@@ -9172,7 +9172,7 @@ _LABEL_4278:
 	ret
 
 +:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_880
 	dec (iy+29)
 	jr z, +++
@@ -9298,7 +9298,7 @@ _LABEL_43A8:
 	ld a, h
 	or l
 	jp z, _LABEL_4477
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld a, (iy+10)
 	bit 7, (iy+20)
 	jr z, +
@@ -9325,7 +9325,7 @@ _LABEL_43A8:
 	add hl, de
 	ld (iy+16), l
 	ld (iy+17), h
-	call _LABEL_813
+	call ApplyObjectYVelocity
 	ld a, (iy+7)
 	cp $9F
 	ret c
@@ -9575,7 +9575,7 @@ _LABEL_461F:
 
 +:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_880
 	ld a, (_RAM_C532)
 	cp $40
@@ -9802,8 +9802,8 @@ _LABEL_47D9:
 
 +:
 	call _LABEL_1C8C
-	call _LABEL_827
-	call _LABEL_813
+	call ApplyObjectXVelocity
+	call ApplyObjectYVelocity
 	ld a, (iy+7)
 	cp $A0
 	ret c
@@ -9954,7 +9954,7 @@ _LABEL_493A:
 	dec a
 	jr z, +
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld a, (_RAM_X_POSITION_MINOR)
 	add a, $08
 	cp (iy+10)
@@ -9962,7 +9962,7 @@ _LABEL_493A:
 	jp _LABEL_4990
 
 +:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld de, $0020
 	call _LABEL_869
 	ld a, (_RAM_C507)
@@ -10017,7 +10017,7 @@ _LABEL_4998:
 	ld (_RAM_C51A), a
 +:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp $88
 	jr c, +
@@ -10086,8 +10086,8 @@ _LABEL_49FC:
 	jp c, ++
 +:
 	call _LABEL_84C
-	call _LABEL_827
-	call _LABEL_813
+	call ApplyObjectXVelocity
+	call ApplyObjectYVelocity
 	ld a, (_RAM_C55A)
 	or a
 	jp nz, +++
@@ -10333,7 +10333,7 @@ _LABEL_4C2A:
 
 +:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_880
 	ld a, (_RAM_C50A)
 	cp $04
@@ -10375,7 +10375,7 @@ _LABEL_4C7F:
 	ld (_RAM_C510), hl
 	inc (iy+14)
 +:
-	call _LABEL_813
+	call ApplyObjectYVelocity
 	ld a, (_RAM_C507)
 	cp $50
 	ret nc
@@ -10509,7 +10509,7 @@ _LABEL_4D71:
 
 ++:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_880
 	ld a, (iy+50)
 	cp (iy+51)
@@ -10569,7 +10569,7 @@ _LABEL_4DFE:
 	ld (_RAM_C543), a
 _LABEL_4E4B:
 	call _LABEL_1C8C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	ld a, (_RAM_C54B)
 	or a
 	jp nz, _LABEL_8AC
@@ -10845,8 +10845,8 @@ _LABEL_503F:
 
 _LABEL_5072:
 	call _LABEL_1C8C
-	call _LABEL_827
-	call _LABEL_813
+	call ApplyObjectXVelocity
+	call ApplyObjectYVelocity
 	ld a, (_RAM_C54B)
 	or a
 	jp nz, _LABEL_8AC
@@ -12586,7 +12586,7 @@ _LABEL_5E92:
 
 ++:
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_634B
 	ld hl, $D060
 	call _LABEL_632F
@@ -12598,7 +12598,7 @@ _LABEL_5E92:
 	ret
 
 _LABEL_5F2A:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_634B
 	ld de, $0058
 	call _LABEL_869
@@ -12720,7 +12720,7 @@ _LABEL_5FD6:
 	dec a
 	jp z, _LABEL_60ED
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_634B
 	ld hl, $D060
 	call _LABEL_632F
@@ -12735,7 +12735,7 @@ _LABEL_5FD6:
 	ret
 
 +:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_634B
 	ld de, $0060
 	call _LABEL_869
@@ -12795,7 +12795,7 @@ _LABEL_60A8:
 	ret
 
 _LABEL_60ED:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_634B
 	ld de, $0020
 	call _LABEL_869
@@ -12930,7 +12930,7 @@ _LABEL_61AD:
 	ret
 
 ++:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_634B
 	ld de, $0020
 	call _LABEL_869
@@ -12947,7 +12947,7 @@ _LABEL_61AD:
 	ret
 
 _LABEL_6245:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_634B
 	ld de, $0040
 	call _LABEL_869
@@ -13009,7 +13009,7 @@ _LABEL_62C7:
 	jp +++
 
 _LABEL_62D9:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_84C
 	ld a, (_RAM_C50A)
 	bit 7, (iy+20)
@@ -13128,7 +13128,7 @@ _LABEL_6388:
 	ret
 
 _LABEL_63B5:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_634B
 	dec (iy+53)
 	ret nz
@@ -13232,7 +13232,7 @@ _LABEL_6459:
 	or a
 	jp nz, _LABEL_6388
 	call _LABEL_65E4
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_84C
 	ld a, (_RAM_C50A)
 	ld bc, $18FF
@@ -13272,7 +13272,7 @@ _LABEL_64E2:
 	call nc, _LABEL_869
 	ld a, (_RAM_C50E)
 	cp $02
-	call nc, _LABEL_827
+	call nc, ApplyObjectXVelocity
 	ld a, (_RAM_C50E)
 	cp $03
 	jr nc, ++
@@ -13313,7 +13313,7 @@ _LABEL_6531:
 	jp _LABEL_6459
 
 _LABEL_6543:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_634B
 	dec (iy+53)
 	ret nz
@@ -13408,7 +13408,7 @@ _LABEL_6612:
 	ld a, (iy+17)
 	or a
 	call nz, +
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_1C8C
 	ld a, (iy+11)
 	or a
@@ -13419,7 +13419,7 @@ _LABEL_6612:
 	ret
 
 +:
-	call _LABEL_813
+	call ApplyObjectYVelocity
 	ld a, (iy+14)
 	cp $02
 	jp c, _LABEL_84C
@@ -13463,7 +13463,7 @@ _LABEL_6660:
 	dec a
 	jp z, _LABEL_66EE
 	call _LABEL_84C
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_671A
 	ld a, (_RAM_Y_POSITION_MINOR)
 	cp $9C
@@ -13692,7 +13692,7 @@ _LABEL_67F5:
 	jp _LABEL_67E1
 
 _LABEL_687E:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	call _LABEL_84C
 	dec (iy+44)
 	ret nz
@@ -13784,7 +13784,7 @@ _LABEL_6947:
 	ld hl, $0080
 +:
 	ld (_RAM_C513), hl
-	jp _LABEL_827
+	jp ApplyObjectXVelocity
 
 _LABEL_695C:
 	call _LABEL_1C8C
@@ -13809,7 +13809,7 @@ _LABEL_6960:
 	ret
 
 _LABEL_698C:
-	call _LABEL_827
+	call ApplyObjectXVelocity
 	dec (iy+33)
 	jr z, +
 	ld a, (_RAM_C50A)
