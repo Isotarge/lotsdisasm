@@ -156,7 +156,7 @@ _RAM_C165 db
 .ende
 
 .enum $C169 export
-_RAM_C169 db
+_RAM_BUILDING_INDEX db
 _RAM_C16A db
 _RAM_C16B db
 .ende
@@ -556,7 +556,7 @@ _RAM_CC93 db
 .enum $CCA0 export
 _RAM_CCA0 db
 _RAM_CCA1 db
-_RAM_CCA2 db
+_RAM_FLAG_PIRATE_SPAWNED db
 _RAM_CCA3 db
 _RAM_CCA4 db
 .ende
@@ -5024,7 +5024,7 @@ _LABEL_1F39:
 	jp z, _LABEL_2424
 	cp $06
 	jp z, _LABEL_2444
-	ld a, (_RAM_C169)
+	ld a, (_RAM_BUILDING_INDEX)
 	cp $0C
 	jp z, _LABEL_247F
 _LABEL_1FE4:
@@ -5048,7 +5048,7 @@ _LABEL_1FEA:
 	ret
 
 ++:
-	ld a, (_RAM_C169)
+	ld a, (_RAM_BUILDING_INDEX)
 	cp $0C
 	jp z, _LABEL_2077
 	ld a, (_RAM_C118)
@@ -5306,7 +5306,7 @@ _LABEL_21DA:
 	jp _LABEL_1E9A
 
 +:
-	ld a, (_RAM_C169)
+	ld a, (_RAM_BUILDING_INDEX)
 	cp $07
 	jr z, +
 -:
@@ -5330,13 +5330,13 @@ _LABEL_21DA:
 	ld a, c
 	jr -
 
-; Pointer Table from 221B to 223A (16 entries, indexed by _RAM_C169)
+; Pointer Table from 221B to 223A (16 entries, indexed by _RAM_BUILDING_INDEX)
 _DATA_221B:
 .dw _DATA_1ABC7 _RAM_CC21 _DATA_1ABFF _RAM_CC31 _DATA_1AC38 _RAM_CC41 _DATA_1AC71 _RAM_CC51
 .dw _DATA_1ACAA _RAM_CC61 _DATA_1ACE8 _RAM_CC71 _DATA_1AD20 _RAM_CC81 _DATA_1AD59 _RAM_CC91
 
 _LABEL_223B:
-	ld a, (_RAM_C169)
+	ld a, (_RAM_BUILDING_INDEX)
 	add a, a
 	add a, a
 	ld hl, $2217
@@ -5410,7 +5410,7 @@ _LABEL_223B:
 	inc e
 	ld a, e
 	ld (_RAM_C142), a
-	ld a, (_RAM_C169)
+	ld a, (_RAM_BUILDING_INDEX)
 	cp $02
 	jp nz, _LABEL_2082
 	ld a, (_RAM_CCAD)
@@ -5441,15 +5441,15 @@ _DATA_22D6:
 .db $25 $FF $26 $FF
 
 _LABEL_22DA:
-	ld a, (_RAM_C169)
+	ld a, (_RAM_BUILDING_INDEX)
 	ld hl, _DATA_22E3 - 2
 	jp CallFunctionFromPointerTable
 
-; Jump Table from 22E3 to 22F2 (8 entries, indexed by _RAM_C169)
+; Jump Table from 22E3 to 22F2 (8 entries, indexed by _RAM_BUILDING_INDEX)
 _DATA_22E3:
 .dw _LABEL_22F3 _LABEL_230B _LABEL_2355 _LABEL_2370 _LABEL_2394 _LABEL_23C3 _LABEL_23C4 _LABEL_23F0
 
-; 1st entry of Jump Table from 22E3 (indexed by _RAM_C169)
+; 1st entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_22F3:
 	call _LABEL_2408
 	ld c, $30
@@ -5462,7 +5462,7 @@ _LABEL_22F3:
 	set 7, (hl)
 	ret
 
-; 2nd entry of Jump Table from 22E3 (indexed by _RAM_C169)
+; 2nd entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_230B:
 	call _LABEL_2408
 	ld a, (_RAM_C142)
@@ -5507,7 +5507,7 @@ _LABEL_230B:
 	ld (_RAM_SWORD_DAMAGE), a
 	ret
 
-; 3rd entry of Jump Table from 22E3 (indexed by _RAM_C169)
+; 3rd entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_2355:
 	call _LABEL_2408
 	ld a, (_RAM_C142)
@@ -5530,7 +5530,7 @@ _LABEL_2355:
 +++:
 	ret
 
-; 4th entry of Jump Table from 22E3 (indexed by _RAM_C169)
+; 4th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_2370:
 	call _LABEL_2408
 	ld a, (_RAM_C142)
@@ -5556,7 +5556,7 @@ _LABEL_2370:
 	ld c, $30
 	jp ApplyPlayerHealOrDamageFromC
 
-; 5th entry of Jump Table from 22E3 (indexed by _RAM_C169)
+; 5th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_2394:
 	call _LABEL_2408
 	ld a, (_RAM_C142)
@@ -5594,11 +5594,11 @@ _LABEL_2394:
 	ld (_RAM_CC1A), a
 	ret
 
-; 6th entry of Jump Table from 22E3 (indexed by _RAM_C169)
+; 6th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_23C3:
 	ret
 
-; 7th entry of Jump Table from 22E3 (indexed by _RAM_C169)
+; 7th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_23C4:
 	call _LABEL_2408
 	ld a, (_RAM_C142)
@@ -5612,7 +5612,7 @@ _LABEL_23C4:
 
 +:
 	ld a, $01
-	ld (_RAM_CCA2), a
+	ld (_RAM_FLAG_PIRATE_SPAWNED), a
 	ret
 
 ++:
@@ -5627,7 +5627,7 @@ _LABEL_23C4:
 	ld c, $30
 	jp ApplyPlayerHealOrDamageFromC
 
-; 8th entry of Jump Table from 22E3 (indexed by _RAM_C169)
+; 8th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_23F0:
 	ld a, (_RAM_C142)
 	cp $02
@@ -11722,7 +11722,7 @@ _LABEL_57DF:
 	ld (_RAM_C152), a
 	ld a, $0B
 +:
-	ld (_RAM_C169), a
+	ld (_RAM_BUILDING_INDEX), a
 	ld a, Building_Status_Building
 	ld (_RAM_BUILDING_STATUS), a
 	xor a
@@ -11757,7 +11757,7 @@ _LABEL_5820:
 	ld (_RAM_CONTINUE_MAP), a
 ++:
 	xor a
-	ld (_RAM_C169), a
+	ld (_RAM_BUILDING_INDEX), a
 	ld a, (_RAM_C118)
 	cp $07
 	ret nz
@@ -11768,7 +11768,7 @@ _LABEL_5820:
 	ld hl, _DATA_5854
 	add hl, de
 	ld a, (hl)
-	ld (_RAM_C169), a
+	ld (_RAM_BUILDING_INDEX), a
 	ret
 
 ; Data from 5854 to 586D (26 bytes)
@@ -11777,7 +11777,7 @@ _DATA_5854:
 .db $05 $05 $05 $05 $06 $06 $06 $06 $07 $07
 
 _LABEL_586E:
-	ld a, (_RAM_C169)
+	ld a, (_RAM_BUILDING_INDEX)
 	ld c, a
 	ld a, (_RAM_C118)
 	cp $07
@@ -11921,7 +11921,7 @@ CheckPirateSpawned:
 	cp $77 ; Lindon (R)
 	ret nz
 +:
-	ld a, (_RAM_CCA2)
+	ld a, (_RAM_FLAG_PIRATE_SPAWNED)
 	or a
 	ret z
 	ld a, $19 ; Swamp (Lindon +1R) (Pirate +2L) (L)
@@ -12285,7 +12285,7 @@ _LABEL_5C4E:
 	ld a, Building_Status_Building
 	ld (_RAM_BUILDING_STATUS), a
 	ld a, $08
-	ld (_RAM_C169), a
+	ld (_RAM_BUILDING_INDEX), a
 	ret
 
 ; 2nd entry of Jump Table from 5C36 (indexed by _RAM_C152)
@@ -12330,7 +12330,7 @@ _LABEL_5CA1:
 	ret z
 	ld a, $0B
 +:
-	ld (_RAM_C169), a
+	ld (_RAM_BUILDING_INDEX), a
 	xor a
 	ld (_RAM_BOSS_FIGHT_INITIALIZED), a
 	ld (_RAM_C153), a
@@ -12359,7 +12359,7 @@ _LABEL_5CC5:
 	ld a, Building_Status_Building
 	ld (_RAM_BUILDING_STATUS), a
 	ld a, $09
-	ld (_RAM_C169), a
+	ld (_RAM_BUILDING_INDEX), a
 	ret
 
 ; 9th entry of Jump Table from 5C36 (indexed by _RAM_C152)
@@ -14012,7 +14012,7 @@ _LABEL_6B01:
 	ld (_RAM_CC07), a
 	ld (_RAM_CCA0), a
 	ld (_RAM_CCA1), a
-	ld (_RAM_CCA2), a
+	ld (_RAM_FLAG_PIRATE_SPAWNED), a
 	ld (_RAM_CCA3), a
 	ld (_RAM_CCA4), a
 	ret
@@ -18937,7 +18937,7 @@ _DATA_COMPRESSED_FONT_TILES_:
 .db $81 $01 $03 $00 $81 $01 $03 $00 $81 $01 $03 $00 $81 $01 $03 $00
 .db $81 $01 $03 $00 $81 $FF $1F $00 $81 $01 $1F $00 $00
 
-; 1st entry of Pointer Table from 1A016 (indexed by _RAM_C169)
+; 1st entry of Pointer Table from 1A016 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 18227 to 182DB (181 bytes)
 _DATA_18227:
 .db $12 $A0 $84 $A1 $A2 $A3 $A1 $0C $A0 $88 $A4 $A5 $A6 $A4 $A7 $A8
@@ -18953,7 +18953,7 @@ _DATA_18227:
 .db $02 $02 $0E $00 $03 $02 $0D $00 $04 $02 $0C $00 $04 $02 $0C $00
 .db $04 $02 $04 $00 $00
 
-; 2nd entry of Pointer Table from 1A016 (indexed by _RAM_C169)
+; 2nd entry of Pointer Table from 1A016 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 182DC to 183A5 (202 bytes)
 _DATA_182DC:
 .db $17 $A0 $02 $A1 $09 $A0 $85 $A2 $A3 $A4 $A5 $A0 $02 $A6 $02 $A0
@@ -18970,7 +18970,7 @@ _DATA_182DC:
 .db $00 $02 $0B $00 $03 $02 $82 $00 $02 $0B $00 $03 $02 $82 $00 $02
 .db $0B $00 $03 $02 $82 $00 $02 $02 $00 $00
 
-; 9th entry of Pointer Table from 1A016 (indexed by _RAM_C169)
+; 9th entry of Pointer Table from 1A016 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 183A6 to 1847F (218 bytes)
 _DATA_183A6:
 .db $13 $A0 $83 $A1 $A2 $A1 $06 $A0 $83 $A1 $A2 $A1 $04 $A0 $8C $A3
@@ -18988,7 +18988,7 @@ _DATA_183A6:
 .db $00 $81 $02 $05 $00 $02 $02 $0E $00 $04 $02 $0C $00 $04 $02 $0C
 .db $00 $04 $02 $0C $00 $04 $02 $04 $00 $00
 
-; 11th entry of Pointer Table from 1A016 (indexed by _RAM_C169)
+; 11th entry of Pointer Table from 1A016 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 18480 to 18565 (230 bytes)
 _DATA_18480:
 .db $F7 $A0 $A1 $A0 $A1 $A0 $A1 $A0 $A1 $A0 $A1 $A0 $A1 $A0 $A1 $A0
@@ -19007,7 +19007,7 @@ _DATA_18480:
 .db $00 $04 $02 $0C $00 $04 $02 $0C $00 $04 $02 $0C $00 $04 $02 $0C
 .db $00 $04 $02 $04 $00 $00
 
-; 8th entry of Pointer Table from 1A016 (indexed by _RAM_C169)
+; 8th entry of Pointer Table from 1A016 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 18566 to 18606 (161 bytes)
 _DATA_18566:
 .db $C0 $A0 $A1 $A0 $A1 $A0 $A1 $A2 $A3 $A4 $A2 $A0 $A1 $A0 $A1 $A0
@@ -19022,7 +19022,7 @@ _DATA_18566:
 .db $03 $02 $11 $00 $81 $02 $0F $00 $81 $02 $0F $00 $81 $02 $06 $00
 .db $00
 
-; 10th entry of Pointer Table from 1A016 (indexed by _RAM_C169)
+; 10th entry of Pointer Table from 1A016 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 18607 to 186E1 (219 bytes)
 _DATA_18607:
 .db $DE $A0 $A1 $A0 $A1 $A0 $A1 $A0 $A1 $A0 $A1 $A0 $A1 $A0 $A1 $A0
@@ -19040,12 +19040,12 @@ _DATA_18607:
 .db $02 $06 $00 $81 $02 $10 $00 $02 $02 $82 $00 $02 $04 $00 $81 $02
 .db $0A $00 $81 $02 $03 $00 $81 $02 $06 $00 $00
 
-; 1st entry of Pointer Table from 19FFE (indexed by _RAM_C169)
+; 1st entry of Pointer Table from 19FFE (indexed by _RAM_BUILDING_INDEX)
 ; Data from 186E2 to 18B14 (1075 bytes)
 _DATA_186E2:
 .incbin "banks\lots_DATA_186E2.inc"
 
-; 2nd entry of Pointer Table from 19FFE (indexed by _RAM_C169)
+; 2nd entry of Pointer Table from 19FFE (indexed by _RAM_BUILDING_INDEX)
 ; Data from 18B15 to 18EE3 (975 bytes)
 _DATA_18B15:
 .db $16 $FF $82 $E1 $DC $03 $FF $8D $FC $F0 $EA $9D $6E $FF $FF $F1
@@ -19110,7 +19110,7 @@ _DATA_18B15:
 .db $07 $8B $56 $AF $D6 $AE $D4 $EE $5C $08 $00 $83 $07 $05 $06 $03
 .db $07 $8A $06 $03 $A8 $58 $B0 $50 $B8 $50 $A8 $58 $08 $00 $00
 
-; 9th entry of Pointer Table from 19FFE (indexed by _RAM_C169)
+; 9th entry of Pointer Table from 19FFE (indexed by _RAM_BUILDING_INDEX)
 ; Data from 18EE4 to 1929B (952 bytes)
 _DATA_18EE4:
 .db $09 $00 $9F $03 $04 $03 $17 $2F $40 $7A $00 $77 $18 $DB $D3 $D3
@@ -19174,7 +19174,7 @@ _DATA_18EE4:
 .db $84 $DF $8C $03 $DE $03 $FE $03 $FC $04 $01 $04 $03 $81 $40 $02
 .db $E0 $02 $F0 $03 $F8 $08 $00 $00
 
-; 11th entry of Pointer Table from 19FFE (indexed by _RAM_C169)
+; 11th entry of Pointer Table from 19FFE (indexed by _RAM_BUILDING_INDEX)
 ; Data from 1929C to 1959E (771 bytes)
 _DATA_1929C:
 .db $03 $80 $85 $C0 $80 $80 $C3 $FF $03 $01 $88 $03 $01 $01 $05 $FF
@@ -19227,7 +19227,7 @@ _DATA_1929C:
 .db $10 $00 $85 $05 $03 $01 $03 $01 $03 $00 $81 $F8 $03 $F0 $04 $E0
 .db $18 $00 $00
 
-; 8th entry of Pointer Table from 19FFE (indexed by _RAM_C169)
+; 8th entry of Pointer Table from 19FFE (indexed by _RAM_BUILDING_INDEX)
 ; Data from 1959F to 19910 (882 bytes)
 _DATA_1959F:
 .db $CD $A9 $55 $AF $D8 $55 $AA $53 $EC $A3 $58 $B7 $47 $9A $E9 $55
@@ -19287,62 +19287,62 @@ _DATA_1959F:
 .db $08 $FF $84 $80 $C0 $C6 $CF $04 $FF $81 $07 $03 $0F $81 $8F $03
 .db $FF $00
 
-; 10th entry of Pointer Table from 19FFE (indexed by _RAM_C169)
+; 10th entry of Pointer Table from 19FFE (indexed by _RAM_BUILDING_INDEX)
 ; Data from 19911 to 19E80 (1392 bytes)
 _DATA_19911:
 .incbin "banks\lots_DATA_19911.inc"
 
-; 1st entry of Pointer Table from 19FE6 (indexed by _RAM_C169)
+; 1st entry of Pointer Table from 19FE6 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 19E81 to 19E90 (16 bytes)
 _DATA_19E81:
 .db $00 $2A $00 $05 $39 $3E $29 $24 $30 $2A $16 $01 $0B $06 $1A $00
 
-; 3rd entry of Pointer Table from 19FE6 (indexed by _RAM_C169)
+; 3rd entry of Pointer Table from 19FE6 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 19E91 to 19EA0 (16 bytes)
 _DATA_19E91:
 .db $00 $2A $00 $01 $18 $1D $03 $02 $10 $2A $16 $01 $0B $06 $06 $00
 
-; 4th entry of Pointer Table from 19FE6 (indexed by _RAM_C169)
+; 4th entry of Pointer Table from 19FE6 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 19EA1 to 19EB0 (16 bytes)
 _DATA_19EA1:
 .db $00 $2A $00 $15 $05 $0A $03 $02 $38 $10 $16 $01 $0B $06 $2A $00
 
-; 5th entry of Pointer Table from 19FE6 (indexed by _RAM_C169)
+; 5th entry of Pointer Table from 19FE6 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 19EB1 to 19EC0 (16 bytes)
 _DATA_19EB1:
 .db $00 $2A $00 $00 $15 $2A $30 $20 $38 $0C $16 $01 $0B $06 $00 $00
 
-; 7th entry of Pointer Table from 19FE6 (indexed by _RAM_C169)
+; 7th entry of Pointer Table from 19FE6 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 19EC1 to 19ED0 (16 bytes)
 _DATA_19EC1:
 .db $00 $2A $00 $01 $04 $08 $32 $21 $03 $05 $16 $01 $0B $06 $02 $00
 
-; 2nd entry of Pointer Table from 19FE6 (indexed by _RAM_C169)
+; 2nd entry of Pointer Table from 19FE6 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 19ED1 to 19EE0 (16 bytes)
 _DATA_19ED1:
 .db $00 $2A $00 $2A $34 $08 $0F $0A $04 $25 $03 $05 $0B $06 $01 $00
 
-; 9th entry of Pointer Table from 19FE6 (indexed by _RAM_C169)
+; 9th entry of Pointer Table from 19FE6 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 19EE1 to 19EF0 (16 bytes)
 _DATA_19EE1:
 .db $00 $2A $00 $3A $25 $17 $02 $05 $1B $06 $01 $34 $0A $20 $0F $00
 
-; 11th entry of Pointer Table from 19FE6 (indexed by _RAM_C169)
+; 11th entry of Pointer Table from 19FE6 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 19EF1 to 19F00 (16 bytes)
 _DATA_19EF1:
 .db $00 $2A $00 $1A $35 $3A $20 $03 $13 $30 $12 $01 $0B $06 $2F $00
 
-; 12th entry of Pointer Table from 19FE6 (indexed by _RAM_C169)
+; 12th entry of Pointer Table from 19FE6 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 19F01 to 19F10 (16 bytes)
 _DATA_19F01:
 .db $00 $2A $00 $2A $14 $19 $00 $02 $0B $30 $06 $01 $0B $06 $3F $00
 
-; 8th entry of Pointer Table from 19FE6 (indexed by _RAM_C169)
+; 8th entry of Pointer Table from 19FE6 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 19F11 to 19F20 (16 bytes)
 _DATA_19F11:
 .db $00 $2A $00 $0C $08 $04 $10 $0F $0B $06 $01 $2F $0A $05 $3F $00
 
-; 10th entry of Pointer Table from 19FE6 (indexed by _RAM_C169)
+; 10th entry of Pointer Table from 19FE6 (indexed by _RAM_BUILDING_INDEX)
 ; Data from 19F21 to 19F30 (16 bytes)
 _DATA_19F21:
 .db $00 $2A $00 $2A $25 $17 $02 $05 $0B $15 $01 $03 $0A $09 $0F $00
@@ -19365,17 +19365,17 @@ _DATA_19F97:
 .db $02 $17 $00 $81 $02 $17 $00 $81 $02 $17 $00 $81 $02 $17 $00 $81
 .db $02 $17 $00 $81 $02 $17 $00 $82 $02 $00 $16 $00 $81 $02 $00
 
-; Pointer Table from 19FE6 to 19FFD (12 entries, indexed by _RAM_C169)
+; Pointer Table from 19FE6 to 19FFD (12 entries, indexed by _RAM_BUILDING_INDEX)
 _DATA_19FE6:
 .dw _DATA_19E81 _DATA_19ED1 _DATA_19E91 _DATA_19EA1 _DATA_19EB1 _DATA_19E81 _DATA_19EC1 _DATA_19F11
 .dw _DATA_19EE1 _DATA_19F21 _DATA_19EF1 _DATA_19F01
 
-; Pointer Table from 19FFE to 1A015 (12 entries, indexed by _RAM_C169)
+; Pointer Table from 19FFE to 1A015 (12 entries, indexed by _RAM_BUILDING_INDEX)
 _DATA_19FFE:
 .dw _DATA_186E2 _DATA_18B15 _DATA_186E2 _DATA_186E2 _DATA_186E2 _DATA_186E2 _DATA_186E2 _DATA_1959F
 .dw _DATA_18EE4 _DATA_19911 _DATA_1929C _DATA_1929C
 
-; Pointer Table from 1A016 to 1A02D (12 entries, indexed by _RAM_C169)
+; Pointer Table from 1A016 to 1A02D (12 entries, indexed by _RAM_BUILDING_INDEX)
 _DATA_1A016:
 .dw _DATA_18227 _DATA_182DC _DATA_18227 _DATA_18227 _DATA_18227 _DATA_18227 _DATA_18227 _DATA_18566
 .dw _DATA_183A6 _DATA_18607 _DATA_18480 _DATA_18480
@@ -19383,7 +19383,7 @@ _DATA_1A016:
 ; Data from 1A02E to 1ABC6 (2969 bytes)
 .incbin "banks\lots_DATA_1A02E.inc"
 
-; 1st entry of Pointer Table from 221B (indexed by _RAM_C169)
+; 1st entry of Pointer Table from 221B (indexed by _RAM_BUILDING_INDEX)
 ; Data from 1ABC7 to 1ABFE (56 bytes)
 _DATA_1ABC7:
 .db $E3 $AB $E5 $AB $E7 $AB $E9 $AB $EB $AB $ED $AB $EF $AB $F1 $AB
@@ -19391,7 +19391,7 @@ _DATA_1ABC7:
 .db $01 $FF $01 $FF $01 $FF $01 $FF $14 $FF $1D $FF $1D $FF $1D $FF
 .db $1D $FF $1D $FF $1F $FF $1F $FF
 
-; 3rd entry of Pointer Table from 221B (indexed by _RAM_C169)
+; 3rd entry of Pointer Table from 221B (indexed by _RAM_BUILDING_INDEX)
 ; Data from 1ABFF to 1AC37 (57 bytes)
 _DATA_1ABFF:
 .db $1B $AC $1E $AC $20 $AC $22 $AC $24 $AC $26 $AC $28 $AC $2A $AC
@@ -19399,7 +19399,7 @@ _DATA_1ABFF:
 .db $FF $35 $FF $08 $FF $24 $FF $24 $FF $16 $FF $19 $FF $24 $FF $24
 .db $FF $24 $FF $1C $FF $28 $FF $21 $FF
 
-; 5th entry of Pointer Table from 221B (indexed by _RAM_C169)
+; 5th entry of Pointer Table from 221B (indexed by _RAM_BUILDING_INDEX)
 ; Data from 1AC38 to 1AC70 (57 bytes)
 _DATA_1AC38:
 .db $54 $AC $56 $AC $58 $AC $5A $AC $5C $AC $5E $AC $61 $AC $63 $AC
@@ -19407,7 +19407,7 @@ _DATA_1AC38:
 .db $03 $FF $03 $FF $29 $FF $0F $10 $FF $29 $FF $1A $FF $1A $FF $1A
 .db $FF $1A $FF $1E $FF $34 $FF $23 $FF
 
-; 7th entry of Pointer Table from 221B (indexed by _RAM_C169)
+; 7th entry of Pointer Table from 221B (indexed by _RAM_BUILDING_INDEX)
 ; Data from 1AC71 to 1ACA9 (57 bytes)
 _DATA_1AC71:
 .db $8D $AC $8F $AC $91 $AC $93 $AC $95 $AC $98 $AC $9A $AC $9C $AC
@@ -19415,7 +19415,7 @@ _DATA_1AC71:
 .db $04 $FF $09 $FF $0D $2E $FF $11 $FF $11 $FF $11 $FF $11 $FF $11
 .db $FF $11 $FF $11 $FF $11 $FF $23 $FF
 
-; 9th entry of Pointer Table from 221B (indexed by _RAM_C169)
+; 9th entry of Pointer Table from 221B (indexed by _RAM_BUILDING_INDEX)
 ; Data from 1ACAA to 1ACE7 (62 bytes)
 _DATA_1ACAA:
 .db $C6 $AC $C8 $AC $CA $AC $CC $AC $CE $AC $D0 $AC $D2 $AC $D4 $AC
@@ -19423,7 +19423,7 @@ _DATA_1ACAA:
 .db $07 $FF $0A $FF $0A $FF $29 $FF $15 $FF $18 $33 $FF $18 $33 $FF
 .db $18 $33 $FF $18 $33 $FF $18 $33 $FF $18 $33 $FF $23 $FF
 
-; 11th entry of Pointer Table from 221B (indexed by _RAM_C169)
+; 11th entry of Pointer Table from 221B (indexed by _RAM_BUILDING_INDEX)
 ; Data from 1ACE8 to 1AD1F (56 bytes)
 _DATA_1ACE8:
 .db $04 $AD $06 $AD $08 $AD $0A $AD $0C $AD $0E $AD $10 $AD $12 $AD
@@ -19431,7 +19431,7 @@ _DATA_1ACE8:
 .db $01 $FF $01 $FF $01 $FF $01 $FF $01 $FF $01 $FF $01 $FF $01 $FF
 .db $01 $FF $01 $FF $01 $FF $01 $FF
 
-; 13th entry of Pointer Table from 221B (indexed by _RAM_C169)
+; 13th entry of Pointer Table from 221B (indexed by _RAM_BUILDING_INDEX)
 ; Data from 1AD20 to 1AD58 (57 bytes)
 _DATA_1AD20:
 .db $3C $AD $3E $AD $40 $AD $42 $AD $44 $AD $47 $AD $49 $AD $4B $AD
@@ -19439,7 +19439,7 @@ _DATA_1AD20:
 .db $04 $FF $04 $FF $0B $2D $FF $11 $FF $11 $FF $11 $FF $11 $FF $1B
 .db $FF $11 $FF $11 $FF $11 $FF $23 $FF
 
-; 15th entry of Pointer Table from 221B (indexed by _RAM_C169)
+; 15th entry of Pointer Table from 221B (indexed by _RAM_BUILDING_INDEX)
 ; Data from 1AD59 to 1AD91 (57 bytes)
 _DATA_1AD59:
 .db $75 $AD $77 $AD $7A $AD $7C $AD $7E $AD $80 $AD $82 $AD $84 $AD
