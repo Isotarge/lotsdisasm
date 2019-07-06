@@ -753,7 +753,7 @@ _NMI_HANDLER:
 	ld a, (_RAM_C0A7)
 	cpl
 	ld (_RAM_C0A7), a
-	ld a, $04
+	ld a, Building_Status_Map_Screen
 	ld (_RAM_BUILDING_STATUS), a
 +:
 	pop af
@@ -828,10 +828,16 @@ CallFunctionFromPointerTable:
 
 ; Jump Table from 114 to 121 (7 entries, indexed by _RAM_MAP_STATUS)
 _DATA_114:
-.dw _LABEL_122 _LABEL_250 _LABEL_635 _LABEL_508 _LABEL_6C2F _LABEL_946 _LABEL_6B3F
+.dw Handle_Map_Status_Reset
+.dw Handle_Map_Status_Map
+.dw Handle_Map_Status_Sega_Logo
+.dw Handle_Map_Status_Title_Screen
+.dw Handle_Map_Status_Demo
+.dw Handle_Map_Status_Start_Game
+.dw Handle_Map_Status_Story
 
 ; 1st entry of Jump Table from 114 (indexed by _RAM_MAP_STATUS)
-_LABEL_122:
+Handle_Map_Status_Reset:
 	jp _LABEL_C2
 
 _LABEL_125:
@@ -863,7 +869,7 @@ _LABEL_125:
 	in a, (Port_IOPort2)
 	bit 4, a
 	jp nz, +
-	xor a
+	xor a ; Map_Status_Reset
 	ld (_RAM_MAP_STATUS), a
 	jp _LABEL_1A6
 
@@ -995,7 +1001,7 @@ _LABEL_209:
 	ret
 
 ; 2nd entry of Jump Table from 114 (indexed by _RAM_MAP_STATUS)
-_LABEL_250:
+Handle_Map_Status_Map:
 	ld a, (_RAM_BUILDING_STATUS)
 	or a
 	jr nz, +
@@ -1012,7 +1018,12 @@ _LABEL_250:
 
 ; Jump Table from 26E to 279 (6 entries, indexed by _RAM_BUILDING_STATUS)
 _DATA_26E:
-.dw _LABEL_27A _LABEL_280 _LABEL_286 _LABEL_295 _LABEL_29B _LABEL_2A1
+.dw _LABEL_27A
+.dw _LABEL_280
+.dw _LABEL_286
+.dw _LABEL_295
+.dw _LABEL_29B
+.dw _LABEL_2A1
 
 ; 1st entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
 _LABEL_27A:
@@ -1050,7 +1061,7 @@ _LABEL_2A1:
 
 _LABEL_2AA:
 	ld a, (_RAM_MAP_STATUS)
-	cp $04
+	cp Map_Status_Demo
 	jr z, +
 	ld hl, _RAM_CONTROLLER_INPUT
 	in a, (Port_IOPort1)
@@ -1101,7 +1112,7 @@ _LABEL_2E5:
 	or l
 	ret nz
 ++:
-	xor a
+	xor a ; Map_Status_Reset
 	ld (_RAM_MAP_STATUS), a
 	ret
 
@@ -1314,14 +1325,10 @@ _LABEL_3E3:
 	ld bc, $0010
 	jp LoadVDPData
 
-; Data from 3EC to 3FA (15 bytes)
+; Data from 3EC to 3FA (32 bytes)
 _DATA_3EC:
-.db $00 $3F $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
-
-; Data from 3FB to 40B (17 bytes)
-_DATA_3FB:
-.db $00 $00 $3F $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
-.db $00
+.db $00 $3F $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
+.db $00 $3F $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
 
 _LABEL_40C:
 	ld c, Port_VDPData
@@ -1439,7 +1446,7 @@ _LABEL_492:
 	ret
 
 ; 4th entry of Jump Table from 114 (indexed by _RAM_MAP_STATUS)
-_LABEL_508:
+Handle_Map_Status_Title_Screen:
 	ld a, (_RAM_C100)
 	or a
 	jp nz, _LABEL_56F
@@ -1501,12 +1508,12 @@ _LABEL_56F:
 	jp _LABEL_F7
 
 +:
-	ld a, $04
+	ld a, Map_Status_Demo
 	ld (_RAM_MAP_STATUS), a
 	jp _LABEL_F7
 
 ++:
-	ld a, $06
+	ld a, Map_Status_Story
 	ld (_RAM_MAP_STATUS), a
 	ld a, (_RAM_C170)
 	or a
@@ -1564,7 +1571,7 @@ _LABEL_602:
 
 _LABEL_60B:
 	ld a, (_RAM_MAP_STATUS)
-	cp $03
+	cp Map_Status_Title_Screen
 	ret nz
 	ld hl, _RAM_C16F
 	ld a, (hl)
@@ -1591,7 +1598,7 @@ _DATA_631:
 .db $A9 $00 $E1 $00
 
 ; 3rd entry of Jump Table from 114 (indexed by _RAM_MAP_STATUS)
-_LABEL_635:
+Handle_Map_Status_Sega_Logo:
 	ld a, (_RAM_C176)
 	or a
 	jr nz, +
@@ -1625,7 +1632,7 @@ _LABEL_635:
 	dec (hl)
 	jp nz, _LABEL_F7
 +:
-	ld a, $03
+	ld a, Map_Status_Title_Screen
 	ld (_RAM_MAP_STATUS), a
 	jp _LABEL_F7
 
@@ -1941,10 +1948,10 @@ _LABEL_8C8:
 	ret
 
 ; 6th entry of Jump Table from 114 (indexed by _RAM_MAP_STATUS)
-_LABEL_946:
+Handle_Map_Status_Start_Game:
 	ld bc, $8201
 	call _LABEL_302
-	ld a, $01
+	ld a, Map_Status_Map
 	ld (_RAM_MAP_STATUS), a
 	xor a
 	ld (_RAM_C093), a
@@ -1970,9 +1977,9 @@ _LABEL_946:
 	ld a, $01
 	ld (_RAM_CC11), a
 	call _LABEL_9DC
-	ld hl, _DATA_9BC
+	ld hl, _PALETTE_9BC
 	call _LABEL_3D1
-	ld a, $01
+	ld a, Building_Status_Load_Map
 	ld (_RAM_BUILDING_STATUS), a
 	call +
 	ld bc, $E201
@@ -1994,8 +2001,7 @@ _LABEL_946:
 	ret
 
 ; Data from 9BC to 9DB (32 bytes)
-; Pallete
-_DATA_9BC:
+_PALETTE_9BC:
 .db $00 $3F $00 $0B $17 $2A $24 $02 $00 $00 $00 $00 $00 $00 $00 $00
 .db $00 $2A $25 $0B $17 $09 $05 $02 $00 $00 $00 $00 $00 $00 $00 $00
 
@@ -3224,7 +3230,7 @@ Handle_Movement_Death_0F:
 	ld a, (_RAM_C40E)
 	cp $02
 	jp c, _LABEL_14D8
-	ld a, $06
+	ld a, Building_Status_Death
 	ld (_RAM_BUILDING_STATUS), a
 	ret
 
@@ -3765,7 +3771,7 @@ _LABEL_175F:
 	ld a, $01
 	ld (de), a
 	ld a, (_RAM_MAP_STATUS)
-	cp $04
+	cp Map_Status_Demo
 	ret z
 	inc de
 	ld hl, _DATA_1787
@@ -5055,7 +5061,7 @@ _LABEL_1FEA:
 _LABEL_201D:
 	ld (_RAM_CURRENT_MAP), a
 	ld a, $01
-	ld (_RAM_BUILDING_STATUS), a
+	ld (_RAM_BUILDING_STATUS), a ; Building_Status_Load_Map
 	ld (_RAM_C400), a
 	ld (_RAM_C161), a
 	ld a, h
@@ -5071,7 +5077,7 @@ _LABEL_201D:
 	ret
 
 +:
-	ld a, $03
+	ld a, Building_Status_Boss_Fight
 	ld (_RAM_BUILDING_STATUS), a
 	ld a, $01
 	ld (_RAM_C155), a
@@ -5693,7 +5699,7 @@ _LABEL_2459:
 	ret
 
 +:
-	ld a, $01
+	ld a, Building_Status_Load_Map
 	ld (_RAM_BUILDING_STATUS), a
 	ld a, $78
 	ld (_RAM_CURRENT_MAP), a
@@ -5720,7 +5726,7 @@ _LABEL_2494:
 	ld a, (_RAM_CC1E)
 	or a
 	ret z
-	ld a, $05
+	ld a, Building_Status_Ending
 	ld (_RAM_BUILDING_STATUS), a
 	ret
 
@@ -11194,7 +11200,7 @@ _LABEL_52BC:
 	call _LABEL_1B1D
 	call _LABEL_5820
 	call _LABEL_599E
-	xor a
+	xor a ; Building_Status_Map
 	ld (_RAM_BUILDING_STATUS), a
 	call _LABEL_54AB
 	call _LABEL_54D5
@@ -11550,7 +11556,7 @@ _LABEL_56C3:
 	ret z
 	ld a, c
 	ld (_RAM_CURRENT_MAP), a
-	ld a, $01
+	ld a, Building_Status_Load_Map
 	ld (_RAM_BUILDING_STATUS), a
 	xor a
 	ld (_RAM_C161), a
@@ -11559,7 +11565,7 @@ _LABEL_56C3:
 +:
 	ld a, h
 	ld (_RAM_C152), a
-	ld a, $03
+	ld a, Building_Status_Boss_Fight
 	ld (_RAM_BUILDING_STATUS), a
 	xor a
 	ld (_RAM_C162), a
@@ -11601,7 +11607,7 @@ _LABEL_56E5:
 	ld (_RAM_CURRENT_MAP), a
 	ld a, $01
 	ld (_RAM_C161), a
-	ld (_RAM_BUILDING_STATUS), a
+	ld (_RAM_BUILDING_STATUS), a ; Building_Status_Load_Map
 	ld a, (_RAM_SCREEN_X_TILE)
 	ld (_RAM_C163), a
 	ld a, (_RAM_X_POSITION_MINOR)
@@ -11623,7 +11629,7 @@ _LABEL_5740:
 --:
 	ld a, c
 	ld (_RAM_C152), a
-	ld a, $03
+	ld a, Building_Status_Boss_Fight
 	ld (_RAM_BUILDING_STATUS), a
 	ld a, $01
 	ld (_RAM_C162), a
@@ -11637,7 +11643,7 @@ _LABEL_575F:
 	ret nc
 	ld a, (_RAM_C11B)
 	ld (_RAM_CURRENT_MAP), a
-	ld a, $01
+	ld a, Building_Status_Load_Map
 	ld (_RAM_BUILDING_STATUS), a
 	xor a
 	ld (_RAM_C161), a
@@ -11664,7 +11670,7 @@ _LABEL_577D:
 	ret c
 	ld a, $74
 	ld (_RAM_CURRENT_MAP), a
-	ld a, $01
+	ld a, Building_Status_Load_Map
 	ld (_RAM_BUILDING_STATUS), a
 	ld (_RAM_C161), a
 	ld a, $18
@@ -11681,7 +11687,7 @@ _LABEL_57B1:
 	jr z, +
 	cp $75
 	jr z, +
-	ld a, $02
+	ld a, Building_Status_Building
 	ld (_RAM_BUILDING_STATUS), a
 	ret
 
@@ -11716,7 +11722,7 @@ _LABEL_57DF:
 	ld a, $0B
 +:
 	ld (_RAM_C169), a
-	ld a, $02
+	ld a, Building_Status_Building
 	ld (_RAM_BUILDING_STATUS), a
 	xor a
 	ld (_RAM_C162), a
@@ -11857,7 +11863,7 @@ _LABEL_5935:
 	ld a, (_RAM_C0A7)
 	or a
 	ret nz
-	ld a, $01
+	ld a, Building_Status_Load_Map
 	ld (_RAM_BUILDING_STATUS), a
 	ld (_RAM_C400), a
 	ld (_RAM_C161), a
@@ -12275,7 +12281,7 @@ _LABEL_5C4E:
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp $68
 	jp nc, _LABEL_5D42
-	ld a, $02
+	ld a, Building_Status_Building
 	ld (_RAM_BUILDING_STATUS), a
 	ld a, $08
 	ld (_RAM_C169), a
@@ -12329,7 +12335,7 @@ _LABEL_5CA1:
 	ld (_RAM_C153), a
 	ld (_RAM_C155), a
 	ld (_RAM_C140), a
-	ld a, $02
+	ld a, Building_Status_Building
 	ld (_RAM_BUILDING_STATUS), a
 	ret
 
@@ -12349,7 +12355,7 @@ _LABEL_5CC5:
 	ld (_RAM_C153), a
 	ld (_RAM_C155), a
 	ld (_RAM_C140), a
-	ld a, $02
+	ld a, Building_Status_Building
 	ld (_RAM_BUILDING_STATUS), a
 	ld a, $09
 	ld (_RAM_C169), a
@@ -12425,7 +12431,7 @@ _LABEL_5D59:
 	ld (_RAM_C152), a
 	ld (_RAM_C153), a
 	ld (_RAM_C155), a
-	ld a, $01
+	ld a, Building_Status_Load_Map
 	ld (_RAM_BUILDING_STATUS), a
 	ld a, (_RAM_CURRENT_MAP)
 	cp $81
@@ -14011,7 +14017,7 @@ _LABEL_6B01:
 	ret
 
 ; 7th entry of Jump Table from 114 (indexed by _RAM_MAP_STATUS)
-_LABEL_6B3F:
+Handle_Map_Status_Story:
 	call +
 	jp _LABEL_F7
 
@@ -14104,12 +14110,12 @@ _LABEL_6C0B:
 	ret
 
 +:
-	ld a, $05
+	ld a, Map_Status_Start_Game
 	ld (_RAM_MAP_STATUS), a
 	ret
 
 ; 5th entry of Jump Table from 114 (indexed by _RAM_MAP_STATUS)
-_LABEL_6C2F:
+Handle_Map_Status_Demo:
 	ld a, (_RAM_C17A)
 	or a
 	jp nz, _LABEL_6C7B
@@ -14127,9 +14133,9 @@ _LABEL_6C2F:
 	ld a, $01
 	ld (_RAM_C12A), a
 	call _LABEL_9DC
-	ld hl, _DATA_9BC
+	ld hl, _PALETTE_9BC
 	call _LABEL_3D1
-	ld a, $01
+	ld a, Building_Status_Load_Map
 	ld (_RAM_BUILDING_STATUS), a
 	ld hl, $0480
 	ld (_RAM_C17E), hl
@@ -14149,7 +14155,7 @@ _LABEL_6C7B:
 	ld (_RAM_C17E), hl
 	ld a, h
 	or l
-	jp nz, _LABEL_250
+	jp nz, Handle_Map_Status_Map
 +:
 	xor a
 	ld (_RAM_MAP_STATUS), a
@@ -17850,7 +17856,7 @@ _DATA_E568:
 .db $01 $A8 $15 $01 $7C $A5
 
 ; Pointer Table from E56E to E56F (1 entries, indexed by unknown)
-.dw _DATA_3FB
+.db $FB $03
 
 ; Data from E570 to E571 (2 bytes)
 .db $03 $00

@@ -13,6 +13,24 @@
 .define	Button_1_Mask 1 << Button_1
 .define	Button_2_Mask 1 << Button_2
 
+; Map Status
+.define	Map_Status_Reset $00
+.define	Map_Status_Map $01
+.define	Map_Status_Sega_Logo $02
+.define	Map_Status_Title_Screen $03
+.define	Map_Status_Demo $04
+.define	Map_Status_Start_Game $05
+.define	Map_Status_Story $06
+
+; Building Status
+.define	Building_Status_Map $00
+.define	Building_Status_Load_Map $01
+.define	Building_Status_Building $02
+.define	Building_Status_Boss_Fight $03
+.define	Building_Status_Map_Screen $04
+.define	Building_Status_Ending $05
+.define	Building_Status_Death $06
+
 ; Movement States
 .define	Movement_Walking_Left $00
 .define	Movement_Walking_Right $01
