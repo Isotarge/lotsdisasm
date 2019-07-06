@@ -183,7 +183,7 @@ _RAM_C181 db
 _RAM_C182 db
 _RAM_C183 db
 _RAM_C184 db
-_RAM_C185 dw
+_RAM_ENDING_SCREEN_TRANSITION_TIMER dw
 .ende
 
 .enum $C300 export
@@ -287,7 +287,7 @@ _RAM_C490 dw
 .ende
 
 .enum $C4C0 export
-_RAM_C4C0 db
+_RAM_SIGN_OBJECT_BASE db
 .ende
 
 .enum $C4C3 export
@@ -296,7 +296,7 @@ _RAM_C4C4 dw
 .ende
 
 .enum $C4CE export
-_RAM_C4CE db
+_RAM_SIGN_INDEX db
 .ende
 
 .enum $C4E0 export
@@ -908,7 +908,7 @@ _LABEL_1A6:
 	ld (_RAM_C0A4), a
 	ld a, :Bank3
 	ld (_RAM_FFFF), a
-	call _LABEL_C000
+	call SoundEngine
 _LABEL_1B2:
 	pop iy
 	pop ix
@@ -1018,25 +1018,25 @@ Handle_Map_Status_Map:
 
 ; Jump Table from 26E to 279 (6 entries, indexed by _RAM_BUILDING_STATUS)
 _DATA_26E:
-.dw _LABEL_27A
-.dw _LABEL_280
-.dw _LABEL_286
-.dw _LABEL_295
-.dw _LABEL_29B
-.dw _LABEL_2A1
+.dw Handle_Building_Status_Load_Map
+.dw Handle_Building_Status_Building
+.dw Handle_Building_Status_Boss_Fight
+.dw Handle_Building_Status_Map_Screen
+.dw Handle_Building_Status_Ending
+.dw Handle_Building_Status_Death
 
 ; 1st entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
-_LABEL_27A:
+Handle_Building_Status_Load_Map:
 	call _LABEL_52BC
 	jp _LABEL_F7
 
 ; 2nd entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
-_LABEL_280:
+Handle_Building_Status_Building:
 	call _LABEL_1F39
 	jp _LABEL_F7
 
 ; 3rd entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
-_LABEL_286:
+Handle_Building_Status_Boss_Fight:
 	call _LABEL_6AC
 	call _LABEL_A04
 	call _LABEL_59CF
@@ -1044,17 +1044,17 @@ _LABEL_286:
 	jp _LABEL_F7
 
 ; 4th entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
-_LABEL_295:
+Handle_Building_Status_Map_Screen:
 	call _LABEL_58B7
 	jp _LABEL_F7
 
 ; 5th entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
-_LABEL_29B:
+Handle_Building_Status_Ending:
 	call _LABEL_6E95
 	jp _LABEL_F7
 
 ; 6th entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
-_LABEL_2A1:
+Handle_Building_Status_Death:
 	call _LABEL_2E5
 	call _LABEL_467
 	jp _LABEL_F7
@@ -1659,9 +1659,9 @@ _LABEL_6AC:
 
 +:
 	ld a, (iy+0)
-	cp $10
+	cp $10 ; Slime (Dungeon)
 	jp c, +
-	cp $29
+	cp $29 ; Projectile (Straw Fly)
 	jp nc, +
 	ld a, (iy+11)
 	or a
@@ -1672,6 +1672,7 @@ _LABEL_6AC:
 	jp CallFunctionFromPointerTable
 
 ; Jump Table from 6E4 to 767 (66 entries, indexed by _RAM_C400)
+; Object Behaviour Handlers, Collision?
 _DATA_6E4:
 .dw _LABEL_F55 _LABEL_168E _LABEL_769 _LABEL_7C3 _LABEL_7E3 _LABEL_768 _LABEL_768 _LABEL_768
 .dw _LABEL_768 _LABEL_768 _LABEL_768 _LABEL_768 _LABEL_768 _LABEL_768 _LABEL_768 _LABEL_2555
@@ -3750,14 +3751,14 @@ _LABEL_1720:
 
 _LABEL_173E:
 	ld a, (iy+0)
-	cp $27
+	cp $27 ; Damaged (Knight)
 	jr z, +
 	ld ix, _RAM_C440
 	call _LABEL_1C59
 	jr nc, +
 	ld a, $01
 	ld (_RAM_C460), a
-	ld (iy+0), $27
+	ld (iy+0), $27 ; Damaged (Knight)
 	ld (iy+26), $01
 	scf
 	ret
@@ -4599,11 +4600,11 @@ _LABEL_1C8C:
 	call _LABEL_1DBE
 	ret nc
 	ld a, (iy+0)
-	cp $10
+	cp $10 ; Slime (Dungeon)
 	jp c, +
-	cp $29
+	cp $29 ; Projectile (Straw Fly)
 	jp nc, +
-	ld (iy+0), $27
+	ld (iy+0), $27 ; Damaged (Knight)
 +:
 	ld b, $01
 	ret
@@ -4675,7 +4676,7 @@ _LABEL_1D0B:
 	ld a, $91
 	ld (_RAM_DE04), a
 	ld a, (iy+0)
-	cp $21
+	cp $21 ; Book Thief
 	ret nz
 	ld a, (iy+56)
 	or a
@@ -7996,7 +7997,7 @@ _LABEL_38A5:
 	push iy
 	ld de, $FFC0
 	add iy, de
-	ld (iy+0), $27
+	ld (iy+0), $27 ; Damaged (Knight)
 	pop iy
 	ret
 
@@ -8060,7 +8061,7 @@ _LABEL_3912:
 	ld a, (hl)
 	or a
 	ret nz
-	ld (iy+0), $27
+	ld (iy+0), $27 ; Damaged (Knight)
 	jp _LABEL_3EA3
 
 ; 36th entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -8633,7 +8634,7 @@ _LABEL_3DF2:
 	ret nc
 +:
 	ld a, (iy+0)
-	cp $21
+	cp $21 ; Book Thief
 	jr nz, +
 	ld a, (iy+29)
 	or a
@@ -8656,7 +8657,7 @@ _LABEL_3DF2:
 	dec (iy+63)
 	jp nz, _LABEL_3EA3
 	ld a, (iy+0)
-	cp $11
+	cp $11 ; Eye Part
 	jp z, +
 	jp _LABEL_8AC
 
@@ -8674,7 +8675,7 @@ _LABEL_3DF2:
 _LABEL_3EA3:
 	call _LABEL_524C
 	call _LABEL_5241
-	ld (iy+0), $2A
+	ld (iy+0), $2A ; Damaged
 	ld (iy+48), $00
 	ld (iy+49), $01
 	ld (iy+4), <_DATA_8FB8
@@ -8709,7 +8710,7 @@ _LABEL_3ECB:
 	ld (iy+49), $00
 	ld (iy+4), <_DATA_8FB8
 	ld (iy+5), >_DATA_8FB8
-	ld (iy+0), $2A
+	ld (iy+0), $2A ; Damaged
 	ret
 
 ; 43rd entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -8764,11 +8765,11 @@ _LABEL_3F46:
 
 +:
 	ld a, (iy+0)
-	cp $2B
+	cp $2B ; Tree Spirit
 	jr z, +
-	cp $34
+	cp $34 ; Pirate
 	jr z, +
-	cp $37
+	cp $37 ; Baruga
 	jp nz, _LABEL_8AC
 +:
 	ld (iy+62), $01
@@ -9456,11 +9457,11 @@ _LABEL_450F:
 	ld (iy+18), a
 	ld (iy+53), $80
 	ld a, (iy+0)
-	cp $2E
+	cp $2E ; Necromancer
 	jr z, +
-	cp $30
+	cp $30 ; Dark Suma
 	jr z, +
-	cp $42
+	cp $42 ; Ra Goan
 	ret nz
 +:
 	ld a, $A5
@@ -11124,7 +11125,7 @@ _LABEL_524C:
 _LABEL_5268:
 	ld hl, _RAM_SWORD_DAMAGE
 	ld a, (iy+0)
-	cp $2A
+	cp $2A ; Damaged
 	jp nc, ++
 	ld a, (iy+26)
 	or a
@@ -11135,7 +11136,7 @@ _LABEL_5268:
 	ld b, (hl)
 	ld a, (iy+58)
 	sub b
-	ld (iy+58), a
+	ld (iy+58), a ; Apply Sword/Bow Damage To Enemy
 	ret
 
 ++:
@@ -11148,7 +11149,7 @@ _LABEL_5268:
 	ld b, (hl)
 	ld a, (iy+52)
 	sub b
-	ld (iy+52), a
+	ld (iy+52), a ; Apply Sword/Bow Damage To Boss
 	ret c
 	ret nz
 	scf
@@ -11192,10 +11193,10 @@ _LABEL_52BC:
 	or a
 	call z, _LABEL_8AC
 	call _LABEL_595A
-	call _LABEL_59B6
+	call _LABEL_59B6 ; Handle Varlin Door Open/Closed
 	call _LABEL_5115
-	call _LABEL_535B
-	call _LABEL_53D3
+	call _LABEL_535B ; Load Map Metadata (Warps, Starting Position etc.)?
+	call _LABEL_53D3 ; Load Map Layout?
 	call _LABEL_5808
 	call _LABEL_1B1D
 	call _LABEL_5820
@@ -11223,7 +11224,7 @@ _LABEL_52BC:
 _LABEL_535B:
 	ld c, :Bank11
 	ld a, (_RAM_CURRENT_MAP)
-	cp $44
+	cp $44 ; Mountains (Amon +2UL) (Pharazon +2R) (L)
 	jp c, +
 	ld c, :Bank12
 +:
@@ -11791,9 +11792,9 @@ _LABEL_586E:
 +:
 	dec c
 	ld a, c
-	ld (_RAM_C4CE), a
-	ld a, $05
-	ld (_RAM_C4C0), a
+	ld (_RAM_SIGN_INDEX), a
+	ld a, $05 ; Sign
+	ld (_RAM_SIGN_OBJECT_BASE), a
 	ld a, :Bank6
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_1AD9F
@@ -11803,9 +11804,9 @@ _LABEL_586E:
 _LABEL_589F:
 	dec c
 	ld a, c
-	ld (_RAM_C4CE), a
-	ld a, $05
-	ld (_RAM_C4C0), a
+	ld (_RAM_SIGN_INDEX), a
+	ld a, $05 ; Sign
+	ld (_RAM_SIGN_OBJECT_BASE), a
 	ld a, :Bank6
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_1B418
@@ -13903,17 +13904,17 @@ _LABEL_6A47:
 
 +:
 	ld a, (iy+0)
-	cp $2B
+	cp $2B ; Tree Spirit
 	jr z, ++
-	cp $37
+	cp $37 ; Baruga
 	jr z, +++
-	cp $2E
+	cp $2E ; Necromancer
 	jr z, ++++
-	cp $34
+	cp $34 ; Pirate
 	jr z, _LABEL_6A9E
-	cp $30
+	cp $30 ; Dark Suma
 	jr z, _LABEL_6AA5
-	cp $42
+	cp $42 ; Ra Goan
 	jr z, +
 	ret
 
@@ -14272,7 +14273,7 @@ _LABEL_6F08:
 	or a
 	jp z, +
 	ld hl, $0010
-	ld (_RAM_C185), hl
+	ld (_RAM_ENDING_SCREEN_TRANSITION_TIMER), hl
 	xor a
 	ld (_RAM_C183), a
 	ld hl, _DATA_70C3
@@ -14282,7 +14283,7 @@ _LABEL_6F08:
 	ld bc, $8001
 	call _LABEL_302
 	ld hl, $0100
-	ld (_RAM_C185), hl
+	ld (_RAM_ENDING_SCREEN_TRANSITION_TIMER), hl
 	ld hl, _RAM_C182
 	ld a, (hl)
 	cp $0A
@@ -14390,9 +14391,9 @@ _LABEL_700F:
 	ld a, (_RAM_C184)
 	or a
 	ret nz
-	ld hl, (_RAM_C185)
+	ld hl, (_RAM_ENDING_SCREEN_TRANSITION_TIMER)
 	dec hl
-	ld (_RAM_C185), hl
+	ld (_RAM_ENDING_SCREEN_TRANSITION_TIMER), hl
 	ld a, l
 	or h
 	ret nz
@@ -15407,7 +15408,7 @@ _DATA_B801:
 .ORG $0000
 Bank3:
 
-_LABEL_C000:
+SoundEngine:
 	exx
 	ld a, (_RAM_DE00)
 	or a
