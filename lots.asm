@@ -1005,10 +1005,10 @@ Handle_Map_Status_Map:
 	ld a, (_RAM_BUILDING_STATUS)
 	or a
 	jr nz, +
-	call _LABEL_6AC
+	call ProcessObjects
 	call _LABEL_A04
 	call _LABEL_540B
-	call _LABEL_5654
+	call ProcessWarpsAndDoors
 	call _LABEL_467
 	jp _LABEL_F7
 
@@ -1037,7 +1037,7 @@ Handle_Building_Status_Building:
 
 ; 3rd entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
 Handle_Building_Status_Boss_Fight:
-	call _LABEL_6AC
+	call ProcessObjects
 	call _LABEL_A04
 	call _LABEL_59CF
 	call _LABEL_467
@@ -1641,7 +1641,7 @@ _DATA_68C:
 .db $00 $3F $30 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
 .db $00 $3F $30 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
 
-_LABEL_6AC:
+ProcessObjects:
 	ld iy, _RAM_C400
 	ld b, $18
 -:
@@ -11193,14 +11193,14 @@ _LABEL_52BC:
 	or a
 	call z, _LABEL_8AC
 	call _LABEL_595A
-	call _LABEL_59B6 ; Handle Varlin Door Open/Closed
+	call CheckVarlinDoor
 	call _LABEL_5115
 	call _LABEL_535B ; Load Map Metadata (Warps, Starting Position etc.)?
 	call _LABEL_53D3 ; Load Map Layout?
 	call _LABEL_5808
 	call _LABEL_1B1D
 	call _LABEL_5820
-	call _LABEL_599E
+	call CheckPirateSpawned
 	xor a ; Building_Status_Map
 	ld (_RAM_BUILDING_STATUS), a
 	call _LABEL_54AB
@@ -11494,7 +11494,7 @@ _DATA_5546:
 .dw _DATA_2C270 _DATA_2C27C _DATA_2C288 _DATA_2C294 _DATA_2C2A0 _DATA_2C2AC _DATA_2C2C4 _DATA_2C2B8
 .dw _DATA_2C2D0 _DATA_2C2DC _DATA_2C2E8 _DATA_2C2F4 _DATA_2C300 _DATA_2C30C _DATA_2C318
 
-_LABEL_5654:
+ProcessWarpsAndDoors:
 	ld a, (_RAM_C118)
 	cp $07
 	jp nz, +
@@ -11914,7 +11914,7 @@ _LABEL_595A:
 .db $6B $00 $6E $6C $00 $6F $6D $00 $70 $25 $00 $31 $26 $00 $32 $48
 .db $01 $4C $49 $01 $4D $72 $01 $74 $73 $01 $75
 
-_LABEL_599E:
+CheckPirateSpawned:
 	ld a, (_RAM_CURRENT_MAP)
 	cp $76 ; Lindon (L)
 	jr z, +
@@ -11924,12 +11924,12 @@ _LABEL_599E:
 	ld a, (_RAM_CCA2)
 	or a
 	ret z
-	ld a, $19
+	ld a, $19 ; Swamp (Lindon +1R) (Pirate +2L) (L)
 	ld (_RAM_WARP_DESTINATION_TOP_RIGHT), a
 	ld (_RAM_WARP_DESTINATION_BOTTOM_RIGHT), a
 	ret
 
-_LABEL_59B6:
+CheckVarlinDoor:
 	ld a, (_RAM_CURRENT_MAP)
 	ld c, $7C ; Varlin (DL, Open)
 	cp $7A ; Varlin (DL, Closed)
