@@ -1674,15 +1674,72 @@ ProcessObjects:
 ; Jump Table from 6E4 to 767 (66 entries, indexed by _RAM_C400)
 ; Object Behaviour Handlers, Collision?
 _DATA_6E4:
-.dw _LABEL_F55 _LABEL_168E _LABEL_769 _LABEL_7C3 _LABEL_7E3 _LABEL_768 _LABEL_768 _LABEL_768
-.dw _LABEL_768 _LABEL_768 _LABEL_768 _LABEL_768 _LABEL_768 _LABEL_768 _LABEL_768 _LABEL_2555
-.dw _LABEL_3853 _LABEL_2621 _LABEL_2915 _LABEL_2A4E _LABEL_3C17 _LABEL_2B31 _LABEL_2CB1 _LABEL_2FB0
-.dw _LABEL_321C _LABEL_3D54 _LABEL_3912 _LABEL_3092 _LABEL_2E6D _LABEL_2D88 _LABEL_2F55 _LABEL_3B86
-.dw _LABEL_3389 _LABEL_3A85 _LABEL_34F0 _LABEL_3930 _LABEL_3635 _LABEL_3785 _LABEL_3DF2 _LABEL_3CD8
-.dw _LABEL_26DD _LABEL_3ECB _LABEL_3EFC _LABEL_412D _LABEL_41AB _LABEL_4226 _LABEL_5FD6 _LABEL_4A85
-.dw _LABEL_435A _LABEL_6194 _LABEL_663B _LABEL_483F _LABEL_49FC _LABEL_6787 _LABEL_4576 _LABEL_768
-.dw _LABEL_643D _LABEL_5E7D _LABEL_47D9 _LABEL_6612 _LABEL_4CAB _LABEL_4DFE _LABEL_50CB _LABEL_503F
-.dw _LABEL_508B _LABEL_4E7A
+.dw _LABEL_F55 ; Landau
+.dw _LABEL_168E ; Arrow
+.dw _LABEL_769 ; Sword Upgrade
+.dw _LABEL_7C3 ; Bow Upgrade
+.dw _LABEL_7E3 ; Sign
+.dw _LABEL_768 ; Null
+.dw _LABEL_768 ; Null
+.dw _LABEL_768 ; Null
+.dw _LABEL_768 ; Null
+.dw _LABEL_768 ; Null
+.dw _LABEL_768 ; Null
+.dw _LABEL_768 ; Null
+.dw _LABEL_768 ; Null
+.dw _LABEL_768 ; Null
+.dw _LABEL_768 ; Null
+.dw _LABEL_2555 ; Slime
+.dw _LABEL_3853 ; Eye Part
+.dw _LABEL_2621 ; Giant Bat
+.dw _LABEL_2915 ; Bird
+.dw _LABEL_2A4E ; Killer Fish
+.dw _LABEL_3C17 ; Clown
+.dw _LABEL_2B31 ; Knight
+.dw _LABEL_2CB1 ; Scorpion
+.dw _LABEL_2FB0 ; Spider
+.dw _LABEL_321C ; White Wolf
+.dw _LABEL_3D54 ; Caterpillar
+.dw _LABEL_3912 ; Eye Part
+.dw _LABEL_3092 ; Skeleton
+.dw _LABEL_2E6D ; Demon (Red Flying Thingy)
+.dw _LABEL_2D88 ; Snake
+.dw _LABEL_2F55 ; Giant Bat
+.dw _LABEL_3B86 ; Straw Fly
+.dw _LABEL_3389 ; Book Thief
+.dw _LABEL_3A85 ; Dragon Enemy (Unused?)
+.dw _LABEL_34F0 ; Dark Shunaida
+.dw _LABEL_3930 ; Lizard Man
+.dw _LABEL_3635 ; Dagon
+.dw _LABEL_3785 ; Zombie
+.dw _LABEL_3DF2 ; Damaged (0x27)
+.dw _LABEL_3CD8 ; Snake
+.dw _LABEL_26DD ; Projectile (Straw Fly)
+.dw _LABEL_3ECB ; Damaged (0x2A)
+.dw _LABEL_3EFC ; Tree Spirit (Boss)
+.dw _LABEL_412D ; Projectile (Tree Spirit)
+.dw _LABEL_41AB ; Projectile (Tree Spirit)
+.dw _LABEL_4226 ; Necromancer (Boss)
+.dw _LABEL_5FD6 ; Stone Hammer (Boss)
+.dw _LABEL_4A85 ; Dark Suma (Boss)
+.dw _LABEL_435A ; Necromancer's Clone (Boss)
+.dw _LABEL_6194 ; Golden Guard (Boss)
+.dw _LABEL_663B ; Paradin (Boss)
+.dw _LABEL_483F ; Pirate (Boss)
+.dw _LABEL_49FC ; Projecile (Pirate's Sword)
+.dw _LABEL_6787 ; Medusa (Boss)
+.dw _LABEL_4576 ; Baruga (Boss)
+.dw _LABEL_768 ; Null
+.dw _LABEL_643D ; Court Jester (Boss)
+.dw _LABEL_5E7D ; The Ripper (Boss)
+.dw _LABEL_47D9 ; Projectile (Baruga)
+.dw _LABEL_6612 ; Projectile (Court Jester)
+.dw _LABEL_4CAB ; Skull (Dark Suma)
+.dw _LABEL_4DFE ; Projectile (Dark Suma)
+.dw _LABEL_50CB ; Shield (Ra Goan)
+.dw _LABEL_503F ; Projectile (Ra Goan)
+.dw _LABEL_508B ; Projectile (Ra Goan)
+.dw _LABEL_4E7A ; Ra Goan (Boss)
 
 ; 6th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 _LABEL_768:
@@ -5332,8 +5389,14 @@ _LABEL_21DA:
 
 ; Pointer Table from 221B to 223A (16 entries, indexed by _RAM_BUILDING_INDEX)
 _DATA_221B:
-.dw _DATA_1ABC7 _RAM_CC21 _DATA_1ABFF _RAM_CC31 _DATA_1AC38 _RAM_CC41 _DATA_1AC71 _RAM_CC51
-.dw _DATA_1ACAA _RAM_CC61 _DATA_1ACE8 _RAM_CC71 _DATA_1AD20 _RAM_CC81 _DATA_1AD59 _RAM_CC91
+.dw _DATA_1ABC7 _RAM_CC21 ; Harfoot Text(?) & Flags
+.dw _DATA_1ABFF _RAM_CC31 ; Amon Text(?) & Flags
+.dw _DATA_1AC38 _RAM_CC41 ; Dwarle Text(?) & Flags
+.dw _DATA_1AC71 _RAM_CC51 ; Ithile Text(?) & Flags
+.dw _DATA_1ACAA _RAM_CC61 ; Pharazon Text(?) & Flags
+.dw _DATA_1ACE8 _RAM_CC71 ; ??? Text(?) & Flags
+.dw _DATA_1AD20 _RAM_CC81 ; Lindon Text(?) & Flags
+.dw _DATA_1AD59 _RAM_CC91 ; Ulmo Text(?) & Flags
 
 _LABEL_223B:
 	ld a, (_RAM_BUILDING_INDEX)
