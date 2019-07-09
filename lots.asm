@@ -45,7 +45,7 @@ _RAM_C0A2 db
 .ende
 
 .enum $C0A4 export
-_RAM_C0A4 db
+_RAM_GAME_LOOP_IS_RUNNING db ; 1 on NMI boundaries for lag frames
 _RAM_CONTROLLER_INPUT db
 _RAM_NEW_CONTROLLER_INPUT db
 _RAM_C0A7 db
@@ -225,7 +225,7 @@ _RAM_X_VELOCITY_MAJOR db
 .enum $C420 export
 _RAM_C420 db
 _RAM_C421 db
-_RAM_PLAYER_IN_AIR db
+_RAM_LANDAU_IN_AIR db
 _RAM_C423 db
 .ende
 
@@ -236,7 +236,7 @@ _RAM_C427 db
 _RAM_C428 db
 _RAM_PRE_DAMAGE_MOVEMENT_STATE db
 _RAM_C42A db
-_RAM_INCOMING_PLAYER_DAMAGE db
+_RAM_INCOMING_LANDAU_DAMAGE db
 _RAM_C42C db
 .ende
 
@@ -724,7 +724,7 @@ _DATA_30:
 .db $FF $FF $FF $FF $FF $FF $FF $FF
 
 _IRQ_HANDLER:
-	jp _LABEL_125
+	jp HandleIRQ
 
 ; Data from 3B to 3F (5 bytes)
 .db $FF $FF $FF $FF $FF
@@ -807,10 +807,10 @@ _LABEL_C2:
 	ld (_RAM_MAP_STATUS), a
 _LABEL_F7:
 	ld a, $01
-	ld (_RAM_C0A4), a
+	ld (_RAM_GAME_LOOP_IS_RUNNING), a
 -:
 	ei
-	ld a, (_RAM_C0A4)
+	ld a, (_RAM_GAME_LOOP_IS_RUNNING)
 	or a
 	jp nz, -
 	ld a, (_RAM_MAP_STATUS)
@@ -840,7 +840,7 @@ _DATA_114:
 Handle_Map_Status_Reset:
 	jp _LABEL_C2
 
-_LABEL_125:
+HandleIRQ:
 	di
 	push af
 	in a, (Port_VDPStatus)
@@ -851,7 +851,7 @@ _LABEL_125:
 	push de
 	push ix
 	push iy
-	ld a, (_RAM_C0A4)
+	ld a, (_RAM_GAME_LOOP_IS_RUNNING)
 	or a
 	jr z, _LABEL_1B2
 	ld a, (_RAM_C0A2)
@@ -895,8 +895,8 @@ _LABEL_125:
 
 +:
 	call _LABEL_2AA
-	call _LABEL_17AB
-	call _LABEL_188D
+	call UpdateScoreCounter
+	call DrawHealthBar
 	call _LABEL_14F8
 	call _LABEL_543A
 	call _LABEL_69D4
@@ -905,7 +905,7 @@ _LABEL_125:
 	call _LABEL_60B
 _LABEL_1A6:
 	xor a
-	ld (_RAM_C0A4), a
+	ld (_RAM_GAME_LOOP_IS_RUNNING), a
 	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	call SoundEngine
@@ -1006,7 +1006,7 @@ Handle_Map_Status_Map:
 	or a
 	jr nz, +
 	call ProcessObjects
-	call _LABEL_A04
+	call UpdateLandauGraphics
 	call _LABEL_540B
 	call ProcessWarpsAndDoors
 	call _LABEL_467
@@ -1038,7 +1038,7 @@ Handle_Building_Status_Building:
 ; 3rd entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
 Handle_Building_Status_Boss_Fight:
 	call ProcessObjects
-	call _LABEL_A04
+	call UpdateLandauGraphics
 	call _LABEL_59CF
 	call _LABEL_467
 	jp _LABEL_F7
@@ -2080,7 +2080,7 @@ _LABEL_9F3:
 	ld bc, $0080
 	jp LoadVDPData
 
-_LABEL_A04:
+UpdateLandauGraphics:
 	ld a, (_RAM_C420)
 	or a
 	ret z
@@ -3306,7 +3306,7 @@ Handle_Movement_Damaged:
 	ld (_RAM_X_VELOCITY_MINOR), a
 	ld (_RAM_X_VELOCITY_MAJOR), a
 	ld c, (iy+43)
-	call ApplyPlayerHealOrDamageFromC
+	call ApplyLandauHealOrDamageFromC
 	ret nc
 	ld (iy+44), $01
 	xor a
@@ -3326,7 +3326,7 @@ Handle_Movement_Damaged:
 _LABEL_1387:
 	call _LABEL_14CC
 	call _LABEL_13DF
-	ld a, (_RAM_PLAYER_IN_AIR)
+	ld a, (_RAM_LANDAU_IN_AIR)
 	or a
 	ret nz
 	ld (iy+34), $01
@@ -3337,7 +3337,7 @@ _LABEL_1387:
 	ret
 
 _LABEL_13A2:
-	ld a, (_RAM_PLAYER_IN_AIR)
+	ld a, (_RAM_LANDAU_IN_AIR)
 	or a
 	ret z
 	ld de, $0040
@@ -3360,7 +3360,7 @@ _LABEL_13A2:
 	and $F8
 	ld (_RAM_Y_POSITION_MINOR), a
 	xor a
-	ld (_RAM_PLAYER_IN_AIR), a
+	ld (_RAM_LANDAU_IN_AIR), a
 	ld (_RAM_Y_POSITION_SUB), a
 	ld (_RAM_C425), a
 _LABEL_13DF:
@@ -3376,7 +3376,7 @@ _LABEL_13DF:
 	and $F8
 	ld (_RAM_Y_POSITION_MINOR), a
 	xor a
-	ld (_RAM_PLAYER_IN_AIR), a
+	ld (_RAM_LANDAU_IN_AIR), a
 	ld (_RAM_Y_POSITION_SUB), a
 	ret
 
@@ -3395,7 +3395,7 @@ _LABEL_13FD:
 _LABEL_1413:
 	call _LABEL_14CC
 	call _LABEL_13DF
-	ld a, (_RAM_PLAYER_IN_AIR)
+	ld a, (_RAM_LANDAU_IN_AIR)
 	or a
 	ret nz
 	ld (iy+34), $01
@@ -3443,7 +3443,7 @@ _LABEL_146A:
 	call _LABEL_13DF
 	ld (iy+13), b
 	ld (iy+36), c
-	ld a, (_RAM_PLAYER_IN_AIR)
+	ld a, (_RAM_LANDAU_IN_AIR)
 	or a
 	ret nz
 	xor a
@@ -3454,7 +3454,7 @@ _LABEL_146A:
 
 _LABEL_1486:
 	xor a
-	ld (_RAM_PLAYER_IN_AIR), a
+	ld (_RAM_LANDAU_IN_AIR), a
 	bit 0, (iy+35)
 	jr z, +
 	ex de, hl
@@ -3863,7 +3863,7 @@ _DATA_1787:
 .db $20 $00 $00 $30 $00 $00 $40 $00 $00 $50 $00 $00 $60 $00 $00 $70
 .db $00 $00 $80 $00
 
-_LABEL_17AB:
+UpdateScoreCounter:
 	ld a, (_RAM_C093)
 	or a
 	ret z
@@ -3959,7 +3959,7 @@ _LABEL_17E6:
 .db $F5 $F1 $3E $09 $D3 $BE $F5 $F1 $79 $C6 $01 $D3 $BE $F5 $F1 $3E
 .db $09 $D3 $BE $C9
 
-ApplyPlayerHealOrDamageFromC:
+ApplyLandauHealOrDamageFromC:
 	ld a, $01
 	ld (_RAM_C12A), a
 	ld a, (_RAM_HEALTH)
@@ -3983,7 +3983,7 @@ ApplyPlayerHealOrDamageFromC:
 	scf
 	ret
 
-_LABEL_188D:
+DrawHealthBar:
 	ld a, (_RAM_C12A)
 	or a
 	ret z
@@ -4729,7 +4729,7 @@ _LABEL_1D0B:
 +:
 	ld a, c
 	neg
-	ld (_RAM_INCOMING_PLAYER_DAMAGE), a
+	ld (_RAM_INCOMING_LANDAU_DAMAGE), a
 	ld a, $91
 	ld (_RAM_SOUND_TO_PLAY), a
 	ld a, (iy+0)
@@ -4914,7 +4914,7 @@ _LABEL_1E72:
 _DATA_1E95:
 .db $3C $00 $3C $00 $00
 
-_LABEL_1E9A:
+_LABEL_1E9A: ; Something to do with drawing building backgrounds, also title screen
 	ld iy, _RAM_C0BC
 	ld (iy+0), a
 	ld (iy+1), a
@@ -5114,7 +5114,7 @@ _LABEL_1FEA:
 	ld hl, $18A8
 	ld a, (_RAM_C141)
 	call _LABEL_201D
-	jp _LABEL_22DA
+	jp _LABEL_22DA ; Handle building extra effects (heals, flags, etc)
 
 _LABEL_201D:
 	ld (_RAM_CURRENT_MAP), a
@@ -5525,7 +5525,7 @@ _LABEL_22F3:
 	ld c, $30
 	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $07
-	jp nz, ApplyPlayerHealOrDamageFromC
+	jp nz, ApplyLandauHealOrDamageFromC
 	ld a, $01
 	ld (_RAM_FLAG_MEDUSA_SPAWNED), a
 	ld hl, _RAM_CC27
@@ -5624,7 +5624,7 @@ _LABEL_2370:
 
 +++:
 	ld c, $30
-	jp ApplyPlayerHealOrDamageFromC
+	jp ApplyLandauHealOrDamageFromC
 
 ; 5th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_2394:
@@ -5695,7 +5695,7 @@ _LABEL_23C4:
 
 +++:
 	ld c, $30
-	jp ApplyPlayerHealOrDamageFromC
+	jp ApplyLandauHealOrDamageFromC
 
 ; 8th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_23F0:
@@ -5718,7 +5718,7 @@ _LABEL_23F0:
 
 _LABEL_2408:
 	ld c, $08
-	jp ApplyPlayerHealOrDamageFromC
+	jp ApplyLandauHealOrDamageFromC
 
 _LABEL_240D:
 	call _LABEL_21DA
@@ -6916,7 +6916,7 @@ _LABEL_2D88:
 	ld a, c
 	add a, b
 	ld (iy+10), a
-	ld a, (_RAM_PLAYER_IN_AIR)
+	ld a, (_RAM_LANDAU_IN_AIR)
 	or a
 	jr nz, +
 	ld a, (_RAM_CONTROLLER_INPUT)
@@ -10994,14 +10994,14 @@ _LABEL_50CB:
 	ret nz
 	jp _LABEL_8AC
 
-_LABEL_5115:
+LoadMapEnemies:
 	ld a, :Bank10
 	ld (_RAM_FFFF), a
 	ld a, (_RAM_CURRENT_MAP)
 	ld l, a
 	ld h, $00
 	add hl, hl
-	ld de, _DATA_28FA8
+	ld de, MapEnemySpawnArrayPointers
 	add hl, de
 	ld a, (hl)
 	inc hl
@@ -11264,7 +11264,7 @@ _LABEL_52BC:
 	call z, _LABEL_8AC
 	call _LABEL_595A
 	call CheckVarlinDoor
-	call _LABEL_5115
+	call LoadMapEnemies
 	call _LABEL_535B ; Load Map Metadata (Warps, Starting Position etc.)?
 	call _LABEL_53D3 ; Load Map Layout?
 	call _LABEL_5808
@@ -11412,7 +11412,7 @@ _LABEL_540B:
 +:
 	ld e, a
 	ld d, $00
-	ld hl, $5435
+	ld hl, _DATA_5435
 	add hl, de
 	ld (_RAM_C14F), hl
 	ld a, $01
@@ -11420,6 +11420,7 @@ _LABEL_540B:
 	ret
 
 ; Data from 5435 to 5439 (5 bytes)
+_DATA_5435:
 .db $3C $38 $34 $3C $38
 
 _LABEL_543A:
@@ -11949,7 +11950,7 @@ _LABEL_5935:
 	ret
 
 _LABEL_595A:
-	ld hl, $5983
+	ld hl, _DATA_5983
 	ld b, $09
 	ld a, (_RAM_CURRENT_MAP)
 -:
@@ -11981,6 +11982,7 @@ _LABEL_595A:
 	ret
 
 ; Data from 5983 to 599D (27 bytes)
+_DATA_5983:
 .db $6B $00 $6E $6C $00 $6F $6D $00 $70 $25 $00 $31 $26 $00 $32 $48
 .db $01 $4C $49 $01 $4D $72 $01 $74 $73 $01 $75
 
@@ -12761,7 +12763,7 @@ _LABEL_5FB9:
 	ld a, $01
 	ld (_RAM_C153), a
 	ld c, $10
-	call ApplyPlayerHealOrDamageFromC
+	call ApplyLandauHealOrDamageFromC
 	ld c, $07
 	call _LABEL_175F
 	jp _LABEL_8AC
@@ -12951,7 +12953,7 @@ _LABEL_6177:
 	ld a, $02
 	ld (_RAM_C153), a
 	ld c, $10
-	call ApplyPlayerHealOrDamageFromC
+	call ApplyLandauHealOrDamageFromC
 	ld c, $07
 	call _LABEL_175F
 	jp _LABEL_8AC
@@ -13136,7 +13138,7 @@ _LABEL_6312:
 	ld a, $03
 	ld (_RAM_C153), a
 	ld c, $10
-	call ApplyPlayerHealOrDamageFromC
+	call ApplyLandauHealOrDamageFromC
 	ld c, $07
 	call _LABEL_175F
 	jp _LABEL_8AC
@@ -13488,7 +13490,7 @@ _LABEL_65F5:
 	ld a, $04
 	ld (_RAM_C153), a
 	ld c, $10
-	call ApplyPlayerHealOrDamageFromC
+	call ApplyLandauHealOrDamageFromC
 	ld c, $07
 	call _LABEL_175F
 	jp _LABEL_8AC
@@ -13653,7 +13655,7 @@ _LABEL_674A:
 	ld a, $01
 	ld (_RAM_FLAG_DUELS_DEFEATED), a
 	ld c, $10
-	call ApplyPlayerHealOrDamageFromC
+	call ApplyLandauHealOrDamageFromC
 	ld c, $07
 	call _LABEL_175F
 	jp _LABEL_8AC
@@ -13893,7 +13895,7 @@ _LABEL_6960:
 	ld (_RAM_SOUND_TO_PLAY), a
 	ld (iy+1), $FF
 	ld c, $10
-	call ApplyPlayerHealOrDamageFromC
+	call ApplyLandauHealOrDamageFromC
 +:
 	scf
 	ret
@@ -14060,7 +14062,7 @@ _LABEL_6AC2:
 	ld (_RAM_C153), a
 	call _LABEL_175F
 	ld c, $10
-	call ApplyPlayerHealOrDamageFromC
+	call ApplyLandauHealOrDamageFromC
 	ld ix, _RAM_C540
 	call _LABEL_8A6
 	ld ix, _RAM_C580
@@ -20369,24 +20371,142 @@ _DATA_28F6B:
 .db $88 $00 $00
 
 ; Pointer Table from 28FA8 to 290B5 (135 entries, indexed by _RAM_CURRENT_MAP)
-_DATA_28FA8:
-.dw _DATA_294A3 _DATA_28008 _DATA_28717 _DATA_28008 _DATA_28717 _DATA_2805B _DATA_2876A _DATA_280AE
-.dw _DATA_287BD _DATA_280F2 _DATA_28801 _DATA_280F2 _DATA_28801 _DATA_28131 _DATA_28840 _DATA_28131
-.dw _DATA_28840 _DATA_2816B _DATA_2887A _DATA_281A0 _DATA_288AA _DATA_281D5 _DATA_288E4 _DATA_281D5
-.dw _DATA_288E4 _DATA_28205 _DATA_28914 _DATA_28205 _DATA_28914 _DATA_28258 _DATA_2895D _DATA_28258
-.dw _DATA_2895D _DATA_2829C _DATA_2899C _DATA_28384 _DATA_28A84 _DATA_283D7 _DATA_28AD7 _DATA_283D7
-.dw _DATA_28AD7 _DATA_283D7 _DATA_28AD7 _DATA_2842A _DATA_28B20 _DATA_2842A _DATA_28B20 _DATA_28469
-.dw _DATA_28B5A _DATA_284AD _DATA_28B9E _DATA_284AD _DATA_284AD _DATA_28B9E _DATA_284AD _DATA_28500
-.dw _DATA_28BF1 _DATA_28500 _DATA_28553 _DATA_28C3A _DATA_2857E _DATA_28C65 _DATA_2857E _DATA_28C65
-.dw _DATA_282E0 _DATA_289E0 _DATA_2831A _DATA_28A1A _DATA_285A4 _DATA_28C8B _DATA_285A4 _DATA_28C8B
-.dw _DATA_285A4 _DATA_28C8B _DATA_285A4 _DATA_28C8B _DATA_285ED _DATA_28CD4 _DATA_285ED _DATA_28640
-.dw _DATA_28D27 _DATA_28640 _DATA_2866B _DATA_28D52 _DATA_28696 _DATA_28D7D _DATA_28696 _DATA_28D7D
-.dw _DATA_286D5 _DATA_28DBC _DATA_2834F _DATA_28A4F _DATA_2834F _DATA_28A4F _DATA_28000 _DATA_28000
-.dw _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000
-.dw _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000
-.dw _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000
-.dw _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28000 _DATA_28DF6 _DATA_28DF6
-.dw _DATA_28E35 _DATA_28E83 _DATA_28EB8 _DATA_28EB8 _DATA_28EED _DATA_28F27 _DATA_28F6B
+MapEnemySpawnArrayPointers:
+.dw _DATA_294A3
+.dw _DATA_28008
+.dw _DATA_28717
+.dw _DATA_28008
+.dw _DATA_28717
+.dw _DATA_2805B
+.dw _DATA_2876A
+.dw _DATA_280AE
+.dw _DATA_287BD
+.dw _DATA_280F2
+.dw _DATA_28801
+.dw _DATA_280F2
+.dw _DATA_28801
+.dw _DATA_28131
+.dw _DATA_28840
+.dw _DATA_28131
+.dw _DATA_28840
+.dw _DATA_2816B
+.dw _DATA_2887A
+.dw _DATA_281A0
+.dw _DATA_288AA
+.dw _DATA_281D5
+.dw _DATA_288E4
+.dw _DATA_281D5
+.dw _DATA_288E4
+.dw _DATA_28205
+.dw _DATA_28914
+.dw _DATA_28205
+.dw _DATA_28914
+.dw _DATA_28258
+.dw _DATA_2895D
+.dw _DATA_28258
+.dw _DATA_2895D
+.dw _DATA_2829C
+.dw _DATA_2899C
+.dw _DATA_28384
+.dw _DATA_28A84
+.dw _DATA_283D7
+.dw _DATA_28AD7
+.dw _DATA_283D7
+.dw _DATA_28AD7
+.dw _DATA_283D7
+.dw _DATA_28AD7
+.dw _DATA_2842A
+.dw _DATA_28B20
+.dw _DATA_2842A
+.dw _DATA_28B20
+.dw _DATA_28469
+.dw _DATA_28B5A
+.dw _DATA_284AD
+.dw _DATA_28B9E
+.dw _DATA_284AD
+.dw _DATA_284AD
+.dw _DATA_28B9E
+.dw _DATA_284AD
+.dw _DATA_28500
+.dw _DATA_28BF1
+.dw _DATA_28500
+.dw _DATA_28553
+.dw _DATA_28C3A
+.dw _DATA_2857E
+.dw _DATA_28C65
+.dw _DATA_2857E
+.dw _DATA_28C65
+.dw _DATA_282E0
+.dw _DATA_289E0
+.dw _DATA_2831A
+.dw _DATA_28A1A
+.dw _DATA_285A4
+.dw _DATA_28C8B
+.dw _DATA_285A4
+.dw _DATA_28C8B
+.dw _DATA_285A4
+.dw _DATA_28C8B
+.dw _DATA_285A4
+.dw _DATA_28C8B
+.dw _DATA_285ED
+.dw _DATA_28CD4
+.dw _DATA_285ED
+.dw _DATA_28640
+.dw _DATA_28D27
+.dw _DATA_28640
+.dw _DATA_2866B
+.dw _DATA_28D52
+.dw _DATA_28696
+.dw _DATA_28D7D
+.dw _DATA_28696
+.dw _DATA_28D7D
+.dw _DATA_286D5
+.dw _DATA_28DBC
+.dw _DATA_2834F
+.dw _DATA_28A4F
+.dw _DATA_2834F
+.dw _DATA_28A4F
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000
+.dw _DATA_28000 ; Varlin (UL, Open)
+.dw _DATA_28DF6 ; Dark Suma's Dungeon 1F (DL)
+.dw _DATA_28DF6
+.dw _DATA_28E35
+.dw _DATA_28E83
+.dw _DATA_28EB8
+.dw _DATA_28EB8
+.dw _DATA_28EED
+.dw _DATA_28F27
+.dw _DATA_28F6B
 
 ; 1st entry of Pointer Table from 28006 (indexed by unknown)
 ; Data from 290B6 to 294A2 (1005 bytes)
