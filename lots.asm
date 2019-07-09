@@ -123,7 +123,7 @@ _RAM_C13D db
 _RAM_C13F db
 _RAM_C140 db
 _RAM_C141 db
-_RAM_C142 db
+_RAM_BUILDING_FLAG_PROGRESS db
 _RAM_C143 db
 .ende
 
@@ -467,78 +467,78 @@ _RAM_C9C0 db
 .ende
 
 .enum $CC00 export
-_RAM_CC00 db
-_RAM_CC01 db
-_RAM_CC02 db
-_RAM_CC03 db
-_RAM_CC04 db
-_RAM_CC05 db
-_RAM_CC06 db
-_RAM_CC07 db
+_RAM_FLAG_TREE_SPIRIT_DEFEATED db
+_RAM_FLAG_BARUGA_DEFEATED db
+_RAM_FLAG_MEDUSA_DEFEATED db
+_RAM_FLAG_NECROMANCER_DEFEATED db
+_RAM_FLAG_DUELS_DEFEATED db
+_RAM_FLAG_PIRATE_DEFEATED db
+_RAM_FLAG_DARK_SUMA_DEFEATED db
+_RAM_FLAG_RA_GOAN_DEFEATED db
 .ende
 
 .enum $CC11 export
-_RAM_CC11 db
-_RAM_CC12 db
-_RAM_CC13 db
+_RAM_FLAG_GAME_STARTED db ; Could also be "building progress enabled"
+_RAM_FLAG_ULMO_BUILDING_ENABLED db
+_RAM_FLAG_TREE_SPIRIT_SPAWNED db
 _RAM_CC14 db
 _RAM_CC15 db
-_RAM_CC16 db
+_RAM_FLAG_MAYORS_DAUGHTER_RETURNED db
 _RAM_CC17 db
 _RAM_CC18 db
-_RAM_CC19 db
+_RAM_FLAG_MEDUSA_SPAWNED db
 _RAM_CC1A db
 _RAM_CC1B db
 _RAM_CC1C db
-_RAM_CC1D db
+_RAM_FLAG_VARLIN_OPEN db
 _RAM_CC1E db
 .ende
 
 .enum $CC21 export
-_RAM_CC21 db
+_RAM_CC21 db ; Harfoot textbox flags start
 .ende
 
 .enum $CC27 export
-_RAM_CC27 db
+_RAM_CC27 db ; Harfoot Medusa textbox flag
 .ende
 
 .enum $CC31 export
-_RAM_CC31 db
+_RAM_CC31 db ; Amon textbox flags start
 .ende
 
 .enum $CC37 export
-_RAM_CC37 db
+_RAM_CC37 db ; Amon Pharazon path textbox flag
 .ende
 
 .enum $CC41 export
-_RAM_CC41 db
+_RAM_CC41 db ; Dwarle textbox flags start
 .ende
 
 .enum $CC48 export
-_RAM_CC48 db
-_RAM_CC49 db
-_RAM_CC4A db
-_RAM_CC4B db
+_RAM_CC48 db ; Dwarle: Baruga Defeated?
+_RAM_CC49 db ; Dwarle: Kill the beast text
+_RAM_CC4A db ; Baruga Defeated?
+_RAM_CC4B db ; Baruga Defeated?
 .ende
 
 .enum $CC51 export
-_RAM_CC51 db
+_RAM_CC51 db ; Ithile textbox flags start
 .ende
 
 .enum $CC61 export
-_RAM_CC61 db
+_RAM_CC61 db ; Pharazon textbox flags start
 .ende
 
 .enum $CC67 export
-_RAM_CC67 db
+_RAM_CC67 db ; Pharazon path to Amon textbox flag
 .ende
 
 .enum $CC71 export
-_RAM_CC71 db
+_RAM_CC71 db ; Unused building index flags start
 .ende
 
 .enum $CC81 export
-_RAM_CC81 db
+_RAM_CC81 db ; Lindon textbox flags start
 .ende
 
 .enum $CC8A export
@@ -556,7 +556,7 @@ _RAM_CC93 db
 .enum $CCA0 export
 _RAM_CCA0 db
 _RAM_CCA1 db
-_RAM_FLAG_PIRATE_SPAWNED db
+_RAM_FLAG_PIRATE_PATH_OPEN db
 _RAM_CCA3 db
 _RAM_CCA4 db
 .ende
@@ -1541,8 +1541,8 @@ _LABEL_56F:
 	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	call _LABEL_C989
-	ld hl, _RAM_CC00
-	ld de, _RAM_CC00 + 1
+	ld hl, _RAM_FLAG_TREE_SPIRIT_DEFEATED
+	ld de, _RAM_FLAG_TREE_SPIRIT_DEFEATED + 1
 	ld bc, $03FF
 	ld (hl), $00
 	ldir
@@ -2033,7 +2033,7 @@ Handle_Map_Status_Start_Game:
 	ld a, $01
 	ld (_RAM_C12A), a
 	ld a, $01
-	ld (_RAM_CC11), a
+	ld (_RAM_FLAG_GAME_STARTED), a
 	call _LABEL_9DC
 	ld hl, _PALETTE_9BC
 	call _LABEL_3D1
@@ -5082,7 +5082,7 @@ _LABEL_1F39:
 	cp $06
 	jp z, _LABEL_2444
 	ld a, (_RAM_BUILDING_INDEX)
-	cp $0C
+	cp Building_Varlin
 	jp z, _LABEL_247F
 _LABEL_1FE4:
 	ld bc, $E201
@@ -5106,7 +5106,7 @@ _LABEL_1FEA:
 
 ++:
 	ld a, (_RAM_BUILDING_INDEX)
-	cp $0C
+	cp Building_Varlin
 	jp z, _LABEL_2077
 	ld a, (_RAM_C118)
 	cp $07
@@ -5364,7 +5364,7 @@ _LABEL_21DA:
 
 +:
 	ld a, (_RAM_BUILDING_INDEX)
-	cp $07
+	cp Building_Lindon
 	jr z, +
 -:
 	add a, a
@@ -5379,7 +5379,7 @@ _LABEL_21DA:
 
 +:
 	ld c, $07
-	ld a, (_RAM_CC16)
+	ld a, (_RAM_FLAG_MAYORS_DAUGHTER_RETURNED)
 	or a
 	jr z, +
 	ld c, $09
@@ -5401,8 +5401,8 @@ _DATA_221B:
 _LABEL_223B:
 	ld a, (_RAM_BUILDING_INDEX)
 	add a, a
-	add a, a
-	ld hl, $2217
+	add a, a ; Multiply by 4 (compensation for two 16 bit pointers in the table above)
+	ld hl, _DATA_221B - 4
 	ld e, a
 	ld d, $00
 	add hl, de
@@ -5418,7 +5418,7 @@ _LABEL_223B:
 	pop iy
 	ld b, $0E
 	ld c, $00
-	ld de, _RAM_CC11
+	ld de, _RAM_FLAG_GAME_STARTED
 ----:
 	ld a, (de)
 	or a
@@ -5472,9 +5472,9 @@ _LABEL_223B:
 	ld (_RAM_C137), hl
 	inc e
 	ld a, e
-	ld (_RAM_C142), a
+	ld (_RAM_BUILDING_FLAG_PROGRESS), a
 	ld a, (_RAM_BUILDING_INDEX)
-	cp $02
+	cp Building_Amon
 	jp nz, _LABEL_2082
 	ld a, (_RAM_CCAD)
 	or a
@@ -5510,17 +5510,24 @@ _LABEL_22DA:
 
 ; Jump Table from 22E3 to 22F2 (8 entries, indexed by _RAM_BUILDING_INDEX)
 _DATA_22E3:
-.dw _LABEL_22F3 _LABEL_230B _LABEL_2355 _LABEL_2370 _LABEL_2394 _LABEL_23C3 _LABEL_23C4 _LABEL_23F0
+.dw _LABEL_22F3 ; Harfoot
+.dw _LABEL_230B ; Amon
+.dw _LABEL_2355 ; Dwarle
+.dw _LABEL_2370 ; Ithile
+.dw _LABEL_2394 ; Pharazon
+.dw _LABEL_23C3 ; Unused 0x06
+.dw _LABEL_23C4 ; Lindon
+.dw _LABEL_23F0 ; Ulmo
 
 ; 1st entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_22F3:
 	call _LABEL_2408
 	ld c, $30
-	ld a, (_RAM_C142)
+	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $07
 	jp nz, ApplyPlayerHealOrDamageFromC
 	ld a, $01
-	ld (_RAM_CC19), a
+	ld (_RAM_FLAG_MEDUSA_SPAWNED), a
 	ld hl, _RAM_CC27
 	set 7, (hl)
 	ret
@@ -5528,7 +5535,7 @@ _LABEL_22F3:
 ; 2nd entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_230B:
 	call _LABEL_2408
-	ld a, (_RAM_C142)
+	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $01
 	jr z, +
 	cp $07
@@ -5539,7 +5546,7 @@ _LABEL_230B:
 
 +:
 	ld a, $01
-	ld (_RAM_CC12), a
+	ld (_RAM_FLAG_ULMO_BUILDING_ENABLED), a
 	ld (_RAM_INVENTORY_BOOK), a
 	ld (_RAM_CCAD), a
 	ld (_RAM_C16D), a
@@ -5573,7 +5580,7 @@ _LABEL_230B:
 ; 3rd entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_2355:
 	call _LABEL_2408
-	ld a, (_RAM_C142)
+	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $01
 	jr z, +
 	cp $06
@@ -5596,7 +5603,7 @@ _LABEL_2355:
 ; 4th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_2370:
 	call _LABEL_2408
-	ld a, (_RAM_C142)
+	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $04
 	jr z, +
 	cp $05
@@ -5622,7 +5629,7 @@ _LABEL_2370:
 ; 5th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_2394:
 	call _LABEL_2408
-	ld a, (_RAM_C142)
+	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $01
 	jr z, +
 	cp $03
@@ -5664,7 +5671,7 @@ _LABEL_23C3:
 ; 7th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_23C4:
 	call _LABEL_2408
-	ld a, (_RAM_C142)
+	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $05
 	jr z, +
 	cp $0A
@@ -5675,7 +5682,7 @@ _LABEL_23C4:
 
 +:
 	ld a, $01
-	ld (_RAM_FLAG_PIRATE_SPAWNED), a
+	ld (_RAM_FLAG_PIRATE_PATH_OPEN), a
 	ret
 
 ++:
@@ -5692,7 +5699,7 @@ _LABEL_23C4:
 
 ; 8th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 _LABEL_23F0:
-	ld a, (_RAM_C142)
+	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $02
 	jr z, +
 	cp $03
@@ -5701,7 +5708,7 @@ _LABEL_23F0:
 
 +:
 	ld a, $01
-	ld (_RAM_CC13), a
+	ld (_RAM_FLAG_TREE_SPIRIT_SPAWNED), a
 	ret
 
 ++:
@@ -5723,7 +5730,7 @@ _LABEL_2419:
 	ld a, $08
 	ld (_RAM_C152), a
 	ld a, $01
-	ld (_RAM_CC16), a
+	ld (_RAM_FLAG_MAYORS_DAUGHTER_RETURNED), a
 	ret
 
 _LABEL_2424:
@@ -5746,7 +5753,7 @@ _LABEL_2430:
 _LABEL_2444:
 	call _LABEL_21DA
 	ld hl, _DATA_1AD95 + 2
-	ld a, (_RAM_CC04)
+	ld a, (_RAM_FLAG_DUELS_DEFEATED)
 	or a
 	jr z, +
 	ld hl, _DATA_1AD99
@@ -5755,7 +5762,7 @@ _LABEL_2444:
 	jp _LABEL_1FE4
 
 _LABEL_2459:
-	ld a, (_RAM_CC04)
+	ld a, (_RAM_FLAG_DUELS_DEFEATED)
 	or a
 	jr nz, +
 	ld a, $06
@@ -11687,7 +11694,7 @@ _LABEL_5740:
 	ld a, (_RAM_SCREEN_X_TILE)
 	or a
 	ret nz
-	ld a, (_RAM_CC06)
+	ld a, (_RAM_FLAG_DARK_SUMA_DEFEATED)
 	or a
 	ret nz
 --:
@@ -11714,7 +11721,7 @@ _LABEL_575F:
 	ret
 
 -:
-	ld a, (_RAM_CC07)
+	ld a, (_RAM_FLAG_RA_GOAN_DEFEATED)
 	or a
 	ret nz
 	jp --
@@ -11778,7 +11785,7 @@ _LABEL_57DF:
 	jp c, _LABEL_56C3
 	cp $7C
 	ret c
-	ld a, (_RAM_CC04)
+	ld a, (_RAM_FLAG_DUELS_DEFEATED)
 	or a
 	ret nz
 	ld a, $06
@@ -11984,7 +11991,7 @@ CheckPirateSpawned:
 	cp $77 ; Lindon (R)
 	ret nz
 +:
-	ld a, (_RAM_FLAG_PIRATE_SPAWNED)
+	ld a, (_RAM_FLAG_PIRATE_PATH_OPEN)
 	or a
 	ret z
 	ld a, $19 ; Swamp (Lindon +1R) (Pirate +2L) (L)
@@ -12001,7 +12008,7 @@ CheckVarlinDoor:
 	cp $7B ; Varlin (UL, Closed)
 	ret nz
 +:
-	ld hl, (_RAM_CC1D)
+	ld hl, (_RAM_FLAG_VARLIN_OPEN)
 	ld a, h
 	or l
 	ret z
@@ -12124,8 +12131,18 @@ _LABEL_5A9D:
 
 ; Jump Table from 5AAC to 5AC3 (12 entries, indexed by _RAM_C152)
 _DATA_5AAC:
-.dw _LABEL_5AD0 _LABEL_5ADA _LABEL_5AFA _LABEL_5B1C _LABEL_5B59 _LABEL_5B74 _LABEL_5B8F _LABEL_5ACF
-.dw _LABEL_5ACF _LABEL_5ACF _LABEL_5BA8 _LABEL_5BE2
+.dw _LABEL_5AD0
+.dw _LABEL_5ADA
+.dw _LABEL_5AFA
+.dw _LABEL_5B1C
+.dw _LABEL_5B59
+.dw _LABEL_5B74
+.dw _LABEL_5B8F
+.dw _LABEL_5ACF
+.dw _LABEL_5ACF
+.dw _LABEL_5ACF
+.dw _LABEL_5BA8
+.dw _LABEL_5BE2
 
 _LABEL_5AC4:
 	ld a, $01
@@ -12149,10 +12166,10 @@ _LABEL_5AD0:
 _LABEL_5ADA:
 	ld c, $0B
 	call _LABEL_589F
-	ld a, (_RAM_CC00)
+	ld a, (_RAM_FLAG_TREE_SPIRIT_DEFEATED)
 	or a
 	jp nz, _LABEL_5AC4
-	ld a, (_RAM_CC13)
+	ld a, (_RAM_FLAG_TREE_SPIRIT_SPAWNED)
 	or a
 	jp z, _LABEL_5AC4
 	ld hl, _DATA_2624D
@@ -12165,7 +12182,7 @@ _LABEL_5ADA:
 _LABEL_5AFA:
 	ld hl, _RAM_C16B
 	ld (hl), $00
-	ld a, (_RAM_CC01)
+	ld a, (_RAM_FLAG_BARUGA_DEFEATED)
 	or a
 	jp nz, _LABEL_5AC4
 	ld a, (_RAM_CCA0)
@@ -12180,7 +12197,7 @@ _LABEL_5AFA:
 
 ; 4th entry of Jump Table from 5AAC (indexed by _RAM_C152)
 _LABEL_5B1C:
-	ld a, (_RAM_CC02)
+	ld a, (_RAM_FLAG_MEDUSA_DEFEATED)
 	or a
 	jp nz, _LABEL_5AC4
 	ld hl, _DATA_1C000
@@ -12194,7 +12211,7 @@ _LABEL_5B1C:
 	call LoadVDPData
 	ld a, $02
 	ld (_RAM_C502), a
-	ld a, (_RAM_CC19)
+	ld a, (_RAM_FLAG_MEDUSA_SPAWNED)
 	or a
 	jp z, _LABEL_5AC4
 	ld a, (_RAM_INVENTORY_HERB)
@@ -12210,7 +12227,7 @@ _DATA_5B54:
 
 ; 5th entry of Jump Table from 5AAC (indexed by _RAM_C152)
 _LABEL_5B59:
-	ld a, (_RAM_CC03)
+	ld a, (_RAM_FLAG_NECROMANCER_DEFEATED)
 	or a
 	jp nz, _LABEL_5AC4
 	ld a, (_RAM_CCA1)
@@ -12224,10 +12241,10 @@ _LABEL_5B59:
 
 ; 6th entry of Jump Table from 5AAC (indexed by _RAM_C152)
 _LABEL_5B74:
-	ld a, (_RAM_CC04)
+	ld a, (_RAM_FLAG_DUELS_DEFEATED)
 	or a
 	jp nz, _LABEL_5AC4
-	ld a, (_RAM_CC16)
+	ld a, (_RAM_FLAG_MAYORS_DAUGHTER_RETURNED)
 	or a
 	jp z, _LABEL_5AC4
 	ld hl, _DATA_25AF3
@@ -12238,7 +12255,7 @@ _LABEL_5B74:
 
 ; 7th entry of Jump Table from 5AAC (indexed by _RAM_C152)
 _LABEL_5B8F:
-	ld a, (_RAM_CC05)
+	ld a, (_RAM_FLAG_PIRATE_DEFEATED)
 	or a
 	jr nz, +
 	ld hl, _DATA_24717
@@ -12254,7 +12271,7 @@ _LABEL_5B8F:
 
 ; 11th entry of Jump Table from 5AAC (indexed by _RAM_C152)
 _LABEL_5BA8:
-	ld a, (_RAM_CC06)
+	ld a, (_RAM_FLAG_DARK_SUMA_DEFEATED)
 	or a
 	jp nz, _LABEL_5AC4
 	ld a, (_RAM_CCA3)
@@ -12281,7 +12298,7 @@ _DATA_5BDD:
 
 ; 12th entry of Jump Table from 5AAC (indexed by _RAM_C152)
 _LABEL_5BE2:
-	ld a, (_RAM_CC07)
+	ld a, (_RAM_FLAG_RA_GOAN_DEFEATED)
 	or a
 	jp nz, _LABEL_5AC4
 	ld hl, _DATA_2AF80
@@ -12331,8 +12348,18 @@ _LABEL_5C2B:
 
 ; Jump Table from 5C36 to 5C4D (12 entries, indexed by _RAM_C152)
 _DATA_5C36:
-.dw _LABEL_5C4E _LABEL_5C6F _LABEL_5C72 _LABEL_5C9B _LABEL_5C9E _LABEL_5CA1 _LABEL_5CC5 _LABEL_5D14
-.dw _LABEL_5CEE _LABEL_5D14 _LABEL_5D34 _LABEL_5D37
+.dw _LABEL_5C4E
+.dw _LABEL_5C6F
+.dw _LABEL_5C72
+.dw _LABEL_5C9B
+.dw _LABEL_5C9E
+.dw _LABEL_5CA1
+.dw _LABEL_5CC5
+.dw _LABEL_5D14
+.dw _LABEL_5CEE
+.dw _LABEL_5D14
+.dw _LABEL_5D34
+.dw _LABEL_5D37
 
 ; 1st entry of Jump Table from 5C36 (indexed by _RAM_C152)
 _LABEL_5C4E:
@@ -12360,7 +12387,7 @@ _LABEL_5C72:
 	ld a, (_RAM_C16B)
 	or a
 	jp z, _LABEL_5D42
-	ld a, (_RAM_CC01)
+	ld a, (_RAM_FLAG_BARUGA_DEFEATED)
 	or a
 	ret z
 	ld a, $01
@@ -12388,7 +12415,7 @@ _LABEL_5CA1:
 	ld a, (_RAM_C153)
 	or a
 	jp nz, _LABEL_5DA6
-	ld a, (_RAM_CC04)
+	ld a, (_RAM_FLAG_DUELS_DEFEATED)
 	or a
 	ret z
 	ld a, $0B
@@ -13624,7 +13651,7 @@ _LABEL_674A:
 	xor a
 	ld (_RAM_C153), a
 	ld a, $01
-	ld (_RAM_CC04), a
+	ld (_RAM_FLAG_DUELS_DEFEATED), a
 	ld c, $10
 	call ApplyPlayerHealOrDamageFromC
 	ld c, $07
@@ -13897,8 +13924,8 @@ _LABEL_69B2:
 	ret nc
 	ld a, $01
 	ld (_RAM_C153), a
-	ld (_RAM_CC02), a
-	ld (_RAM_CC1D), a
+	ld (_RAM_FLAG_MEDUSA_DEFEATED), a
+	ld (_RAM_FLAG_VARLIN_OPEN), a
 	ld c, $0A
 	call _LABEL_175F
 	xor a
@@ -13984,7 +14011,7 @@ _LABEL_6A47:
 +:
 	ld a, $01
 	ld (_RAM_CC1E), a
-	ld hl, _RAM_CC07
+	ld hl, _RAM_FLAG_RA_GOAN_DEFEATED
 	ld c, $0B
 	call _LABEL_6AC2
 	jp _LABEL_6B01
@@ -13994,24 +14021,24 @@ _LABEL_6A47:
 	ld (_RAM_CC14), a
 	ld (_RAM_C16D), a
 	ld (_RAM_INVENTORY_TREE_LIMB), a
-	ld hl, _RAM_CC00
+	ld hl, _RAM_FLAG_TREE_SPIRIT_DEFEATED
 	ld c, $04
 	jr _LABEL_6AC2
 
 +++:
-	ld hl, _RAM_CC01
+	ld hl, _RAM_FLAG_BARUGA_DEFEATED
 	ld c, $09
 	jr _LABEL_6AC2
 
 ++++:
 	ld a, $01
 	ld (_RAM_CC15), a
-	ld hl, _RAM_CC03
+	ld hl, _RAM_FLAG_NECROMANCER_DEFEATED
 	ld c, $05
 	jr _LABEL_6AC2
 
 _LABEL_6A9E:
-	ld hl, _RAM_CC05
+	ld hl, _RAM_FLAG_PIRATE_DEFEATED
 	ld c, $06
 	jr _LABEL_6AC2
 
@@ -14025,7 +14052,7 @@ _LABEL_6AA5:
 	ld (_RAM_C480), a
 	ld a, $01
 	ld (_RAM_CC18), a
-	ld hl, _RAM_CC06
+	ld hl, _RAM_FLAG_DARK_SUMA_DEFEATED
 	ld c, $08
 _LABEL_6AC2:
 	ld a, $01
@@ -14050,7 +14077,7 @@ _LABEL_6AC2:
 	jp _LABEL_8A6
 
 _LABEL_6B01:
-	ld hl, _RAM_CC11
+	ld hl, _RAM_FLAG_GAME_STARTED
 	ld c, $09
 	ld a, $01
 --:
@@ -14065,17 +14092,17 @@ _LABEL_6B01:
 	dec c
 	jr nz, --
 	ld a, $01
-	ld (_RAM_CC00), a
-	ld (_RAM_CC01), a
-	ld (_RAM_CC02), a
-	ld (_RAM_CC03), a
-	ld (_RAM_CC04), a
-	ld (_RAM_CC05), a
-	ld (_RAM_CC06), a
-	ld (_RAM_CC07), a
+	ld (_RAM_FLAG_TREE_SPIRIT_DEFEATED), a
+	ld (_RAM_FLAG_BARUGA_DEFEATED), a
+	ld (_RAM_FLAG_MEDUSA_DEFEATED), a
+	ld (_RAM_FLAG_NECROMANCER_DEFEATED), a
+	ld (_RAM_FLAG_DUELS_DEFEATED), a
+	ld (_RAM_FLAG_PIRATE_DEFEATED), a
+	ld (_RAM_FLAG_DARK_SUMA_DEFEATED), a
+	ld (_RAM_FLAG_RA_GOAN_DEFEATED), a
 	ld (_RAM_CCA0), a
 	ld (_RAM_CCA1), a
-	ld (_RAM_FLAG_PIRATE_SPAWNED), a
+	ld (_RAM_FLAG_PIRATE_PATH_OPEN), a
 	ld (_RAM_CCA3), a
 	ld (_RAM_CCA4), a
 	ret

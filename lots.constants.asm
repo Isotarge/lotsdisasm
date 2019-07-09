@@ -31,6 +31,19 @@
 .define	Building_Status_Ending $05
 .define	Building_Status_Death $06
 
+; Buildings
+.define	Building_Harfoot $01
+.define	Building_Amon $02
+.define	Building_Dawrle $03
+.define	Building_Ithile $04
+.define	Building_Pharazon $05
+.define	Building_Unused_6 $06 ; Unused but the progress flags are still set by Ra Goan
+.define	Building_Lindon $07
+.define	Building_Ulmo $08
+.define	Building_Mayors_Daughter $09 ; After Pirate
+.define	Building_Elder $0B
+.define	Building_Varlin $0C
+
 ; Movement States
 .define	Movement_Walking_Left $00
 .define	Movement_Walking_Right $01
