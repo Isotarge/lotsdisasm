@@ -129,7 +129,7 @@ _RAM_C143 db
 
 .enum $C146 export
 _RAM_C146 db
-_RAM_C147 db
+_RAM_BACKGROUND_SCROLL_X db
 _RAM_C148 db
 _RAM_C149 db
 _RAM_C14A db
@@ -787,7 +787,7 @@ _LABEL_82:
 	ld (_RAM_CONTINUE_MAP), a
 _LABEL_C2:
 	ld bc, $8001
-	call _LABEL_302
+	call SendVDPCommand
 	call _LABEL_38E
 	ld a, :Bank3
 	ld (_RAM_FFFF), a
@@ -802,7 +802,7 @@ _LABEL_C2:
 	call _LABEL_3C2
 	call _LABEL_3B7
 	ld bc, $E001
-	call _LABEL_302
+	call SendVDPCommand
 	ld a, $03
 	ld (_RAM_MAP_STATUS), a
 _LABEL_F7:
@@ -860,8 +860,8 @@ HandleIRQ:
 	ld a, $FF
 	ld (_RAM_C134), a
 	ld bc, $4F0A
-	call _LABEL_302
-	ld a, (_RAM_C147)
+	call SendVDPCommand
+	ld a, (_RAM_BACKGROUND_SCROLL_X)
 	out (Port_VDPAddress), a
 	ld a, $88
 	out (Port_VDPAddress), a
@@ -1116,7 +1116,7 @@ _LABEL_2E5:
 	ld (_RAM_MAP_STATUS), a
 	ret
 
-_LABEL_302:
+SendVDPCommand:
 	ld a, b
 	out (Port_VDPAddress), a
 	ld a, c
@@ -1273,7 +1273,7 @@ _LABEL_38E:
 	ld c, $00
 -:
 	ld b, (hl)
-	call _LABEL_302
+	call SendVDPCommand
 	inc hl
 	inc c
 	dec e
@@ -1451,7 +1451,7 @@ Handle_Map_Status_Title_Screen:
 	or a
 	jp nz, _LABEL_56F
 	ld bc, $8001
-	call _LABEL_302
+	call SendVDPCommand
 	ld a, $01
 	ld (_RAM_C100), a
 	ld hl, $0340
@@ -1486,7 +1486,7 @@ Handle_Map_Status_Title_Screen:
 	ld a, $81
 	ld (_RAM_SOUND_TO_PLAY), a
 	ld bc, $E001
-	call _LABEL_302
+	call SendVDPCommand
 	jp _LABEL_F7
 
 _LABEL_56F:
@@ -1537,7 +1537,7 @@ _LABEL_56F:
 
 ++:
 	ld bc, $C001
-	call _LABEL_302
+	call SendVDPCommand
 	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	call _LABEL_C989
@@ -1554,7 +1554,7 @@ _LABEL_56F:
 	ld a, $5E ; Harfoot (L)
 	ld (_RAM_CONTINUE_MAP), a
 	ld bc, $E001
-	jp _LABEL_302
+	jp SendVDPCommand
 
 _LABEL_5F8:
 	ld a, $01
@@ -1603,7 +1603,7 @@ Handle_Map_Status_Sega_Logo:
 	or a
 	jr nz, +
 	ld bc, $8001
-	call _LABEL_302
+	call SendVDPCommand
 	ld a, $01
 	ld (_RAM_C176), a
 	ld a, :Bank2
@@ -1621,7 +1621,7 @@ Handle_Map_Status_Sega_Logo:
 	ld a, $40
 	ld (_RAM_C177), a
 	ld bc, $E001
-	call _LABEL_302
+	call SendVDPCommand
 	jp _LABEL_F7
 
 +:
@@ -2008,7 +2008,7 @@ _LABEL_8C8:
 ; 6th entry of Jump Table from 114 (indexed by _RAM_MAP_STATUS)
 Handle_Map_Status_Start_Game:
 	ld bc, $8201
-	call _LABEL_302
+	call SendVDPCommand
 	ld a, Map_Status_Map
 	ld (_RAM_MAP_STATUS), a
 	xor a
@@ -2041,7 +2041,7 @@ Handle_Map_Status_Start_Game:
 	ld (_RAM_BUILDING_STATUS), a
 	call +
 	ld bc, $E201
-	call _LABEL_302
+	call SendVDPCommand
 	jp _LABEL_F7
 
 +:
@@ -5025,13 +5025,13 @@ _LABEL_1F39:
 	or a
 	jp nz, _LABEL_1FEA
 	ld bc, $0600
-	call _LABEL_302
+	call SendVDPCommand
 	ld bc, $8201
-	call _LABEL_302
+	call SendVDPCommand
 	ld bc, $0008
-	call _LABEL_302
+	call SendVDPCommand
 	ld bc, $FF0A
-	call _LABEL_302
+	call SendVDPCommand
 	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	call _LABEL_C989
@@ -5086,7 +5086,7 @@ _LABEL_1F39:
 	jp z, _LABEL_247F
 _LABEL_1FE4:
 	ld bc, $E201
-	jp _LABEL_302
+	jp SendVDPCommand
 
 _LABEL_1FEA:
 	ld a, (_RAM_C135)
@@ -11232,11 +11232,11 @@ _DATA_52A2:
 
 _LABEL_52BC:
 	ld bc, $8201
-	call _LABEL_302
+	call SendVDPCommand
 	ld bc, $0008
-	call _LABEL_302
+	call SendVDPCommand
 	ld bc, $FF0A
-	call _LABEL_302
+	call SendVDPCommand
 	ld a, a
 	ld a, :Bank3
 	ld (_RAM_FFFF), a
@@ -11287,9 +11287,9 @@ _LABEL_52BC:
 	xor a
 	ld (_RAM_C0A7), a
 	ld bc, $7600
-	call _LABEL_302
+	call SendVDPCommand
 	ld bc, $E201
-	jp _LABEL_302
+	jp SendVDPCommand
 
 _LABEL_535B:
 	ld c, :Bank11
@@ -11889,13 +11889,13 @@ _LABEL_58B7:
 	or a
 	jp nz, _LABEL_5935
 	ld bc, $0600
-	call _LABEL_302
+	call SendVDPCommand
 	ld bc, $8201
-	call _LABEL_302
+	call SendVDPCommand
 	ld bc, $0008
-	call _LABEL_302
+	call SendVDPCommand
 	ld bc, $FF0A
-	call _LABEL_302
+	call SendVDPCommand
 	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	call _LABEL_C989
@@ -11929,7 +11929,7 @@ _LABEL_58B7:
 	ld a, $A1
 	ld (_RAM_SOUND_TO_PLAY), a
 	ld bc, $E201
-	jp _LABEL_302
+	jp SendVDPCommand
 
 _LABEL_5935:
 	ld a, (_RAM_C0A7)
@@ -12025,9 +12025,9 @@ _LABEL_59CF:
 	ld a, $01
 	ld (_RAM_BOSS_FIGHT_INITIALIZED), a
 	ld bc, $8201
-	call _LABEL_302
+	call SendVDPCommand
 	ld bc, $4600
-	call _LABEL_302
+	call SendVDPCommand
 	ld de, $7F00
 	ld a, $D0
 	ld (_RAM_C300), a
@@ -12041,9 +12041,9 @@ _LABEL_59CF:
 	or a
 	jr nz, +
 	ld bc, $0008
-	call _LABEL_302
+	call SendVDPCommand
 	ld bc, $FF0A
-	call _LABEL_302
+	call SendVDPCommand
 	xor a
 	ld (_RAM_C0A2), a
 	ld hl, _RAM_C109
@@ -12064,7 +12064,7 @@ _LABEL_59CF:
 	call +
 	call _LABEL_5A9D
 	ld bc, $E201
-	jp _LABEL_302
+	jp SendVDPCommand
 
 +:
 	ld a, (_RAM_C162)
@@ -12559,7 +12559,7 @@ _LABEL_5D59:
 
 _LABEL_5DA6:
 	ld bc, $8201
-	call _LABEL_302
+	call SendVDPCommand
 	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	call _LABEL_C9C8
@@ -12602,7 +12602,7 @@ _LABEL_5DA6:
 	ld a, $86
 	ld (_RAM_SOUND_TO_PLAY), a
 	ld bc, $E201
-	jp _LABEL_302
+	jp SendVDPCommand
 
 ; Data from 5E11 to 5E7C (108 bytes)
 .db $A8 $C0 $29 $1A $99 $37 $AC $0A $99 $A8 $C0 $27 $1A $99 $E6 $AE
@@ -14119,7 +14119,7 @@ Handle_Map_Status_Story:
 	or a
 	jp nz, _LABEL_6C0B
 	ld bc, $8201
-	call _LABEL_302
+	call SendVDPCommand
 	ld a, $01
 	ld (_RAM_C171), a
 	ld hl, $0C00
@@ -14157,7 +14157,7 @@ Handle_Map_Status_Story:
 	ld hl, _DATA_6BBA
 	call _LABEL_3D1
 	ld bc, $E201
-	jp _LABEL_302
+	jp SendVDPCommand
 
 ; Data from 6BBA to 6BD9 (32 bytes)
 _DATA_6BBA:
@@ -14182,7 +14182,7 @@ _LABEL_6BDA:
 	ld a, $18
 	call _LABEL_1E9A
 	ld bc, $E201
-	jp _LABEL_302
+	jp SendVDPCommand
 
 _LABEL_6C0B:
 	ld a, (_RAM_NEW_CONTROLLER_INPUT)
@@ -14213,7 +14213,7 @@ Handle_Map_Status_Demo:
 	or a
 	jp nz, _LABEL_6C7B
 	ld bc, $8201
-	call _LABEL_302
+	call SendVDPCommand
 	ld a, $01
 	ld (_RAM_C17A), a
 	call _LABEL_3C2
@@ -14235,7 +14235,7 @@ Handle_Map_Status_Demo:
 	ld a, $07 ; Swamp (Harfoot +1R) (Amon +2L) (L) (Demo)
 	ld (_RAM_CURRENT_MAP), a
 	ld bc, $E201
-	call _LABEL_302
+	call SendVDPCommand
 	jp _LABEL_F7
 
 _LABEL_6C7B:
@@ -14294,7 +14294,7 @@ _LABEL_6E95:
 	or a
 	jp nz, _LABEL_6F08
 	ld bc, $8201
-	call _LABEL_302
+	call SendVDPCommand
 	ld a, $01
 	ld (_RAM_C180), a
 	ld a, $88
@@ -14331,7 +14331,7 @@ _LABEL_6E95:
 	ld hl, _DATA_70B3
 	call _LABEL_3DA
 	ld bc, $E201
-	jp _LABEL_302
+	jp SendVDPCommand
 
 _LABEL_6F08:
 	ld a, (_RAM_C181)
@@ -14343,7 +14343,7 @@ _LABEL_6F08:
 	or a
 	jp z, +
 	ld bc, $8001
-	call _LABEL_302
+	call SendVDPCommand
 	ld a, :Bank11
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_70D3
@@ -14358,7 +14358,7 @@ _LABEL_6F08:
 	ld a, $0B
 	call _LABEL_1E9A
 	ld bc, $E001
-	jp _LABEL_302
+	jp SendVDPCommand
 
 +:
 	ld a, (_RAM_C183)
@@ -14373,7 +14373,7 @@ _LABEL_6F08:
 
 +:
 	ld bc, $8001
-	call _LABEL_302
+	call SendVDPCommand
 	ld hl, $0100
 	ld (_RAM_ENDING_SCREEN_TRANSITION_TIMER), hl
 	ld hl, _RAM_C182
@@ -14477,7 +14477,7 @@ _LABEL_6F08:
 	ld (_RAM_C183), a
 	call _LABEL_3E3
 	ld bc, $E001
-	jp _LABEL_302
+	jp SendVDPCommand
 
 _LABEL_700F:
 	ld a, (_RAM_C184)
