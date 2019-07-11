@@ -65,3 +65,70 @@
 .define	Movement_Damaged_11 $11
 .define	Movement_Crouching_Sword_Left $12
 .define	Movement_Crouching_Sword_Right $13
+
+.struct object
+	type db
+	unknown_0x01 db
+	unknown_0x02 db
+	unknown_0x03 db
+	unknown_0x04 db ; Pointer, tiles?
+	unknown_0x05 db ; Pointer, tiles?
+	y_position_sub db   ; 6
+	y_position_minor db ; 7
+	unknown_0x08 db
+	x_position_sub db   ; 9
+	x_position_minor db ; 10
+	x_position_major db ; 11
+	unknown_0x0C db
+	unknown_0x0D db
+	sign_index db       ; 14
+	sign_timer db       ; 15
+	y_velocity_sub db   ; 16
+	y_velocity_minor db ; 17
+	unknown_0x12 db
+	x_velocity_sub db   ; 19
+	x_velocity_minor db ; 20
+	x_velocity_major db ; 21
+	unknown_0x16 db
+	unknown_0x17 db
+	unknown_0x18 db
+	unknown_0x19 db
+	unknown_0x1A db
+	unknown_0x1B db
+	unknown_0x1C db
+	unknown_0x1D db
+	unknown_0x1E db
+	unknown_0x1F db
+	unknown_0x20 db
+	unknown_0x21 db
+	boss_teleport_timer db ; 34
+	unknown_0x23 db
+	boss_flash_timer db ; 36
+	unknown_0x25 db
+	unknown_0x26 db
+	unknown_0x27 db
+	unknown_0x28 db
+	unknown_0x29 db
+	unknown_0x2A db
+	unknown_0x2B db
+	unknown_0x2C db
+	unknown_0x2D db
+	unknown_0x2E db
+	unknown_0x2F db
+	respawn_timer_minor db ; Technically DW but handling it as 2 DB is easier on my end, oof, might be able to fix in the future
+	respawn_timer_major db
+	unknown_0x32 db
+	unknown_0x33 db
+	boss_hp db ; 52
+	unknown_0x35 db
+	unknown_0x36 db
+	unknown_0x37 db
+	unknown_0x38 db
+	unknown_0x39 db
+	current_hp db ; 58
+	unknown_0x3B db
+	unknown_0x3C db
+	unknown_0x3D db
+	boss_defeated db ; 62
+	unknown_0x3F db
+.endst

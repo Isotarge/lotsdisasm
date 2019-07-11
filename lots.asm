@@ -358,7 +358,7 @@ _RAM_C530 db
 _RAM_C531 db
 _RAM_C532 db
 _RAM_C533 db
-_RAM_C534 db
+_RAM_BOSS_HP db
 .ende
 
 .enum $C538 export
@@ -1645,7 +1645,7 @@ ProcessObjects:
 	ld iy, _RAM_C400
 	ld b, $18
 -:
-	ld a, (iy+0)
+	ld a, (iy+object.type)
 	or a
 	push bc
 	push iy
@@ -1658,16 +1658,16 @@ ProcessObjects:
 	ret
 
 +:
-	ld a, (iy+0)
+	ld a, (iy+object.type)
 	cp $10 ; Slime (Dungeon)
 	jp c, +
 	cp $29 ; Projectile (Straw Fly)
 	jp nc, +
-	ld a, (iy+11)
+	ld a, (iy+object.x_position_major)
 	or a
 	jp nz, _LABEL_51F3
 +:
-	ld a, (iy+0)
+	ld a, (iy+object.type)
 	ld hl, _DATA_6E4 - 2
 	jp CallFunctionFromPointerTable
 
@@ -1772,7 +1772,7 @@ _LABEL_775:
 	ld de, $0040
 	jp c, _LABEL_869
 	ld (iy+1), $01
-	ld (iy+7), $B0
+	ld (iy+object.y_position_minor), $B0
 	ret
 
 +:
@@ -1807,8 +1807,8 @@ _LABEL_7E3:
 	ld a, (_RAM_C4C3)
 	or a
 	jr nz, +
-	ld (iy+7), $38
-	ld (iy+10), $80
+	ld (iy+object.y_position_minor), $38
+	ld (iy+object.x_position_minor), $80
 	ld (iy+3), $01
 	ld hl, $B37A
 	ld (_RAM_C4C4), hl
@@ -1816,39 +1816,39 @@ _LABEL_7E3:
 	ret
 
 +:
-	ld (iy+7), $38
-	ld (iy+10), $80
+	ld (iy+object.y_position_minor), $38
+	ld (iy+object.x_position_minor), $80
 	ld (iy+9), $00
 	dec (iy+15)
 	ret nz
 	jp _LABEL_8AC
 
 ApplyObjectYVelocity:
-	ld d, (iy+17) ; Read Object.YVelocity
-	ld e, (iy+16) ; Read Object.YVelocity
+	ld d, (iy+object.y_velocity_minor)
+	ld e, (iy+object.y_velocity_sub)
 _LABEL_819:
-	ld h, (iy+7) ; Read Object.YPosition
-	ld l, (iy+6) ; Read Object.YPosition
-	add hl, de ; Object.YPosition += Object.YVelocity
-	ld (iy+7), h ; Write Object.YPosition
-	ld (iy+6), l ; Write Object.YPosition
+	ld h, (iy+object.y_position_minor)
+	ld l, (iy+object.y_position_sub)
+	add hl, de
+	ld (iy+object.y_position_minor), h
+	ld (iy+object.y_position_sub), l
 	ret
 
 ApplyObjectXVelocity:
 	ld c, $00
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jp z, +
 	ld c, $FF
 +:
-	ld a, (iy+19) ; Read Object.XVelocity
-	add a, (iy+9) ; Read Object.XPosition and += XVelocity
-	ld (iy+9), a ; Write Object.XPosition
-	ld a, (iy+20) ; Read Object.XVelocity
-	adc a, (iy+10) ; Read Object.XPosition and += XVelocity
-	ld (iy+10), a ; Write Object.XPosition
+	ld a, (iy+object.x_velocity_sub)
+	add a, (iy+object.x_position_sub)
+	ld (iy+object.x_position_sub), a
+	ld a, (iy+object.x_velocity_minor)
+	adc a, (iy+object.x_position_minor)
+	ld (iy+object.x_position_minor), a
 	ld a, c
-	adc a, (iy+11) ; Write Object.XPosition
-	ld (iy+11), a ; Write Object.XPosition
+	adc a, (iy+object.x_position_major)
+	ld (iy+object.x_position_major), a
 	ret
 
 _LABEL_84C:
@@ -1865,14 +1865,14 @@ _LABEL_84C:
 	ret
 
 _LABEL_869:
-	ld h, (iy+17)
-	ld l, (iy+16)
+	ld h, (iy+object.y_velocity_minor)
+	ld l, (iy+object.y_velocity_sub)
 	add hl, de
 	ld a, h
 	cp $06
 	jp z, ApplyObjectYVelocity
-	ld (iy+17), h
-	ld (iy+16), l
+	ld (iy+object.y_velocity_minor), h
+	ld (iy+object.y_velocity_sub), l
 	ex de, hl
 	jp _LABEL_819
 
@@ -2832,7 +2832,7 @@ Handle_Movement_Walking_Left:
 	ret c
 	ld hl, $FF00
 	ld (_RAM_X_VELOCITY_SUB), hl
-	ld (iy+21), h
+	ld (iy+object.x_velocity_major), h
 	ld a, (_RAM_CONTROLLER_INPUT)
 	bit ButtonLeft, a
 	jp nz, _LABEL_1071
@@ -2882,7 +2882,7 @@ Handle_Movement_Walking_Right:
 	ret c
 	ld hl, $0100
 	ld (_RAM_X_VELOCITY_SUB), hl
-	ld (iy+21), l
+	ld (iy+object.x_velocity_major), l
 	ld a, (_RAM_CONTROLLER_INPUT)
 	bit ButtonRight, a
 	jp nz, _LABEL_1071
@@ -3092,7 +3092,7 @@ Handle_Movement_Sword_Right:
 	ret c
 	call _LABEL_1222
 	ret c
-	dec (iy+36)
+	dec (iy+object.boss_flash_timer)
 	ret nz
 	ld c, (iy+33)
 	jp SetMovementState
@@ -3212,7 +3212,7 @@ Handle_Movement_Bow_Right:
 	cp $03
 	jr c, +
 	call _LABEL_161E
-	dec (iy+36)
+	dec (iy+object.boss_flash_timer)
 	ret nz
 	ld (iy+40), $00
 	ld c, (iy+33)
@@ -3329,7 +3329,7 @@ _LABEL_1387:
 	ld a, (_RAM_LANDAU_IN_AIR)
 	or a
 	ret nz
-	ld (iy+34), $01
+	ld (iy+object.boss_teleport_timer), $01
 	ld hl, $FB00
 	ld (_RAM_Y_VELOCITY_SUB), hl
 	ld a, $A2
@@ -3342,7 +3342,7 @@ _LABEL_13A2:
 	ret z
 	ld de, $0040
 	call _LABEL_869
-	bit 7, (iy+17)
+	bit 7, (iy+object.y_velocity_minor)
 	ret nz
 	call _LABEL_15CA
 	ret nc
@@ -3398,7 +3398,7 @@ _LABEL_1413:
 	ld a, (_RAM_LANDAU_IN_AIR)
 	or a
 	ret nz
-	ld (iy+34), $01
+	ld (iy+object.boss_teleport_timer), $01
 	ld hl, $0000
 	ld (_RAM_Y_VELOCITY_SUB), hl
 	ret
@@ -3442,7 +3442,7 @@ _LABEL_146A:
 	call _LABEL_14CC
 	call _LABEL_13DF
 	ld (iy+13), b
-	ld (iy+36), c
+	ld (iy+object.boss_flash_timer), c
 	ld a, (_RAM_LANDAU_IN_AIR)
 	or a
 	ret nz
@@ -3572,7 +3572,7 @@ _LABEL_1545:
 	jp _LABEL_1569
 
 _LABEL_1569:
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jp z, ++
 	ld de, $FFF7
 	call _LABEL_15E5
@@ -3640,10 +3640,10 @@ _LABEL_15CA:
 	ret
 
 _LABEL_15E5:
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	add a, d
 	ld d, a
-	ld a, (iy+10)
+	ld a, (iy+object.x_position_minor)
 	add a, e
 	ld e, a
 	ld a, d
@@ -3705,7 +3705,7 @@ _LABEL_161E:
 	jp z, +
 	ld a, $E8
 +:
-	add a, (iy+7)
+	add a, (iy+object.y_position_minor)
 	ld (_RAM_C447), a
 	ld hl, _DATA_85D1
 	ld (_RAM_C444), hl
@@ -3739,7 +3739,7 @@ _LABEL_168E:
 	call _LABEL_1720
 	ret c
 	ld de, $FEF8
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jp nz, +
 	ld de, $FE08
 +:
@@ -3768,22 +3768,22 @@ _LABEL_168E:
 	ret
 
 +:
-	dec (iy+34)
+	dec (iy+object.boss_teleport_timer)
 	ret nz
 	jp _LABEL_8AC
 
 ++:
 	ld hl, $0080
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jp nz, +
 	ld hl, $FF80
 +:
 	ld (_RAM_C453), hl
-	ld (iy+21), h
+	ld (iy+object.x_velocity_major), h
 	ld a, $A4
 	ld (_RAM_SOUND_TO_PLAY), a
 	ld (iy+33), $01
-	ld (iy+34), $08
+	ld (iy+object.boss_teleport_timer), $08
 	ld a, (_RAM_C500)
 	cp $2B
 	ret c
@@ -3807,7 +3807,7 @@ _LABEL_1720:
 	ret
 
 _LABEL_173E:
-	ld a, (iy+0)
+	ld a, (iy+object.type)
 	cp $27 ; Damaged (Knight)
 	jr z, +
 	ld ix, _RAM_C440
@@ -3815,7 +3815,7 @@ _LABEL_173E:
 	jr nc, +
 	ld a, $01
 	ld (_RAM_C460), a
-	ld (iy+0), $27 ; Damaged (Knight)
+	ld (iy+object.type), $27 ; Damaged (Knight)
 	ld (iy+26), $01
 	scf
 	ret
@@ -4611,7 +4611,7 @@ _LABEL_1C8C:
 	ld a, (_RAM_C42C)
 	or a
 	ret nz
-	ld a, (iy+11)
+	ld a, (iy+object.x_position_major)
 	or a
 	ret nz
 	ld a, (_RAM_C425)
@@ -4620,7 +4620,7 @@ _LABEL_1C8C:
 	ld a, (_RAM_MOVEMENT_STATE)
 	ld c, a
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jp c, +
 	bit 0, c
 	jp nz, _LABEL_1D0B
@@ -4632,7 +4632,7 @@ _LABEL_1C8C:
 	jp z, _LABEL_1D0B
 	ld c, $00
 ++:
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	add a, (iy+22)
 	ld h, a
 	add a, (iy+23)
@@ -4644,7 +4644,7 @@ _LABEL_1C8C:
 	ld e, a
 	call _LABEL_1DBE
 	ret nc
-	ld a, (iy+10)
+	ld a, (iy+object.x_position_minor)
 	add a, (iy+24)
 	ld h, a
 	add a, (iy+25)
@@ -4656,12 +4656,12 @@ _LABEL_1C8C:
 	ld e, a
 	call _LABEL_1DBE
 	ret nc
-	ld a, (iy+0)
+	ld a, (iy+object.type)
 	cp $10 ; Slime (Dungeon)
 	jp c, +
 	cp $29 ; Projectile (Straw Fly)
 	jp nc, +
-	ld (iy+0), $27 ; Damaged (Knight)
+	ld (iy+object.type), $27 ; Damaged (Knight)
 +:
 	ld b, $01
 	ret
@@ -4670,7 +4670,7 @@ _LABEL_1D0B:
 	ld a, (_RAM_RECOVERY_STATUS)
 	or a
 	ret nz
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	add a, (iy+22)
 	ld h, a
 	add a, (iy+23)
@@ -4682,7 +4682,7 @@ _LABEL_1D0B:
 	ld e, a
 	call _LABEL_1DBE
 	ret nc
-	ld a, (iy+10)
+	ld a, (iy+object.x_position_minor)
 	add a, (iy+24)
 	ld h, a
 	add a, (iy+25)
@@ -4701,7 +4701,7 @@ _LABEL_1D0B:
 	ld hl, $FE00
 	ld c, $FF
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jp c, +
 	ld hl, $0200
 	ld c, $00
@@ -4732,7 +4732,7 @@ _LABEL_1D0B:
 	ld (_RAM_INCOMING_LANDAU_DAMAGE), a
 	ld a, $91
 	ld (_RAM_SOUND_TO_PLAY), a
-	ld a, (iy+0)
+	ld a, (iy+object.type)
 	cp $21 ; Book Thief
 	ret nz
 	ld a, (iy+56)
@@ -5821,7 +5821,7 @@ _LABEL_24B4:
 
 _LABEL_24BD:
 	ld a, (_RAM_X_POSITION_MINOR)
-	sub (iy+10)
+	sub (iy+object.x_position_minor)
 	bit 7, a
 	ld (iy+41), $00
 	ret z
@@ -5838,28 +5838,28 @@ _LABEL_24D1:
 	ret
 
 _LABEL_24E0:
-	ld a, (iy+19)
+	ld a, (iy+object.x_velocity_sub)
 	cpl
 	ld l, a
-	ld a, (iy+20)
+	ld a, (iy+object.x_velocity_minor)
 	cpl
 	ld h, a
 	inc hl
-	ld (iy+19), l
-	ld (iy+20), h
+	ld (iy+object.x_velocity_sub), l
+	ld (iy+object.x_velocity_minor), h
 	scf
 	ret
 
 _LABEL_24F3:
-	ld a, (iy+16)
+	ld a, (iy+object.y_velocity_sub)
 	cpl
 	ld l, a
-	ld a, (iy+17)
+	ld a, (iy+object.y_velocity_minor)
 	cpl
 	ld h, a
 	inc hl
-	ld (iy+16), l
-	ld (iy+17), h
+	ld (iy+object.y_velocity_sub), l
+	ld (iy+object.y_velocity_minor), h
 	ret
 
 _LABEL_2505:
@@ -5876,13 +5876,13 @@ _LABEL_2505:
 
 +:
 	ld (hl), $29
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	ld de, $0007
 	add hl, de
 	ld (hl), a
 	ld de, $0003
 	add hl, de
-	ld a, (iy+10)
+	ld a, (iy+object.x_position_minor)
 	ld (hl), a
 	ld de, $0024
 	add hl, de
@@ -5891,7 +5891,7 @@ _LABEL_2505:
 	ret
 
 _LABEL_252E:
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr nz, +
 	ld (iy+4), e
 	ld (iy+5), d
@@ -5904,7 +5904,7 @@ _LABEL_252E:
 
 _LABEL_2542:
 	ld de, $F808
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	ld de, $F8F8
 +:
@@ -5955,8 +5955,8 @@ _LABEL_2555:
 	ret nz
 	inc (iy+14)
 	ld (iy+1), $01
-	ld (iy+16), $80
-	ld (iy+17), $02
+	ld (iy+object.y_velocity_sub), $80
+	ld (iy+object.y_velocity_minor), $02
 	ret
 
 ++:
@@ -5964,9 +5964,9 @@ _LABEL_2555:
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	and $F8
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ld (iy+1), $02
 	inc (iy+14)
 	ld (iy+15), $08
@@ -5985,11 +5985,11 @@ _LABEL_25DC:
 	ld hl, _DATA_85FC
 	ld de, $FE80
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr c, 1
 	ld de, $0180
-	ld (iy+20), d
-	ld (iy+19), e
+	ld (iy+object.x_velocity_minor), d
+	ld (iy+object.x_velocity_sub), e
 	jp _LABEL_24A3
 
 +:
@@ -6018,8 +6018,8 @@ _LABEL_2621:
 	ld hl, _DATA_86B1
 	ld de, $0180
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_249F
 
 ++:
@@ -6028,8 +6028,8 @@ _LABEL_2621:
 	ld a, (iy+1)
 	dec a
 	jp z, +++
-	ld a, (iy+10)
-	bit 7, (iy+20)
+	ld a, (iy+object.x_position_minor)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	cp $20
 	ret nc
@@ -6050,15 +6050,15 @@ _LABEL_2621:
 	ld de, $FF00
 	ld hl, _DATA_8690
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr c, +
 	ld de, $0100
 	ld hl, _DATA_86B1
 +:
-	ld (iy+19), e
-	ld (iy+20), d
-	ld (iy+16), $00
-	ld (iy+17), $03
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $03
 	jp _LABEL_24A3
 
 ++:
@@ -6072,18 +6072,18 @@ _LABEL_2621:
 	call ApplyObjectYVelocity
 	ld a, (_RAM_Y_POSITION_MINOR)
 	ld b, a
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	add a, $18
 	cp b
 	ret c
 	ld (iy+38), $01
-	ld (iy+16), $00
-	ld (iy+17), $00
-	ld (iy+19), $00
-	ld a, (iy+20)
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $00
+	ld (iy+object.x_velocity_sub), $00
+	ld a, (iy+object.x_velocity_minor)
 	add a, a
 	add a, a
-	ld (iy+20), a
+	ld (iy+object.x_velocity_minor), a
 	ret
 
 ; 41st entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -6113,26 +6113,26 @@ _LABEL_26DD:
 	jp z, _LABEL_2834
 	cp $0B
 	jp z, _LABEL_2834
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	add a, $FE
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ld de, $FC00
 	ld hl, _DATA_9466
 	ld b, $F0
-	ld a, (iy+10)
+	ld a, (iy+object.x_position_minor)
 	cp $80
 	jr nc, +
 	ld de, $0400
 	ld hl, _DATA_9493
 	ld b, $10
 +:
-	ld a, (iy+10)
+	ld a, (iy+object.x_position_minor)
 	add a, b
-	ld (iy+10), a
-	ld (iy+20), d
-	ld (iy+19), e
-	ld (iy+16), $F0
-	ld (iy+17), $FF
+	ld (iy+object.x_position_minor), a
+	ld (iy+object.x_velocity_minor), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.y_velocity_sub), $F0
+	ld (iy+object.y_velocity_minor), $FF
 	ld (iy+14), $02
 	jp _LABEL_249F
 
@@ -6155,10 +6155,10 @@ _LABEL_2779:
 	ld (iy+25), $08
 	ld (iy+22), $F0
 	ld (iy+23), $10
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	ld b, $F0
 	add a, b
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ld (iy+39), $00
 	ld (iy+40), $00
 	ld (iy+3), $01
@@ -6166,16 +6166,16 @@ _LABEL_2779:
 	ld de, $0400
 	ld b, $0C
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr nc, +
 	ld de, $FC00
 	ld b, $F4
 +:
-	ld a, (iy+10)
+	ld a, (iy+object.x_position_minor)
 	add a, b
-	ld (iy+10), a
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_position_minor), a
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_24A3
 
 _LABEL_27C3:
@@ -6183,19 +6183,19 @@ _LABEL_27C3:
 	ld (iy+25), $08
 	ld (iy+22), $F4
 	ld (iy+23), $04
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	add a, $E7
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ld de, $0400
 	ld hl, _DATA_94E0
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr nc, +
 	ld de, $FC00
 	ld hl, _DATA_94D9
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_249F
 
 _LABEL_27F8:
@@ -6213,12 +6213,12 @@ _LABEL_27F8:
 +:
 	ld (iy+4), l
 	ld (iy+5), h
-	ld a, (iy+10)
+	ld a, (iy+object.x_position_minor)
 	add a, b
-	ld (iy+10), a
-	ld a, (iy+7)
+	ld (iy+object.x_position_minor), a
+	ld a, (iy+object.y_position_minor)
 	add a, $E0
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ld (iy+3), $02
 	ret
 
@@ -6236,10 +6236,10 @@ _LABEL_2834:
 	ld hl, $2855
 	add hl, de
 	ld a, (hl)
-	ld (iy+17), a
+	ld (iy+object.y_velocity_minor), a
 	inc hl
 	ld a, (hl)
-	ld (iy+20), a
+	ld (iy+object.x_velocity_minor), a
 	ld hl, _DATA_93CC
 	jp _LABEL_24A3
 
@@ -6249,7 +6249,7 @@ _LABEL_2834:
 _LABEL_286D:
 	call _LABEL_1C8C
 	ret c
-	ld a, (iy+11)
+	ld a, (iy+object.x_position_major)
 	or a
 	jp nz, _LABEL_8AC
 	ld a, (iy+46)
@@ -6261,7 +6261,7 @@ _LABEL_286D:
 	call _LABEL_15E5
 	jp nz, _LABEL_8AC
 	ld de, $F808
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	ld de, $F8F8
 +:
@@ -6308,7 +6308,7 @@ _LABEL_28DA:
 	ld (iy+2), $01
 	call _LABEL_2C9A
 +:
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	cp $C0
 	jp nc, _LABEL_8AC
 	call ApplyObjectYVelocity
@@ -6369,8 +6369,8 @@ _LABEL_2915:
 	ld hl, _DATA_9420
 	ld de, $0200
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	call _LABEL_24A3
 	ld a, (iy+1)
 	dec a
@@ -6392,8 +6392,8 @@ _LABEL_2915:
 	ld a, (iy+42)
 	or a
 	ret z
-	ld a, (iy+10)
-	bit 7, (iy+20)
+	ld a, (iy+object.x_position_minor)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	cp $10
 	ret nc
@@ -6407,8 +6407,8 @@ _LABEL_2915:
 	or a
 	jr z, +
 	ld (iy+1), $02
-	ld (iy+16), $00
-	ld (iy+17), $03
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $03
 	jr ++
 
 +:
@@ -6443,7 +6443,7 @@ _LABEL_2A05:
 	ret nz
 	ld a, (_RAM_Y_POSITION_MINOR)
 	add a, $E8
-	cp (iy+7)
+	cp (iy+object.y_position_minor)
 	ret nc
 	ld (iy+39), $01
 	jp _LABEL_24F3
@@ -6456,16 +6456,16 @@ _LABEL_2A20:
 	ret nz
 	ld a, (_RAM_Y_POSITION_MINOR)
 	add a, $E8
-	cp (iy+7)
+	cp (iy+object.y_position_minor)
 	ret nc
 	ld (iy+43), $01
-	ld l, (iy+19)
-	ld h, (iy+20)
+	ld l, (iy+object.x_velocity_sub)
+	ld h, (iy+object.x_velocity_minor)
 	add hl, hl
-	ld (iy+19), l
-	ld (iy+20), h
-	ld (iy+16), $C0
-	ld (iy+17), $FF
+	ld (iy+object.x_velocity_sub), l
+	ld (iy+object.x_velocity_minor), h
+	ld (iy+object.y_velocity_sub), $C0
+	ld (iy+object.y_velocity_minor), $FF
 	ret
 
 ; 20th entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -6485,11 +6485,11 @@ _LABEL_2A4E:
 	ld hl, _DATA_86FF
 	ld de, $0100
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	ld (iy+14), $02
-	ld (iy+16), $00
-	ld (iy+17), $FA
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FA
 	call _LABEL_24AE
 	jp _LABEL_249F
 
@@ -6512,18 +6512,18 @@ _LABEL_2A4E:
 	ld de, $0030
 	call _LABEL_869
 	call ApplyObjectXVelocity
-	bit 7, (iy+17)
+	bit 7, (iy+object.y_velocity_minor)
 	ret nz
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	and $F8
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ld (iy+1), $01
 	ld (iy+38), $00
-	ld (iy+16), $00
-	ld (iy+17), $FA
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FA
 	ld (iy+14), $00
 	jp _LABEL_24AE
 
@@ -6531,7 +6531,7 @@ _LABEL_2AE2:
 	call _LABEL_84C
 	call ApplyObjectXVelocity
 	ld de, $F80C
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	ld de, $F8F4
 +:
@@ -6545,13 +6545,13 @@ _LABEL_2AE2:
 	ld hl, $86D2
 	ld de, $FF00
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr c, +
 	ld hl, $86FF
 	ld de, $0100
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jr +++
 
 ++:
@@ -6574,8 +6574,8 @@ _LABEL_2B31:
 	ld hl, _DATA_881D
 	ld de, $0180
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	call _LABEL_24AE
 	ld (iy+22), $D0
 	ld (iy+23), $30
@@ -6605,16 +6605,16 @@ _LABEL_2B31:
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
-	ld (iy+17), $00
+	ld (iy+object.y_velocity_minor), $00
 	ld (iy+38), $00
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	and $F8
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ret
 
 +:
 	ld de, $F8F4
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr nz, +
 	ld de, $F80C
 +:
@@ -6623,11 +6623,11 @@ _LABEL_2B31:
 	ld de, $0000
 	call _LABEL_15E5
 	jr z, +
-	ld (iy+17), $00
-	ld (iy+16), $00
-	ld a, (iy+7)
+	ld (iy+object.y_velocity_minor), $00
+	ld (iy+object.y_velocity_sub), $00
+	ld a, (iy+object.y_position_minor)
 	and $F8
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	jr ++
 
 +:
@@ -6642,8 +6642,8 @@ _LABEL_2B31:
 
 +++:
 	ld (iy+38), $01
-	ld (iy+16), $00
-	ld (iy+17), $FB
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FB
 	ret
 
 _LABEL_2BF0:
@@ -6668,7 +6668,7 @@ _LABEL_2BF0:
 	ret nz
 	ld (iy+38), $01
 	ld (iy+14), $00
-	ld (iy+17), $FA
+	ld (iy+object.y_velocity_minor), $FA
 	ret
 
 +:
@@ -6687,17 +6687,17 @@ _LABEL_2BF0:
 	ld (iy+1), $00
 	ld (iy+2), $00
 	ld (iy+38), $00
-	ld (iy+17), $00
+	ld (iy+object.y_velocity_minor), $00
 	ld hl, _DATA_87A8
 	ld de, $FE80
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr c, +
 	ld hl, _DATA_881D
 	ld de, $0180
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_24A3
 
 _LABEL_2C82:
@@ -6724,10 +6724,10 @@ _LABEL_2C9A:
 	ld ix, _RAM_C400
 	call _LABEL_8C8
 	call -
-	ld (iy+19), c
-	ld (iy+20), b
-	ld (iy+16), e
-	ld (iy+17), d
+	ld (iy+object.x_velocity_sub), c
+	ld (iy+object.x_velocity_minor), b
+	ld (iy+object.y_velocity_sub), e
+	ld (iy+object.y_velocity_minor), d
 	ret
 
 ; 23rd entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -6736,8 +6736,8 @@ _LABEL_2CB1:
 	or a
 	jp nz, ++
 	call _LABEL_24B4
-	ld (iy+19), $80
-	ld (iy+20), $FF
+	ld (iy+object.x_velocity_sub), $80
+	ld (iy+object.x_velocity_minor), $FF
 	ld (iy+24), $F0
 	ld (iy+25), $20
 	ld (iy+22), $F0
@@ -6750,8 +6750,8 @@ _LABEL_2CB1:
 	ld de, $FF00
 	ld hl, _DATA_8892
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_249F
 
 ++:
@@ -6761,8 +6761,8 @@ _LABEL_2CB1:
 	ret c
 	call ApplyObjectXVelocity
 	call _LABEL_84C
-	ld a, (iy+10)
-	bit 7, (iy+20)
+	ld a, (iy+object.x_position_minor)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	ld hl, $0100
 	cp $20
@@ -6774,8 +6774,8 @@ _LABEL_2CB1:
 	cp $E0
 	jr c, +++
 ++:
-	ld (iy+19), l
-	ld (iy+20), h
+	ld (iy+object.x_velocity_sub), l
+	ld (iy+object.x_velocity_minor), h
 	ld de, _DATA_88EF
 	ld hl, $8892
 	call _LABEL_252E
@@ -6795,14 +6795,14 @@ _LABEL_2CB1:
 	ld d, $00
 	add hl, de
 	ld a, (hl)
-	ld (iy+20), a
+	ld (iy+object.x_velocity_minor), a
 	ld (iy+39), $01
 +:
 	call _LABEL_2C82
 	call _LABEL_2542
 	jr c, ++
-	ld a, (iy+10)
-	bit 7, (iy+20)
+	ld a, (iy+object.x_position_minor)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	sub $20
 	ret nc
@@ -6813,12 +6813,12 @@ _LABEL_2CB1:
 	ret c
 ++:
 	ld de, $0100
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	ld de, $FF00
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	ld (iy+39), $00
 	ld hl, $8892
 	ld de, _DATA_88EF
@@ -6859,13 +6859,13 @@ _LABEL_2D88:
 	ld de, $0200
 	ld hl, _DATA_8D5A
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr nc, +
 	ld de, $FE00
 	ld hl, _DATA_8D2D
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	ld (iy+4), l
 	ld (iy+5), h
 	call _LABEL_24BD
@@ -6873,8 +6873,8 @@ _LABEL_2D88:
 	ret nc
 	ld (iy+2), $01
 	ld (iy+14), $02
-	ld (iy+16), $00
-	ld (iy+17), $FC
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FC
 	ret
 
 ++:
@@ -6915,7 +6915,7 @@ _LABEL_2D88:
 	ld (iy+5), h
 	ld a, c
 	add a, b
-	ld (iy+10), a
+	ld (iy+object.x_position_minor), a
 	ld a, (_RAM_LANDAU_IN_AIR)
 	or a
 	jr nz, +
@@ -6934,7 +6934,7 @@ _LABEL_2D88:
 ++:
 	ld a, (_RAM_Y_POSITION_MINOR)
 	add a, b
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ret
 
 ; 29th entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -6966,7 +6966,7 @@ _LABEL_2E6D:
 	jp z, _LABEL_2EE9
 	ld hl, _DATA_8C4F
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr nc, +
 	ld hl, _DATA_8C05
 +:
@@ -7058,15 +7058,15 @@ _LABEL_2F55:
 	jr nz, +
 	ld de, $FEE0
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	call _LABEL_24AE
-	ld (iy+48), $08
-	ld (iy+49), $00
+	ld (iy+object.respawn_timer_minor), $08
+	ld (iy+object.respawn_timer_major), $00
 	ld (iy+50), $20
 	ld (iy+51), $20
-	ld (iy+16), $80
-	ld (iy+17), $FF
+	ld (iy+object.y_velocity_sub), $80
+	ld (iy+object.y_velocity_minor), $FF
 	ld hl, _DATA_8D87
 	jp _LABEL_249F
 
@@ -7096,8 +7096,8 @@ _LABEL_2FB0:
 	ld hl, _DATA_89B5
 	ld de, $0140
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	call _LABEL_24B4
 	jp _LABEL_249F
 
@@ -7124,24 +7124,24 @@ _LABEL_2FB0:
 	call _LABEL_15E5
 	ret z
 	dec (iy+39)
-	ld (iy+16), $00
-	ld (iy+17), $FD
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FD
 	ret nz
-	ld a, (iy+10)
+	ld a, (iy+object.x_position_minor)
 	and $F8
-	ld (iy+10), a
+	ld (iy+object.x_position_minor), a
 	ld (iy+1), $01
 	ld (iy+2), $00
 	ld a, (_RAM_X_POSITION_MINOR)
 	ld hl, _DATA_894C
 	ld de, $FEC0
-	sub (iy+10)
+	sub (iy+object.x_position_minor)
 	jr c, +
 	ld hl, _DATA_89B5
 	ld de, $0140
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	call _LABEL_3072
 	jp _LABEL_24A3
 
@@ -7162,8 +7162,8 @@ _LABEL_3051:
 	ret
 
 _LABEL_3072:
-	ld (iy+16), $00
-	ld (iy+17), $FD
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FD
 	ld a, r
 	and $03
 	or $01
@@ -7171,11 +7171,11 @@ _LABEL_3072:
 	ret
 
 _LABEL_3084:
-	ld h, (iy+17)
-	ld l, (iy+16)
+	ld h, (iy+object.y_velocity_minor)
+	ld l, (iy+object.y_velocity_sub)
 	add hl, de
-	ld (iy+16), l
-	ld (iy+17), h
+	ld (iy+object.y_velocity_sub), l
+	ld (iy+object.y_velocity_minor), h
 	ret
 
 ; 28th entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -7196,8 +7196,8 @@ _LABEL_3092:
 	ld hl, _DATA_8B9C
 	ld de, $0120
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_249F
 
 ++:
@@ -7224,7 +7224,7 @@ _LABEL_3092:
 	or a
 	jp z, ++
 	ld a, (_RAM_C44A)
-	sub (iy+10)
+	sub (iy+object.x_position_minor)
 	bit 7, a
 	jp z, +
 	neg
@@ -7238,7 +7238,7 @@ _LABEL_3092:
 	call _LABEL_84C
 	call ApplyObjectXVelocity
 	ld de, $F80C
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	ld de, $F8F4
 +:
@@ -7251,8 +7251,8 @@ _LABEL_3092:
 	ld de, $0000
 	call _LABEL_15E5
 	jr z, +
-	ld (iy+16), $00
-	ld (iy+17), $00
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $00
 	ret
 
 +:
@@ -7264,8 +7264,8 @@ _LABEL_313E:
 	or a
 	jp nz, +
 	ld (iy+2), $01
-	ld (iy+16), $00
-	ld (iy+17), $FB
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FB
 	ret
 
 _LABEL_3152:
@@ -7273,8 +7273,8 @@ _LABEL_3152:
 	or a
 	jp nz, +
 	ld (iy+2), $01
-	ld (iy+16), $00
-	ld (iy+17), $FA
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FA
 	call _LABEL_24B4
 	ld (iy+24), $E8
 	ld (iy+25), $1C
@@ -7289,12 +7289,12 @@ _LABEL_3152:
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	and $F8
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ld (iy+2), $00
-	ld (iy+16), $00
-	ld (iy+17), $00
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $00
 	ld a, (iy+38)
 	ld (iy+38), $00
 	cp $01
@@ -7316,13 +7316,13 @@ _LABEL_31AE:
 	ld de, $0120
 	ld hl, _DATA_8B33
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr c, +
 	ld de, $FED0
 	ld hl, _DATA_8B9C
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_24A3
 
 ++:
@@ -7368,8 +7368,8 @@ _LABEL_321C:
 	ld hl, _DATA_8A6C
 	ld de, $0180
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_249F
 
 ++:
@@ -7398,7 +7398,7 @@ _LABEL_321C:
 	call _LABEL_84C
 	call ApplyObjectXVelocity
 	ld de, $F820
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	ld de, $F8E0
 +:
@@ -7423,13 +7423,13 @@ _LABEL_321C:
 	ld a, (iy+38)
 	dec a
 	jr z, +
-	ld (iy+16), $00
-	ld (iy+17), $00
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $00
 	ret
 
 +:
-	ld (iy+16), $00
-	ld (iy+17), $FB
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FB
 	ret
 
 ++:
@@ -7443,11 +7443,11 @@ _LABEL_321C:
 	ld (iy+2), $00
 	ld (iy+14), $00
 	ld (iy+38), $00
-	ld (iy+16), $00
-	ld (iy+17), $00
-	ld a, (iy+7)
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $00
+	ld a, (iy+object.y_position_minor)
 	and $F8
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ret
 
 _LABEL_3303:
@@ -7456,13 +7456,13 @@ _LABEL_3303:
 	jp nz, +
 	ld (iy+2), $01
 	ld (iy+14), $04
-	ld (iy+16), $00
-	ld (iy+17), $FE
-	ld h, (iy+20)
-	ld l, (iy+19)
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FE
+	ld h, (iy+object.x_velocity_minor)
+	ld l, (iy+object.x_velocity_sub)
 	add hl, hl
-	ld (iy+19), l
-	ld (iy+20), h
+	ld (iy+object.x_velocity_sub), l
+	ld (iy+object.x_velocity_minor), h
 	ret
 
 +:
@@ -7474,8 +7474,8 @@ _LABEL_3303:
 	ret z
 	ld (iy+2), $00
 	ld (iy+1), $02
-	ld (iy+16), $00
-	ld (iy+17), $00
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $00
 	ret
 
 _LABEL_3349:
@@ -7489,13 +7489,13 @@ _LABEL_3349:
 	ld de, $FE80
 	ld hl, _DATA_8A1E
 	ld a, (_RAM_X_POSITION_MINOR)
-	sub (iy+10)
+	sub (iy+object.x_position_minor)
 	jr c, +
 	ld de, $0180
 	ld hl, _DATA_8A6C
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_24A3
 
 ++:
@@ -7523,8 +7523,8 @@ _LABEL_3389:
 	ld de, $FEE0
 	ld hl, _DATA_8DB3
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_249F
 
 ++:
@@ -7538,7 +7538,7 @@ _LABEL_3389:
 	call _LABEL_84C
 	call ApplyObjectXVelocity
 	ld de, $F80C
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	ld de, $F8F4
 +:
@@ -7568,7 +7568,7 @@ _LABEL_3389:
 	ld de, $0000
 	call _LABEL_15E5
 	jr z, +
-	ld (iy+17), $00
+	ld (iy+object.y_velocity_minor), $00
 	ret
 
 +:
@@ -7584,8 +7584,8 @@ _LABEL_3389:
 	ld (iy+25), $08
 	ld (iy+22), $F0
 	ld (iy+23), $10
-	ld (iy+10), $00
-	ld (iy+7), $00
+	ld (iy+object.x_position_minor), $00
+	ld (iy+object.y_position_minor), $00
 	ret
 
 _LABEL_344D:
@@ -7611,8 +7611,8 @@ _LABEL_344D:
 +:
 	ld a, (_RAM_X_POSITION_MINOR)
 	add a, b
-	ld (iy+10), a
-	ld (iy+7), $30
+	ld (iy+object.x_position_minor), a
+	ld (iy+object.y_position_minor), $30
 	jp _LABEL_24A3
 
 _LABEL_3493:
@@ -7622,15 +7622,15 @@ _LABEL_3493:
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	and $F8
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ld (iy+2), $00
 	ld (iy+1), $00
 	ld (iy+39), $01
 	ld (iy+40), $40
-	ld (iy+16), $00
-	ld (iy+17), $00
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $00
 	ld (iy+24), $F4
 	ld (iy+25), $18
 	ld (iy+22), $D0
@@ -7638,13 +7638,13 @@ _LABEL_3493:
 	ld hl, _DATA_8DB3
 	ld de, $FEE0
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr c, +
 	ld hl, _DATA_8DFC
 	ld de, $0120
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_24A3
 
 ; 35th entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -7691,12 +7691,12 @@ _LABEL_34F0:
 	ld (iy+12), $02
 	ld de, $FE80
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr c, +
 	ld de, $0180
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 -:
 	ld de, _DATA_904A
 	ld hl, $8FC2
@@ -7724,7 +7724,7 @@ _LABEL_3593:
 	ld a, r
 	and $03
 	ld (iy+39), a
-	ld (iy+16), $00
+	ld (iy+object.y_velocity_sub), $00
 	ld c, $00
 	ld b, $FB
 	ld d, $40
@@ -7743,7 +7743,7 @@ _LABEL_3593:
 +:
 	ld (iy+42), d
 	ld (iy+14), c
-	ld (iy+17), b
+	ld (iy+object.y_velocity_minor), b
 	ld a, (iy+39)
 	ld b, a
 	or a
@@ -7751,8 +7751,8 @@ _LABEL_3593:
 	cp $03
 	jr z, +
 	ld (iy+40), $10
-	ld (iy+19), $00
-	ld (iy+20), $00
+	ld (iy+object.x_velocity_sub), $00
+	ld (iy+object.x_velocity_minor), $00
 +:
 	or a
 	ret z
@@ -7781,9 +7781,9 @@ _LABEL_35F9:
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	and $F8
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	jp +++
 
 ++:
@@ -7812,8 +7812,8 @@ _LABEL_3635:
 	ld hl, _DATA_925B
 	ld de, $0120
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	ld (iy+39), $40
 	jp _LABEL_249F
 
@@ -7832,15 +7832,15 @@ _LABEL_3635:
 	call _LABEL_84C
 	call ApplyObjectXVelocity
 	ld a, (_RAM_X_POSITION_MINOR)
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
-	sub (iy+10)
+	sub (iy+object.x_position_minor)
 	jr nc, +++
 	neg
 	jr ++
 
 +:
-	sub (iy+10)
+	sub (iy+object.x_position_minor)
 	jr c, +++
 ++:
 	cp $40
@@ -7864,8 +7864,8 @@ _LABEL_36BB:
 	ld (iy+14), $00
 	ld (iy+22), $D0
 	ld (iy+23), $28
-	ld (iy+16), $00
-	ld (iy+17), $F9
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $F9
 _LABEL_36DA:
 	ld de, _DATA_9279
 	ld hl, $91EA
@@ -7875,12 +7875,12 @@ _LABEL_36DA:
 	call ApplyObjectXVelocity
 	ld de, $0040
 	call _LABEL_869
-	bit 7, (iy+17)
+	bit 7, (iy+object.y_velocity_minor)
 	ret nz
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	cp $B0
 	jp c, +
 	ld (iy+22), $F8
@@ -7888,16 +7888,16 @@ _LABEL_36DA:
 	ld (iy+1), $00
 	ld (iy+2), $00
 	ld (iy+14), $00
-	ld (iy+7), $B0
+	ld (iy+object.y_position_minor), $B0
 	ld (iy+39), $40
 	ld de, _DATA_925B
 	ld hl, $91CC
 	jp _LABEL_252E
 
 +:
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	and $F8
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ld (iy+1), $02
 	ret
 
@@ -7917,14 +7917,14 @@ _LABEL_3732:
 	call _LABEL_15E5
 	ret nz
 	ld a, (_RAM_X_POSITION_MINOR)
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jp z, +
-	sub (iy+10)
+	sub (iy+object.x_position_minor)
 	jr nc, +++
 	jr ++
 
 +:
-	sub (iy+10)
+	sub (iy+object.x_position_minor)
 	jr c, +++
 ++:
 	ld (iy+1), $01
@@ -7962,8 +7962,8 @@ _LABEL_3785:
 	ld hl, _DATA_935B
 	ld de, $00C0
 +:
-	ld (iy+20), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_minor), e ; BUG?
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_249F
 
 ++:
@@ -7988,7 +7988,7 @@ _LABEL_3785:
 	call _LABEL_84C
 	call _LABEL_2C82
 	ld de, $F8F8
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr nz, +
 	ld de, $F808
 +:
@@ -8009,13 +8009,13 @@ _LABEL_3785:
 	ld de, $00C0
 	ld hl, _DATA_935B
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr nc, +
 	ld de, $FF40
 	ld hl, _DATA_92EA
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	ld (iy+4), l
 	ld (iy+5), h
 	ld c, $05
@@ -8038,12 +8038,12 @@ _LABEL_3853:
 	ld (iy+25), $18
 	ld (iy+22), $E0
 	ld (iy+23), $20
-	ld (iy+16), $00
-	ld (iy+17), $FF
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FF
 	ld (iy+39), $02
 	ld (iy+40), $10
-	ld (iy+48), $04
-	ld (iy+49), $00
+	ld (iy+object.respawn_timer_minor), $04
+	ld (iy+object.respawn_timer_major), $00
 	ld (iy+50), $80
 	ld (iy+51), $80
 	call _LABEL_24B4
@@ -8054,8 +8054,8 @@ _LABEL_3853:
 	jr z, +
 	ld de, $0030
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_249F
 
 _LABEL_38A5:
@@ -8067,7 +8067,7 @@ _LABEL_38A5:
 	push iy
 	ld de, $FFC0
 	add iy, de
-	ld (iy+0), $27 ; Damaged (Knight)
+	ld (iy+object.type), $27 ; Damaged (Knight)
 	pop iy
 	ret
 
@@ -8086,15 +8086,15 @@ _LABEL_38A5:
 	pop hl
 	ld de, $FFC7
 	add hl, de
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	add a, $F3
 	ld (hl), a
 	ld de, $0003
 	add hl, de
-	ld a, (iy+10)
+	ld a, (iy+object.x_position_minor)
 	ld (hl), a
 	inc hl
-	ld a, (iy+11)
+	ld a, (iy+object.x_position_major)
 	ld (hl), a
 	ret
 
@@ -8107,12 +8107,12 @@ _LABEL_38A5:
 	ld (iy+40), a
 	ld de, $0030
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr nc, +
 	ld de, $FFD0
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	ret
 
 ; 27th entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -8131,7 +8131,7 @@ _LABEL_3912:
 	ld a, (hl)
 	or a
 	ret nz
-	ld (iy+0), $27 ; Damaged (Knight)
+	ld (iy+object.type), $27 ; Damaged (Knight)
 	jp _LABEL_3EA3
 
 ; 36th entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -8152,8 +8152,8 @@ _LABEL_3930:
 	ld de, $0100
 	ld hl, _DATA_914F
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_249F
 
 ++:
@@ -8184,7 +8184,7 @@ _LABEL_3930:
 ++:
 	call _LABEL_84C
 	ld de, $F808
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	ld de, $F8F8
 +:
@@ -8200,17 +8200,17 @@ _LABEL_3930:
 	ld de, $FF00
 	ld hl, _DATA_90D2
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_24A3
 
 ++:
 	ld de, $0000
 	call _LABEL_15E5
 	jr z, +
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	and $F8
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ret
 
 +:
@@ -8222,8 +8222,8 @@ _LABEL_39E5:
 	or a
 	jp nz, +
 	ld (iy+2), $01
-	ld (iy+16), $00
-	ld (iy+17), $FC
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FC
 +:
 	ld de, $0040
 	call _LABEL_869
@@ -8239,19 +8239,19 @@ _LABEL_3A0E:
 	or a
 	jp nz, ++
 	ld (iy+2), $01
-	ld (iy+16), $00
-	ld (iy+17), $FB
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FB
 	ld (iy+14), $02
 	ld de, $0200
 	ld hl, _DATA_914F
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr nc, +
 	ld de, $FE00
 	ld hl, _DATA_90D2
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	ld (iy+4), l
 	ld (iy+5), h
 ++:
@@ -8260,22 +8260,22 @@ _LABEL_3A0E:
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	and $F8
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ld (iy+1), $00
 	ld (iy+2), $00
 	ld (iy+39), $01
 	ld (iy+40), $30
 	ld de, $0100
 	ld hl, _DATA_914F
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr nz, +
 	ld de, $FF00
 	ld hl, _DATA_90D2
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_24A3
 
 ; 34th entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -8288,10 +8288,10 @@ _LABEL_3A85:
 	ld (iy+22), $C0
 	ld (iy+23), $30
 	call _LABEL_24AE
-	ld (iy+16), $00
-	ld (iy+17), $FF
-	ld (iy+48), $10
-	ld (iy+49), $00
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FF
+	ld (iy+object.respawn_timer_minor), $10
+	ld (iy+object.respawn_timer_major), $00
 	ld (iy+50), $20
 	ld (iy+51), $20
 	ld a, r
@@ -8306,8 +8306,8 @@ _LABEL_3A85:
 	ld de, $0200
 	ld hl, _DATA_8F4A
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_249F
 
 _LABEL_3ADD:
@@ -8333,7 +8333,7 @@ _LABEL_3ADD:
 	or $1F
 	ld (iy+38), a
 	ld c, $06
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr nz, +
 	ld c, $07
 +:
@@ -8344,8 +8344,8 @@ _LABEL_3ADD:
 	or a
 	ret nz
 	call ApplyObjectXVelocity
-	ld a, (iy+10)
-	bit 7, (iy+20)
+	ld a, (iy+object.x_position_minor)
+	bit 7, (iy+object.x_velocity_minor)
 	jr nz, +
 	cp $20
 	ret c
@@ -8363,11 +8363,11 @@ _LABEL_3B39:
 	ld a, (iy+2)
 	or a
 	jp nz, +
-	ld (iy+48), $60
+	ld (iy+object.respawn_timer_minor), $60
 	ld (iy+2), $01
 +:
 	call ApplyObjectXVelocity
-	dec (iy+48)
+	dec (iy+object.respawn_timer_minor)
 	ret nz
 	call _LABEL_24E0
 	ld (iy+2), $00
@@ -8376,10 +8376,10 @@ _LABEL_3B39:
 	or $1F
 	ld (iy+38), a
 	ld (iy+40), $C0
-	ld (iy+16), $00
-	ld (iy+17), $FF
-	ld (iy+48), $10
-	ld (iy+49), $00
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FF
+	ld (iy+object.respawn_timer_minor), $10
+	ld (iy+object.respawn_timer_major), $00
 	ld (iy+50), $20
 	ld (iy+51), $20
 	ld de, _DATA_8F4A
@@ -8395,10 +8395,10 @@ _LABEL_3B86:
 	ld (iy+25), $10
 	ld (iy+22), $F0
 	ld (iy+23), $10
-	ld (iy+16), $00
-	ld (iy+17), $01
-	ld (iy+48), $F8
-	ld (iy+49), $FF
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $01
+	ld (iy+object.respawn_timer_minor), $F8
+	ld (iy+object.respawn_timer_major), $FF
 	ld (iy+50), $40
 	ld (iy+51), $40
 	ld a, r
@@ -8459,8 +8459,8 @@ _LABEL_3C17:
 	ld (iy+25), $10
 	ld (iy+22), $E0
 	ld (iy+23), $20
-	ld (iy+16), $00
-	ld (iy+17), $FB
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FB
 	ld (iy+14), $01
 	ld hl, _DATA_872C
 	ld de, $FE80
@@ -8470,8 +8470,8 @@ _LABEL_3C17:
 	ld hl, _DATA_876A
 	ld de, $0180
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_249F
 
 ++:
@@ -8493,7 +8493,7 @@ _LABEL_3C17:
 	ld de, $0040
 	call _LABEL_869
 	ld de, $F810
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	ld de, $F8F0
 +:
@@ -8508,24 +8508,24 @@ _LABEL_3C17:
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	and $F8
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ld (iy+14), $00
 	ld (iy+39), $20
 	ld (iy+1), $01
-	ld (iy+16), $00
-	ld (iy+17), $FB
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FB
 	ld hl, _DATA_872C
 	ld de, $FE80
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr c, +
 	ld hl, _DATA_876A
 	ld de, $0180
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_24A3
 
 ; 40th entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -8546,8 +8546,8 @@ _LABEL_3CD8:
 	ld hl, _DATA_9493
 	ld de, $0200
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_249F
 
 ++:
@@ -8566,8 +8566,8 @@ _LABEL_3CD8:
 +:
 	call _LABEL_84C
 	call ApplyObjectXVelocity
-	ld a, (iy+10)
-	bit 7, (iy+20)
+	ld a, (iy+object.x_position_minor)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	cp $30
 	ret nc
@@ -8605,8 +8605,8 @@ _LABEL_3D54:
 	ld hl, _DATA_8AF3
 	ld de, $0180
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_249F
 
 ++:
@@ -8638,12 +8638,12 @@ _LABEL_3D54:
 	ld a, (iy+41)
 	or a
 	jr nz, +
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	cp (iy+60)
 	jr c, +
 	ld (iy+41), $01
 	ld a, (iy+60)
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 +:
 	dec (iy+40)
 	ret nz
@@ -8657,7 +8657,7 @@ _LABEL_3D54:
 
 ; 39th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 _LABEL_3DF2:
-	ld a, (iy+52)
+	ld a, (iy+object.boss_hp)
 	or a
 	jp nz, ++
 	ld b, $A6
@@ -8668,7 +8668,7 @@ _LABEL_3DF2:
 	ld hl, _RAM_BOW_DAMAGE
 +:
 	ld c, (hl)
-	ld a, (iy+58)
+	ld a, (iy+object.current_hp)
 	sub c
 	jr c, +
 	jr z, +
@@ -8682,8 +8682,8 @@ _LABEL_3DF2:
 	ld a, (iy+5)
 	ld (iy+18), a
 ++:
-	inc (iy+52)
-	bit 0, (iy+52)
+	inc (iy+object.boss_hp)
+	bit 0, (iy+object.boss_hp)
 	jr z, +
 	ld (iy+4), <_DATA_8FB8
 	ld (iy+5), >_DATA_8FB8
@@ -8696,14 +8696,14 @@ _LABEL_3DF2:
 	ret nz
 	ld (iy+53), $40
 	ld a, (iy+59)
-	ld (iy+0), a
-	ld (iy+52), $00
+	ld (iy+object.type), a
+	ld (iy+object.boss_hp), $00
 	call _LABEL_3EBE
 	call _LABEL_5268
 	jr z, +
 	ret nc
 +:
-	ld a, (iy+0)
+	ld a, (iy+object.type)
 	cp $21 ; Book Thief
 	jr nz, +
 	ld a, (iy+29)
@@ -8726,7 +8726,7 @@ _LABEL_3DF2:
 	call _LABEL_175F
 	dec (iy+63)
 	jp nz, _LABEL_3EA3
-	ld a, (iy+0)
+	ld a, (iy+object.type)
 	cp $11 ; Eye Part
 	jp z, +
 	jp _LABEL_8AC
@@ -8745,9 +8745,9 @@ _LABEL_3DF2:
 _LABEL_3EA3:
 	call _LABEL_524C
 	call _LABEL_5241
-	ld (iy+0), $2A ; Damaged
-	ld (iy+48), $00
-	ld (iy+49), $01
+	ld (iy+object.type), $2A ; Damaged
+	ld (iy+object.respawn_timer_minor), $00
+	ld (iy+object.respawn_timer_major), $01
 	ld (iy+4), <_DATA_8FB8
 	ld (iy+5), >_DATA_8FB8
 	ret
@@ -8761,26 +8761,26 @@ _LABEL_3EBE:
 
 ; 42nd entry of Jump Table from 6E4 (indexed by _RAM_C400)
 _LABEL_3ECB:
-	ld l, (iy+48)
-	ld h, (iy+49)
+	ld l, (iy+object.respawn_timer_minor)
+	ld h, (iy+object.respawn_timer_major)
 	dec hl
-	ld (iy+48), l
-	ld (iy+49), h
+	ld (iy+object.respawn_timer_minor), l
+	ld (iy+object.respawn_timer_major), h
 	ld a, l
 	or h
 	ret nz
 	call _LABEL_51FB
-	ld a, (iy+11)
+	ld a, (iy+object.x_position_major)
 	or a
 	jr z, +
 	jp _LABEL_524C
 
 +:
-	ld (iy+48), $01
-	ld (iy+49), $00
+	ld (iy+object.respawn_timer_minor), $01
+	ld (iy+object.respawn_timer_major), $00
 	ld (iy+4), <_DATA_8FB8
 	ld (iy+5), >_DATA_8FB8
-	ld (iy+0), $2A ; Damaged
+	ld (iy+object.type), $2A ; Damaged
 	ret
 
 ; 43rd entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -8805,7 +8805,7 @@ _LABEL_3EFC:
 	ld a, $06
 	ld (_RAM_C538), a
 	ld a, $14 ; TREE BOSS NAMO HEALTH
-	ld (_RAM_C534), a
+	ld (_RAM_BOSS_HP), a
 	ret
 
 +:
@@ -8834,7 +8834,7 @@ _LABEL_3F46:
 	ret
 
 +:
-	ld a, (iy+0)
+	ld a, (iy+object.type)
 	cp $2B ; Tree Spirit
 	jr z, +
 	cp $34 ; Pirate
@@ -8842,7 +8842,7 @@ _LABEL_3F46:
 	cp $37 ; Baruga
 	jp nz, _LABEL_8AC
 +:
-	ld (iy+62), $01
+	ld (iy+object.boss_defeated), $01
 	ld a, $A5
 	ld (_RAM_SOUND_TO_PLAY), a
 	ld (iy+31), $60
@@ -8971,8 +8971,8 @@ _LABEL_406B:
 	jp _LABEL_24E0
 
 _LABEL_407B:
-	inc (iy+36)
-	bit 0, (iy+36)
+	inc (iy+object.boss_flash_timer)
+	bit 0, (iy+object.boss_flash_timer)
 	jr z, +
 	ld (iy+4), <_DATA_8FB8
 	ld (iy+5), >_DATA_8FB8
@@ -8983,7 +8983,7 @@ _LABEL_407B:
 ++:
 	dec (iy+31)
 	ret nz
-	ld a, (iy+62)
+	ld a, (iy+object.boss_defeated)
 	or a
 	jp nz, _LABEL_6A47
 	ld a, (iy+29)
@@ -9073,16 +9073,16 @@ _LABEL_412D:
 	ld de, _DATA_416C
 	add hl, de
 	ld a, (hl)
-	ld (iy+20), a
+	ld (iy+object.x_velocity_minor), a
 	inc hl
 	ld a, (hl)
-	ld (iy+19), a
+	ld (iy+object.x_velocity_sub), a
 	inc hl
 	ld a, (hl)
-	ld (iy+17), a
+	ld (iy+object.y_velocity_minor), a
 	inc hl
 	ld a, (hl)
-	ld (iy+16), a
+	ld (iy+object.y_velocity_sub), a
 	ld (iy+24), $FA
 	ld (iy+25), $0C
 	ld (iy+22), $F2
@@ -9107,7 +9107,7 @@ _LABEL_4178:
 +:
 	call _LABEL_1C8C
 	jp c, _LABEL_8AC
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	cp $A8
 	jr c, +
 	ld (iy+1), $02
@@ -9134,16 +9134,16 @@ _LABEL_41AB:
 	ld hl, $41EA
 	add hl, de
 	ld a, (hl)
-	ld (iy+16), a
+	ld (iy+object.y_velocity_sub), a
 	inc hl
 	ld a, (hl)
-	ld (iy+17), a
+	ld (iy+object.y_velocity_minor), a
 	inc hl
 	ld a, (hl)
-	ld (iy+19), a
+	ld (iy+object.x_velocity_sub), a
 	inc hl
 	ld a, (hl)
-	ld (iy+20), a
+	ld (iy+object.x_velocity_minor), a
 	ld (iy+24), $FC
 	ld (iy+25), $08
 	ld (iy+22), $F8
@@ -9162,14 +9162,14 @@ _LABEL_41FE:
 	ld a, (iy+1)
 	or a
 	jp z, +
-	ld a, (iy+11)
+	ld a, (iy+object.x_position_major)
 	or a
 	jp nz, _LABEL_8AC
 	jp ApplyObjectXVelocity
 
 +:
 	call ApplyObjectYVelocity
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	cp $A8
 	ret c
 	ld (iy+1), $01
@@ -9201,7 +9201,7 @@ _LABEL_4226:
 	ld a, $1D
 	ld (_RAM_C51D), a
 	ld a, $08
-	ld (_RAM_C534), a
+	ld (_RAM_BOSS_HP), a
 	ld a, $04
 	ld (_RAM_C538), a
 	call _LABEL_24AE
@@ -9247,7 +9247,7 @@ _LABEL_4278:
 	dec (iy+29)
 	jr z, +++
 	ld a, (_RAM_C50A)
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	cp $08
 	ret nc
@@ -9287,7 +9287,7 @@ _LABEL_42FD:
 	ld (_RAM_C50D), a
 	ld hl, $97C0
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr c, +
 	ld hl, $988E
 +:
@@ -9324,7 +9324,7 @@ _LABEL_435A:
 	ld a, (iy+3)
 	or a
 	jp nz, _LABEL_43A8
-	ld (iy+7), $A0
+	ld (iy+object.y_position_minor), $A0
 	ld (iy+24), $F4
 	ld (iy+25), $18
 	ld (iy+22), $D0
@@ -9342,9 +9342,9 @@ _LABEL_435A:
 	ld b, $D8
 	ld hl, _DATA_9926
 +:
-	ld (iy+10), b
+	ld (iy+object.x_position_minor), b
 	ld (iy+56), $06
-	ld (iy+52), $05
+	ld (iy+object.boss_hp), $05
 	jp _LABEL_249F
 
 _LABEL_43A8:
@@ -9369,8 +9369,8 @@ _LABEL_43A8:
 	or l
 	jp z, _LABEL_4477
 	call ApplyObjectXVelocity
-	ld a, (iy+10)
-	bit 7, (iy+20)
+	ld a, (iy+object.x_position_minor)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	cp $08
 	jr nc, +++
@@ -9384,19 +9384,19 @@ _LABEL_43A8:
 	ld hl, _DATA_995D
 	ld de, $FF00
 ++:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_24A3
 
 +++:
 	ld de, $0030
-	ld l, (iy+16)
-	ld h, (iy+17)
+	ld l, (iy+object.y_velocity_sub)
+	ld h, (iy+object.y_velocity_minor)
 	add hl, de
-	ld (iy+16), l
-	ld (iy+17), h
+	ld (iy+object.y_velocity_sub), l
+	ld (iy+object.y_velocity_minor), h
 	call ApplyObjectYVelocity
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	cp $9F
 	ret c
 	ld a, (iy+26)
@@ -9406,7 +9406,7 @@ _LABEL_43A8:
 	cp $20
 	jp c, _LABEL_4477
 +:
-	ld (iy+7), $A0
+	ld (iy+object.y_position_minor), $A0
 	ld hl, _DATA_456E
 	ld a, r
 	and $03
@@ -9415,10 +9415,10 @@ _LABEL_43A8:
 	ld d, $00
 	add hl, de
 	ld a, (hl)
-	ld (iy+16), a
+	ld (iy+object.y_velocity_sub), a
 	inc hl
 	ld a, (hl)
-	ld (iy+17), a
+	ld (iy+object.y_velocity_minor), a
 	ld (iy+12), $01
 	call _LABEL_24BD
 	cp $20
@@ -9431,13 +9431,13 @@ _LABEL_43A8:
 	ld hl, _DATA_995D
 	ld de, $FF00
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr c, +
 	ld hl, _DATA_99EE
 	ld de, $0100
 +:
-	ld (iy+19), e
-	ld (iy+20), d
+	ld (iy+object.x_velocity_sub), e
+	ld (iy+object.x_velocity_minor), d
 	jp _LABEL_249F
 
 _LABEL_4477:
@@ -9447,7 +9447,7 @@ _LABEL_4477:
 	ld (iy+14), $00
 	ld hl, _DATA_99AF
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr nc, +
 	ld hl, _DATA_991E
 +:
@@ -9468,7 +9468,7 @@ _LABEL_4498:
 	ld (iy+14), $00
 	ld hl, _DATA_995D
 	ld de, $FF00
-	ld a, (iy+10)
+	ld a, (iy+object.x_position_minor)
 	cp $80
 	jr nc, +
 	ld hl, _DATA_99EE
@@ -9476,10 +9476,10 @@ _LABEL_4498:
 +:
 	ld (iy+4), l
 	ld (iy+5), h
-	ld (iy+20), e
-	ld (iy+20), d
-	ld (iy+16), $00
-	ld (iy+17), $FC
+	ld (iy+object.x_velocity_minor), e ; BUG?
+	ld (iy+object.x_velocity_minor), d
+	ld (iy+object.y_velocity_sub), $00
+	ld (iy+object.y_velocity_minor), $FC
 	ret
 
 _LABEL_44E0:
@@ -9499,13 +9499,13 @@ _LABEL_44E0:
 	jr nz, +
 	ld b, $FC
 +:
-	ld a, (iy+10)
+	ld a, (iy+object.x_position_minor)
 	add a, b
 	cp $08
 	ret c
 	cp $F8
 	ret nc
-	ld (iy+10), a
+	ld (iy+object.x_position_minor), a
 	ret
 
 _LABEL_450F:
@@ -9513,7 +9513,7 @@ _LABEL_450F:
 	ld (iy+53), $08
 	ld b, $01
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr c, +
 	ld b, $02
 +:
@@ -9526,7 +9526,7 @@ _LABEL_450F:
 	ld a, (iy+5)
 	ld (iy+18), a
 	ld (iy+53), $80
-	ld a, (iy+0)
+	ld a, (iy+object.type)
 	cp $2E ; Necromancer
 	jr z, +
 	cp $30 ; Dark Suma
@@ -9573,7 +9573,7 @@ _LABEL_4576:
 	ld a, $08
 	ld (_RAM_C538), a
 	ld a, $32
-	ld (_RAM_C534), a
+	ld (_RAM_BOSS_HP), a
 	ld hl, _DATA_A4DD
 	jp _LABEL_249F
 
@@ -9850,10 +9850,10 @@ _LABEL_47D9:
 	jp nz, +
 	ld a, (_RAM_C50A)
 	add a, $F4
-	ld (iy+10), a
+	ld (iy+object.x_position_minor), a
 	ld a, (_RAM_C507)
 	add a, $10
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ld (iy+24), $FC
 	ld (iy+25), $08
 	ld (iy+22), $FC
@@ -9874,7 +9874,7 @@ _LABEL_47D9:
 	call _LABEL_1C8C
 	call ApplyObjectXVelocity
 	call ApplyObjectYVelocity
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	cp $A0
 	ret c
 	ld (iy+1), $02
@@ -9902,7 +9902,7 @@ _LABEL_483F:
 	ld hl, $38B0
 	ld (_RAM_C516), hl
 	ld a, $1E
-	ld (_RAM_C534), a
+	ld (_RAM_BOSS_HP), a
 	ld a, $08
 	ld (_RAM_C538), a
 	ld hl, _DATA_9F02
@@ -10027,7 +10027,7 @@ _LABEL_493A:
 	call ApplyObjectXVelocity
 	ld a, (_RAM_X_POSITION_MINOR)
 	add a, $08
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	ret nc
 	jp _LABEL_4990
 
@@ -10202,7 +10202,7 @@ _LABEL_4A85:
 	ld a, $08
 	ld (_RAM_C51A), a
 	ld a, $14
-	ld (_RAM_C534), a
+	ld (_RAM_BOSS_HP), a
 	ld a, $04
 	ld (_RAM_C538), a
 	ld hl, _DATA_ADE8
@@ -10232,7 +10232,7 @@ _LABEL_4A85:
 	jp nz, ++
 	ld hl, $AEC5
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr nc, +
 	ld hl, $AFF6
 +:
@@ -10288,7 +10288,7 @@ _LABEL_4B44:
 _LABEL_4B53:
 	ld hl, $AE3A
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr nc, +
 	ld hl, $AE3E
 +:
@@ -10299,7 +10299,7 @@ _LABEL_4B53:
 
 ++:
 	call _LABEL_84C
-	dec (iy+34)
+	dec (iy+object.boss_teleport_timer)
 	ret nz
 	ld a, (_RAM_C523)
 	or a
@@ -10334,7 +10334,7 @@ _LABEL_4BA0:
 	jp nz, ++
 	ld hl, $ADE8
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr nc, +
 	ld hl, $AF21
 +:
@@ -10343,7 +10343,7 @@ _LABEL_4BA0:
 	ld (_RAM_C50E), a
 	ld (_RAM_C502), a
 ++:
-	inc (iy+7)
+	inc (iy+object.y_position_minor)
 	ld a, (_RAM_C507)
 	cp $B0
 	ret c
@@ -10464,8 +10464,8 @@ _LABEL_4CAB:
 	ld (iy+23), $10
 	ld (iy+24), $F8
 	ld (iy+25), $10
-	ld (iy+48), $FC
-	ld (iy+49), $FF
+	ld (iy+object.respawn_timer_minor), $FC
+	ld (iy+object.respawn_timer_major), $FF
 	ld a, (iy+60)
 	ld b, a
 	add a, a
@@ -10478,19 +10478,19 @@ _LABEL_4CAB:
 	ld hl, _DATA_4D12
 	add hl, de
 	ld a, (hl)
-	ld (iy+10), a
+	ld (iy+object.x_position_minor), a
 	inc hl
 	ld a, (hl)
-	ld (iy+16), a
+	ld (iy+object.y_velocity_sub), a
 	inc hl
 	ld a, (hl)
-	ld (iy+17), a
+	ld (iy+object.y_velocity_minor), a
 	inc hl
 	ld a, (hl)
-	ld (iy+19), a
+	ld (iy+object.x_velocity_sub), a
 	inc hl
 	ld a, (hl)
-	ld (iy+20), a
+	ld (iy+object.x_velocity_minor), a
 	inc hl
 	ld a, (hl)
 	ld (iy+26), a
@@ -10499,9 +10499,9 @@ _LABEL_4CAB:
 	ld (iy+50), a
 	ld (iy+51), a
 	ld a, $B0
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ld (iy+56), $02
-	ld (iy+52), $01
+	ld (iy+object.boss_hp), $01
 	ld hl, _DATA_B073
 	jp _LABEL_249F
 
@@ -10568,7 +10568,7 @@ _LABEL_4D71:
 	or a
 	jp nz, ++
 	ld hl, _DATA_B07E
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr nz, +
 	ld hl, _DATA_B05D
 +:
@@ -10591,8 +10591,8 @@ _LABEL_4D71:
 	jp _LABEL_24E0
 
 _LABEL_4DE8:
-	dec (iy+7)
-	ld a, (iy+7)
+	dec (iy+object.y_position_minor)
+	ld a, (iy+object.y_position_minor)
 	cp (iy+26)
 	ret nc
 	ld a, r
@@ -10678,7 +10678,7 @@ _LABEL_4E7A:
 	ld a, $04
 	ld (_RAM_C538), a
 	ld a, $3C
-	ld (_RAM_C534), a
+	ld (_RAM_BOSS_HP), a
 	ld hl, _DATA_B0CC
 	jp _LABEL_249F
 
@@ -10724,7 +10724,7 @@ _LABEL_4E7A:
 	ld (_RAM_C502), a
 	ld hl, $B1F9
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr c, +
 	ld hl, $B2B8
 +:
@@ -10804,7 +10804,7 @@ _LABEL_4F7E:
 	jr nz, ++
 	ld hl, $B10F
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr c, +
 	ld hl, $B242
 +:
@@ -10852,7 +10852,7 @@ _LABEL_4FE4:
 	jr c, +++
 	cp $EF
 	jr nc, +++
-	sub (iy+10)
+	sub (iy+object.x_position_minor)
 	bit 7, a
 	jr z, +
 	cp $D0
@@ -10870,7 +10870,7 @@ _LABEL_4FE4:
 +++:
 	ld b, $00
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	jr c, +
 	ld b, $01
 +:
@@ -11012,20 +11012,20 @@ LoadMapEnemies:
 -:
 	inc hl
 	ld a, (hl)
-	ld (iy+0), a
+	ld (iy+object.type), a
 	ld (iy+59), a
 	inc hl
 	ld a, (hl)
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ld (iy+60), a
 	inc hl
 	ld a, (hl)
-	ld (iy+10), a
+	ld (iy+object.x_position_minor), a
 	ld (iy+61), a
 	inc hl
 	ld a, (hl)
-	ld (iy+11), a
-	ld (iy+62), a
+	ld (iy+object.x_position_major), a
+	ld (iy+object.boss_defeated), a
 	inc hl
 	ld a, (hl)
 	ld (iy+56), a
@@ -11135,28 +11135,28 @@ _LABEL_51FB:
 	inc hl
 	ld a, (iy+61)
 	adc a, (hl)
-	ld (iy+10), a
+	ld (iy+object.x_position_minor), a
 	inc hl
-	ld a, (iy+62)
+	ld a, (iy+object.boss_defeated)
 	adc a, (hl)
-	ld (iy+11), a
+	ld (iy+object.x_position_major), a
 	ld a, (iy+59)
-	ld (iy+0), a
+	ld (iy+object.type), a
 	ld a, (iy+60)
-	ld (iy+7), a
+	ld (iy+object.y_position_minor), a
 	ld (iy+54), $00
 _LABEL_5223:
-	bit 7, (iy+11)
+	bit 7, (iy+object.x_position_major)
 	jr z, +
 -:
 	ld (iy+55), $01
 	ret
 
 +:
-	ld a, (iy+11)
+	ld a, (iy+object.x_position_major)
 	or a
 	jr nz, +
-	ld a, (iy+10)
+	ld a, (iy+object.x_position_minor)
 	cp $80
 	jp c, -
 +:
@@ -11188,13 +11188,13 @@ _LABEL_524C:
 	rrca
 	rrca
 	rrca
-	ld (iy+58), a
+	ld (iy+object.current_hp), a
 	pop hl
 	ret
 
 _LABEL_5268:
 	ld hl, _RAM_SWORD_DAMAGE
-	ld a, (iy+0)
+	ld a, (iy+object.type)
 	cp $2A ; Damaged
 	jp nc, ++
 	ld a, (iy+26)
@@ -11204,9 +11204,9 @@ _LABEL_5268:
 +:
 	ld (iy+26), $00
 	ld b, (hl)
-	ld a, (iy+58)
+	ld a, (iy+object.current_hp)
 	sub b
-	ld (iy+58), a ; Apply Sword/Bow Damage To Enemy
+	ld (iy+object.current_hp), a ; Apply Sword/Bow Damage To Enemy
 	ret
 
 ++:
@@ -11217,9 +11217,9 @@ _LABEL_5268:
 +:
 	ld (iy+63), $00
 	ld b, (hl)
-	ld a, (iy+52)
+	ld a, (iy+object.boss_hp)
 	sub b
-	ld (iy+52), a ; Apply Sword/Bow Damage To Boss
+	ld (iy+object.boss_hp), a ; Apply Sword/Bow Damage To Boss
 	ret c
 	ret nz
 	scf
@@ -11522,11 +11522,11 @@ _LABEL_54D5:
 	add a, (iy+9)
 	ld (iy+9), a
 	ld a, (_RAM_C132)
-	adc a, (iy+10)
-	ld (iy+10), a
+	adc a, (iy+object.x_position_minor)
+	ld (iy+object.x_position_minor), a
 	ld a, (_RAM_C133)
-	adc a, (iy+11)
-	ld (iy+11), a
+	adc a, (iy+object.x_position_major)
+	ld (iy+object.x_position_major), a
 	add iy, de
 	djnz -
 	ret
@@ -12700,7 +12700,7 @@ _LABEL_5F2A:
 	ld hl, $A000
 	ld (_RAM_C506), hl
 	ld (iy+1), $03
-	inc (iy+34)
+	inc (iy+object.boss_teleport_timer)
 	ld hl, $A961
 	ld de, $AA81
 	ld bc, $0804
@@ -12718,7 +12718,7 @@ _LABEL_5F2A:
 +:
 	cp $05
 	jr c, +
-	ld (iy+34), $FF
+	ld (iy+object.boss_teleport_timer), $FF
 +:
 	ld (iy+12), b
 	ld (iy+13), c
@@ -12918,7 +12918,7 @@ _LABEL_612F:
 	ld a, (_RAM_C501)
 	cp $02
 	ret z
-	ld (iy+34), $01
+	ld (iy+object.boss_teleport_timer), $01
 	ld a, (_RAM_C50E)
 	ld (_RAM_C527), a
 	ld (iy+14), $01
@@ -12941,7 +12941,7 @@ _LABEL_6162:
 	ld (_RAM_C50E), a
 	ld hl, (_RAM_C528)
 	ld (_RAM_C504), hl
-	ld (iy+34), $00
+	ld (iy+object.boss_teleport_timer), $00
 	ret
 
 _LABEL_6177:
@@ -13014,7 +13014,7 @@ _LABEL_61AD:
 	ld hl, $FC00
 	ld (_RAM_C510), hl
 	ld hl, $9E97
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr nz, +
 	ld hl, $9DC5
 +:
@@ -13046,8 +13046,8 @@ _LABEL_6245:
 	ld a, (_RAM_C507)
 	cp $A0
 	ret c
-	ld (iy+7), $A0
-	ld (iy+6), $00
+	ld (iy+object.y_position_minor), $A0
+	ld (iy+object.y_position_sub), $00
 	call _LABEL_6378
 	ld hl, $9E99
 	ld d, $F0
@@ -13089,14 +13089,14 @@ _LABEL_6291:
 	ld (iy+33), c
 	call _LABEL_61AD
 	ld (iy+1), $04
-	ld (iy+34), $40
+	ld (iy+object.boss_teleport_timer), $40
 	ret
 
 _LABEL_62C7:
-	dec (iy+34)
+	dec (iy+object.boss_teleport_timer)
 	jr nz, _LABEL_62D9
 	call _LABEL_61AD
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jp nz, +
 	jp +++
 
@@ -13104,7 +13104,7 @@ _LABEL_62D9:
 	call ApplyObjectXVelocity
 	call _LABEL_84C
 	ld a, (_RAM_C50A)
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, ++
 	cp $10
 	ret nc
@@ -13170,11 +13170,11 @@ _LABEL_632F:
 
 _LABEL_634B:
 	ld a, (_RAM_C50A)
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	cp $10
 	ret nc
-	ld (iy+10), $10
+	ld (iy+object.x_position_minor), $10
 	ld (iy+9), $00
 	ld (iy+33), $01
 	jp _LABEL_24E0
@@ -13182,7 +13182,7 @@ _LABEL_634B:
 +:
 	cp $F0
 	ret c
-	ld (iy+10), $F0
+	ld (iy+object.x_position_minor), $F0
 	ld (iy+9), $00
 	ld (iy+33), $00
 	jp _LABEL_24E0
@@ -13190,7 +13190,7 @@ _LABEL_634B:
 _LABEL_6378:
 	ld c, $00
 	ld a, (_RAM_X_POSITION_MINOR)
-	cp (iy+10)
+	cp (iy+object.x_position_minor)
 	ret c
 	ld c, $FF
 	ret
@@ -13211,7 +13211,7 @@ _LABEL_6388:
 	ld (_RAM_C525), hl
 	ex de, hl
 	ld (_RAM_C513), hl
-	ld (iy+36), $01
+	ld (iy+object.boss_flash_timer), $01
 	ld (iy+33), b
 	ld (iy+53), $08
 	ld a, $A3
@@ -13224,7 +13224,7 @@ _LABEL_63B5:
 	call _LABEL_634B
 	dec (iy+53)
 	ret nz
-	ld (iy+36), $00
+	ld (iy+object.boss_flash_timer), $00
 	ld hl, (_RAM_C525)
 	ld (_RAM_C513), hl
 	call _LABEL_5268
@@ -13268,11 +13268,11 @@ _LABEL_63F2:
 	ret
 
 _LABEL_6417:
-	ld (_RAM_C534), a
+	ld (_RAM_BOSS_HP), a
 	ld (iy+56), c
 	ld (iy+3), $01
-	ld (iy+7), $A0
-	ld (iy+10), $D0
+	ld (iy+object.y_position_minor), $A0
+	ld (iy+object.x_position_minor), $D0
 	ld (iy+2), $00
 	ret
 
@@ -13334,7 +13334,7 @@ _LABEL_6459:
 	cp b
 	ret c
 +:
-	ld (iy+10), b
+	ld (iy+object.x_position_minor), b
 	ld (iy+9), $00
 	ld (iy+32), c
 	ld (iy+1), $01
@@ -13382,11 +13382,11 @@ _LABEL_64E2:
 	add a, $E8
 	ld (_RAM_C507), a
 	ld a, $C8
-	bit 7, (iy+20)
+	bit 7, (iy+object.x_velocity_minor)
 	jr nz, +
 	ld a, $38
 +:
-	add a, (iy+10)
+	add a, (iy+object.x_position_minor)
 	ld (_RAM_C50A), a
 	ret
 
@@ -13394,7 +13394,7 @@ _LABEL_64E2:
 	ld a, (_RAM_C507)
 	cp $A0
 	ret c
-	ld (iy+7), $A0
+	ld (iy+object.y_position_minor), $A0
 _LABEL_6531:
 	ld hl, $A720
 	bit 7, (iy+32)
@@ -13409,7 +13409,7 @@ _LABEL_6543:
 	call _LABEL_634B
 	dec (iy+53)
 	ret nz
-	ld (iy+36), $00
+	ld (iy+object.boss_flash_timer), $00
 	call _LABEL_5268
 	jr nc, +
 	ld a, $A5
@@ -13497,15 +13497,15 @@ _LABEL_65F5:
 
 ; 60th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 _LABEL_6612:
-	ld a, (iy+17)
+	ld a, (iy+object.y_velocity_minor)
 	or a
 	call nz, +
 	call ApplyObjectXVelocity
 	call _LABEL_1C8C
-	ld a, (iy+11)
+	ld a, (iy+object.x_position_major)
 	or a
 	jp nz, _LABEL_8AC
-	ld a, (iy+7)
+	ld a, (iy+object.y_position_minor)
 	cp $C0
 	jp nc, _LABEL_8AC
 	ret
@@ -13641,7 +13641,7 @@ _LABEL_671A:
 	ex de, hl
 	ld (_RAM_C513), hl
 	ld (iy+32), c
-	ld (iy+34), $00
+	ld (iy+object.boss_teleport_timer), $00
 	ret
 
 _LABEL_674A:
@@ -13683,14 +13683,14 @@ _LABEL_6787:
 	jr nz, _LABEL_67F5
 	xor a
 	ld (_RAM_C175), a
-	ld (iy+34), $01
+	ld (iy+object.boss_teleport_timer), $01
 	ld (iy+35), $03
-	ld (iy+36), $20
-	ld (iy+52), $64
+	ld (iy+object.boss_flash_timer), $20
+	ld (iy+object.boss_hp), $64
 	ld (iy+56), $04
 	ld (iy+3), $01
-	ld (iy+7), $A8
-	ld (iy+10), $30
+	ld (iy+object.y_position_minor), $A8
+	ld (iy+object.x_position_minor), $30
 	ld hl, $30D0
 	ld de, $18F4
 	call _LABEL_642E
@@ -13995,7 +13995,7 @@ _LABEL_6A47:
 	jp _LABEL_8AC
 
 +:
-	ld a, (iy+0)
+	ld a, (iy+object.type)
 	cp $2B ; Tree Spirit
 	jr z, ++
 	cp $37 ; Baruga
