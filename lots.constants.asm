@@ -1,3 +1,18 @@
+; Ports
+.define Port_MemoryControl $3E
+.define Port_PSG $7F
+.define Port_VDPData $BE
+.define Port_VDPAddress $BF
+.define _PORT_DF $DF
+.define Port_FMAddress $F0
+.define Port_FMData $F1
+.define Port_AudioControl $F2
+
+; Input Ports
+.define Port_VDPStatus $BF
+.define Port_IOPort1 $DC
+.define Port_IOPort2 $DD
+
 ; Buttons
 .define	ButtonUp 0
 .define	ButtonDown 1
