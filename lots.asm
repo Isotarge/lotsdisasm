@@ -14528,36 +14528,7 @@ _DATA_70C3:
 
 ; Data from 70D3 to 7814 (1858 bytes)
 _DATA_70D3:
-.incbin "banks\lots_DATA_70D3.inc"
-
-; 1st entry of Pointer Table from 286DB (indexed by unknown)
-; Data from 7815 to 781E (10 bytes)
-_DATA_7815:
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-
-; 1st entry of Pointer Table from 28171 (indexed by unknown)
-; Data from 781F to 7F41 (1827 bytes)
-_DATA_781F:
-.incbin "banks\lots_DATA_781F.inc"
-
-; 1st entry of Pointer Table from 10082 (indexed by _RAM_C40E)
-; Data from 7F42 to 7F5F (30 bytes)
-_DATA_7F42:
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-
-; 1st entry of Pointer Table from 10088 (indexed by _RAM_C40E)
-; Data from 7F60 to 7FEF (144 bytes)
-_DATA_7F60:
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
+.db $50 $00 $00 $50 $00 $00
 
 .BANK 1 SLOT 1
 .ORG $0000
@@ -15494,7 +15465,9 @@ _DATA_COMPRESSED_SEGA_LOGO_TILES_:
 
 ; Data from B801 to BFFF (2047 bytes)
 _DATA_B801:
-.incbin "banks\lots_DATA_B801.inc"
+.db $A4 $01 $02 $03 $04 $05 $06 $07 $08 $09 $0A $0B $0C $0D $0E $0F
+.db $10 $11 $12 $13 $14 $15 $16 $17 $18 $19 $1A $1B $1C $1D $1E $1F
+.db $20 $21 $1F $20 $22 $03 $1F $81 $23 $00 $28 $00 $00
 
 .BANK 3
 .ORG $0000
@@ -18693,7 +18666,7 @@ _DATA_EF34:
 
 ; Data from EF3D to FFFF (4291 bytes)
 _DATA_EF3D:
-.incbin "banks\lots_DATA_EF3D.inc"
+.db $84 $1B $1C $1D $1E $00 $04 $09 $00
 
 .BANK 4
 .ORG $0000
@@ -18747,13 +18720,13 @@ _DATA_10080:
 .db $3F $BC
 
 ; Pointer Table from 10082 to 10083 (1 entries, indexed by _RAM_C40E)
-.dw _DATA_7F42
+.db $42 $7F
 
 ; Data from 10084 to 10087 (4 bytes)
 .db $BE $41 $7F $9F
 
 ; Pointer Table from 10088 to 1008D (3 entries, indexed by _RAM_C40E)
-.dw _DATA_7F60 $F807 $E0FF
+.dw $7F60 $F807 $E0FF
 
 ; Data from 1008E to 137DF (14162 bytes)
 .incbin "banks\lots_DATA_1008E.inc"
@@ -18910,75 +18883,160 @@ _DATA_15539:
 _DATA_COMPRESSED_TITLE_SCREEN_TILES_:
 .incbin "banks\lots_DATA_15549.inc"
 
+.ASCIITABLE
+MAP ' ' = 32
+MAP 'A' TO 'Z' = 33
+MAP ',' = 59
+MAP '.' = 60
+MAP '!' = 61
+MAP '5' = 62
+MAP "'" = 63
+MAP '?' = 64
+MAP '1' = 66
+MAP '2' = 67
+MAP '3' = 68
+.ENDA
+
 ; Data from 16A89 to 16C22 (410 bytes)
-_DATA_16A89:
-.db $AD $33 $25 $36 $25 $32 $21 $2C $20 $34 $28 $2F $35 $33 $21 $2E
-.db $24 $20 $39 $25 $21 $32 $33 $20 $20 $21 $26 $34 $25 $32 $20 $34
-.db $28 $25 $20 $24 $2F $37 $2E $26 $21 $2C $2C $20 $2F $26 $03 $20
-.db $F0 $34 $28 $25 $20 $24 $25 $2D $2F $2E $20 $2C $2F $32 $24 $20
-.db $32 $21 $20 $27 $2F $21 $2E $3B $20 $22 $21 $2C $2A $29 $2E $39
-.db $21 $20 $37 $21 $33 $20 $2F $2E $23 $25 $20 $2D $2F $32 $25 $20
-.db $20 $26 $21 $23 $25 $24 $20 $37 $29 $34 $28 $20 $27 $32 $25 $21
-.db $34 $20 $30 $25 $32 $29 $2C $3C $20 $29 $2E $20 $21 $20 $33 $23
-.db $28 $25 $2D $25 $20 $34 $2F $20 $32 $25 $33 $34 $2F $32 $25 $20
-.db $20 $34 $28 $25 $29 $32 $20 $2D $21 $33 $34 $25 $32 $3B $34 $28
-.db $25 $08 $20 $C5 $26 $2F $2C $2C $2F $37 $25 $32 $33 $20 $2F $26
-.db $20 $32 $21 $20 $27 $2F $21 $2E $20 $28 $21 $24 $2B $29 $2C $2C
-.db $25 $24 $20 $34 $28 $25 $20 $32 $29 $27 $28 $34 $26 $35 $2C $20
-.db $2B $29 $2E $27 $21 $33 $20 $21 $2E $20 $25 $36 $29 $2C $20 $33
-.db $21 $23 $32 $29 $26 $29 $23 $25 $3C $03 $20 $A7 $26 $25 $21 $32
-.db $20 $2F $36 $25 $32 $32 $21 $2E $20 $34 $28 $25 $20 $34 $2F $37
-.db $2E $33 $20 $20 $2F $26 $20 $22 $21 $2C $2A $29 $2E $39 $21 $3B
-.db $21 $2E $24 $09 $20 $95 $2C $21 $37 $2C $25 $33 $33 $2E $25 $33
-.db $33 $20 $32 $35 $2C $25 $24 $20 $34 $28 $25 $03 $20 $85 $2C $21
-.db $2E $24 $3C $13 $20 $94 $21 $20 $23 $2F $35 $2E $23 $29 $2C $20
-.db $2F $26 $20 $25 $2C $24 $25 $32 $33 $3B $04 $20 $92 $33 $25 $25
-.db $2B $29 $2E $27 $20 $34 $2F $20 $32 $25 $33 $34 $2F $32 $25 $06
-.db $20 $AC $2F $32 $24 $25 $32 $3B $24 $25 $23 $32 $25 $25 $24 $20
-.db $34 $28 $21 $34 $20 $21 $2E $39 $20 $20 $37 $28 $2F $20 $33 $2F
-.db $35 $27 $28 $34 $20 $34 $28 $25 $20 $23 $32 $2F $37 $2E $04 $20
-.db $00 $6C $00 $6C $00 $6C $00 $6C $00 $00
+_DATA_16A89: ; Intro Story Text
+.db $AD
+.asc "SEVERAL THOUSAND YEARS  AFTER THE DOWNFALL OF"
+.asc $03 " " $F0
+.asc "THE DEMON LORD RA GOAN, BALJINYA WAS ONCE MORE  FACED WITH GREAT PERIL. "
+.asc "IN A SCHEME TO RESTORE  THEIR MASTER,THE"
+.asc $08 " " $C5
+.asc "FOLLOWERS OF RA GOAN HADKILLED THE RIGHTFUL KINGAS AN EVIL SACRIFICE."
+.asc $03 " " $A7
+.asc "FEAR OVERRAN THE TOWNS  OF BALJINYA,AND"
+.asc $09 " " $95
+.asc "LAWLESSNESS RULED THE"
+.asc $03 " " $85
+.asc "LAND."
+.asc $13 " " $94
+.asc "A COUNCIL OF ELDERS,"
+.asc $04 " " $92
+.asc "SEEKING TO RESTORE"
+.asc $06 " " $AC
+.asc "ORDER,DECREED THAT ANY  WHO SOUGHT THE CROWN"
+.db $04 $20 $00 $6C $00 $6C $00 $6C $00 $6C $00 $00
 
 ; Data from 16C23 to 16C47 (37 bytes)
 _DATA_16C23:
-.db $93 $2D $35 $33 $34 $20 $26 $29 $32 $33 $34 $20 $30 $21 $33 $33
-.db $20 $34 $28 $32 $02 $25 $03 $20 $86 $34 $25 $33 $34 $33 $3C $12
-.db $20 $00 $30 $00 $00
+.db $93
+.asc "MUST FIRST PASS THR" $02 "E"
+.asc $03 " " $86
+.asc "TESTS."
+.db $12 $20 $00 $30 $00 $00
 
 ; Data from 16C48 to 16CC2 (123 bytes)
 _DATA_16C48:
-.db $93 $2C $21 $2E $24 $21 $35 $3B $21 $20 $22 $32 $21 $36 $25 $20
-.db $2C $21 $24 $3B $05 $20 $93 $32 $25 $33 $2F $2C $36 $25 $24 $20
-.db $34 $2F $20 $21 $34 $34 $25 $2D $30 $34 $05 $20 $C8 $34 $28 $25
-.db $33 $25 $20 $26 $25 $21 $34 $33 $20 $26 $2F $32 $20 $34 $28 $25
-.db $20 $2C $21 $2E $24 $28 $25 $20 $2C $2F $36 $25 $24 $3B $21 $2E
-.db $24 $20 $33 $25 $34 $20 $2F $26 $26 $20 $34 $2F $20 $26 $29 $2E
-.db $24 $20 $34 $28 $25 $20 $37 $29 $3A $21 $32 $24 $20 $29 $2E $20
-.db $21 $2D $2F $2E $3C $00 $3C $00 $3C $00 $00
+.db $93
+.asc "LANDAU,A BRAVE LAD,"
+.asc $05 " " $93
+.asc "RESOLVED TO ATTEMPT"
+.asc $05 " " $C8
+.asc "THESE FEATS FOR THE LANDHE LOVED,AND SET OFF TO FIND THE WIZARD IN AMON."
+.db $00 $3C $00 $3C $00 $00
 
 ; Data from 16CC3 to 16DC1 (255 bytes)
 _DATA_16CC3:
-.db $81 $9F $16 $A1 $95 $9F $A0 $20 $42 $3C $28 $25 $20 $2D $35 $33
-.db $34 $20 $26 $29 $2E $24 $20 $34 $28 $25 $03 $20 $02 $A0 $03 $20
-.db $8F $34 $32 $25 $25 $20 $2F $26 $20 $2D $21 $32 $29 $2C $2C $3B
-.db $04 $20 $02 $A0 $03 $20 $91 $34 $28 $25 $20 $33 $39 $2D $22 $2F
-.db $2C $20 $2F $26 $20 $34 $28 $25 $02 $20 $02 $A0 $03 $20 $8D $32
-.db $2F $39 $21 $2C $20 $26 $21 $2D $29 $2C $39 $3C $06 $20 $02 $A0
-.db $96 $20 $43 $41 $28 $25 $20 $2D $35 $33 $34 $20 $33 $35 $22 $24
-.db $35 $25 $20 $34 $28 $25 $20 $02 $A0 $03 $20 $90 $27 $2F $22 $2C
-.db $29 $2E $20 $2F $26 $20 $22 $21 $2C $21 $2C $21 $03 $20 $02 $A0
-.db $03 $20 $87 $36 $21 $2C $2C $25 $39 $3C $0C $20 $02 $A0 $92 $20
-.db $44 $3C $28 $25 $20 $2D $35 $33 $34 $20 $24 $25 $33 $34 $32 $2F
-.db $39 $04 $20 $02 $A0 $03 $20 $95 $34 $28 $25 $20 $33 $34 $21 $34
-.db $35 $25 $20 $2F $26 $20 $25 $36 $29 $2C $3C $A0 $9F $16 $A1 $81
+.db $81 $9F $16 $A1 $95 $9F $A0
+.asc " 1.HE MUST FIND THE"
+.db $03 $20 $02 $A0 $03 $20 $8F
+.asc "TREE OF MARILL,"
+.db $04 $20 $02 $A0 $03 $20 $91
+.asc "THE SYMBOL OF THE"
+.db $02 $20 $02 $A0 $03 $20 $8D
+.asc "ROYAL FAMILY."
+.db $06 $20 $02 $A0 $96
+.asc " 2"
+.db $41
+.asc "HE MUST SUBDUE THE "
+.db $02 $A0 $03 $20 $90
+.asc "GOBLIN OF BALALA"
+.db $03 $20 $02 $A0 $03 $20 $87
+.asc "VALLEY."
+.db $0C $20 $02 $A0 $92
+.asc " 3.HE MUST DESTROY"
+.db $04 $20 $02 $A0 $03 $20 $95
+.asc "THE STATUE OF EVIL."
+.db $A0 $9F $16 $A1 $81
 .db $9F $00 $17 $00 $81 $02 $17 $00 $81 $02 $17 $00 $81 $02 $17 $00
 .db $81 $02 $17 $00 $81 $02 $17 $00 $81 $02 $17 $00 $81 $02 $17 $00
 .db $81 $02 $17 $00 $81 $02 $17 $00 $81 $02 $17 $04 $81 $06 $00
 
 ; 1st entry of Pointer Table from 702F (indexed by _RAM_C182)
 ; Data from 16DC2 to 17FFF (4670 bytes)
-_DATA_16DC2:
-.incbin "banks\lots_DATA_16DC2.inc"
+_DATA_16DC2: ; Credits Text
+.db $92
+.asc " LANDAU HAS PASSED"
+.db $16 $20 $94
+.asc "THE TESTS AND IS NOW"
+.db $15 $20 $93
+.asc "THE RIGHTFUL KING! "
+.db $00 $64 $00 $00 $02 $20 $90
+.asc "CONGRATULATIONS!"
+.db $19 $20 $8E
+.asc "RULE THIS LAND"
+.db $1D $20 $87
+.asc "FIRMLY!"
+.db $07 $20 $00 $64 $00 $00 $93
+.asc "RESTORE OUR LAND TO"
+.db $19 $20 $83
+.asc "ITSG "
+.db $87
+.asc "BEAUTY!"
+.db $07 $20 $00 $64 $00 $00 $93
+.asc " THOU ART NOW KING,"
+.db $18 $20 $8E
+.asc "FORGE A STRONG"
+.db $1D $20 $88
+.asc "COUNTRY!"
+.db $06 $20 $00 $64 $00 $00 $93
+.asc "WE HAVE ALL AWAITED"
+.db $15 $20 $94
+.asc "THIS DAY! HURRAH FOR"
+.db $1A $20 $86
+.asc "LANDAU"
+.db $08 $20 $00 $64 $00 $00 $04 $20 $8C
+.asc "OUR LAND AND"
+.db $18 $20 $94
+.asc "BALJINYA MUST ALWAYS"
+.db $15 $20 $91
+.asc "STAND AS FRIENDS!"
+.db $02 $20 $00 $64 $00 $00 $02 $20 $90
+.asc "THREE CHEERS FOR"
+.db $16 $20 $94
+.asc "LANDAU! WE OFFER OUR"
+.db $16 $20 $8F
+.asc "DEEPEST THANKS!"
+.db $03 $20 $00 $64 $00 $00 $02 $20 $8F
+.asc "LANDAU,SOMEWHAT"
+.db $17 $20 $93
+.asc "TROUBLED LOOKS DOWN"
+.db $19 $20 $8C
+.asc "AT BALJINYA."
+.db $04 $20 $00 $64 $00 $00 $94
+.asc "BALJINYA HAD COUNTED"
+.db $15 $20 $91
+.asc "HEAVILY ON LANDAU"
+.db $18 $20 $8D
+.asc "UNTIL NOW BUT"
+.db $03 $41 $02 $20 $00 $64 $00 $00 $14 $20 $90
+.asc "FIVE YEARS LATER"
+.db $04 $41 $00 $3C $00 $00 $04 $20 $8C
+.asc "BALJINYA WAS"
+.db $19 $20 $92
+.asc "PROSPEROUS AND THE"
+.db $16 $20 $8F
+.asc "PEOPLE AT PEACE"
+.db $03 $41 $81 $20 $00 $64 $00 $00 $93
+.asc " BUT THOUSANDS THEN"
+.db $16 $20 $91
+.asc "ATTACKED,CRUSHING"
+.db $1B $20 $89
+.asc "BALJINYA!"
+.db $06 $20 $00 $64 $00 $00
 
 .BANK 6
 .ORG $0000
@@ -19473,7 +19531,352 @@ _DATA_1A016:
 .dw _DATA_183A6 _DATA_18607 _DATA_18480 _DATA_18480
 
 ; Data from 1A02E to 1ABC6 (2969 bytes)
-.incbin "banks\lots_DATA_1A02E.inc"
+; NPC Text
+.db $15 $20 $92
+.asc "LANDAU,WE PRAY FOR"
+.db $17 $20 $91
+.asc "THEE. IF THOU ART"
+.db $17 $20 $90
+.asc "TIRED,REST HERE!"
+.db $02 $20 $00
+
+.db $15 $20 $91
+.asc "CAST THIS BOOK IN"
+.db $16 $20 $94
+.asc "THE MOUNTAIN OF FIRE"
+.db $14 $20 $94
+.asc "AND RETURN. PROTECT "
+.db $00 $15 $20 $92
+.asc "IT WELL! AND GO TO"
+.db $16 $20 $92
+.asc "ULMO WOODS FOR THE"
+.db $17 $20 $8F
+.asc "TREE OF MARILL!"
+.db $03 $20 $00
+
+.db $14 $20 $93
+.asc "THE DAUGHTER OF THE"
+.db $16 $20 $92
+.asc "MAYOR OF LINDON IS"
+.db $1B $20 $88
+.asc "MISSING!"
+.db $06 $20 $00
+
+.db $15 $20 $92
+.asc "ARE THERE NO BRAVE"
+.db $17 $20 $8F
+.asc "MEN LEFT IN OUR"
+.db $1F $20 $85
+.asc "LAND"
+.db $41
+.db $07 $20 $00
+
+.db $16 $20 $8D
+.asc "THAT RACE STI" $02 "L"
+.db $17 $20 $93
+.asc "EXISTS,I'D VENTURE."
+.db $16 $20 $93
+.asc "PERHAPS THEY COULD "
+.db $00 $15 $20 $91
+.asc "STILL BE FOUND IN"
+.db $17 $20 $92
+.asc "THE WOODS OF NAMO?I " ; TODO: Pretty sure this is part of the command
+.db $00 $15 $20 $91
+.asc "HAST THOU MET THE"
+.db $1A $20 $8C
+.asc "TREE PEOPLE?L " ; TODO: Pretty sure this is part of the command
+.db $00 $16 $20 $8F
+.asc "THOSE WOODS ARE"
+.db $17 $20 $93
+.asc "HAUNTED BY FEARSOME"
+.db $18 $20 $8D
+.asc "TREE SPIRITS!"
+.db $04 $20 $00
+
+.db $14 $20 $94
+.asc "HAST THOU PASSED THE"
+.db $15 $20 $90
+.asc "FIRST OF THE THR" $02 "E"
+.db $1C $20 $86
+.asc "TESTS?"
+.db $07 $20 $00
+
+.db $15 $20 $91
+.asc "BRAVE WARRIOR,RID"
+.db $19 $20 $8E
+.asc "US OF THE EVIL"
+.db $1A $20 $8E
+.asc "SWAMP SPIRITS!"
+.db $03 $20 $00
+
+.db $14 $20 $94
+.asc "THEY SAY SHAGART HAS"
+.db $16 $20 $8F
+.asc "BECOME A DEN OF"
+.db $1D $20 $88
+.asc "THIEVES!"
+.db $06 $20 $00
+
+.db $16 $20 $8F
+.asc "MY DAUGHTER WAS"
+.db $17 $20 $93
+.asc "TAKEN BY PIRATES TO"
+.db $17 $20 $90
+.asc "FALAS! SAVE HER,"
+.db $02 $20 $00
+
+.db $14 $20 $91
+.asc "AND THY REWARD WI" $02 "L"
+.db $15 $20 $94
+.asc "BE GREAT! FOLLOW THE"
+.db $14 $20 $94
+.asc "COAST TO THE ISLAND."
+.db $00 $14 $20 $94
+.asc "RA GOAN'S EVIL POWER"
+.db $14 $20 $94
+.asc "IS SEALED WITHIN THE"
+.db $15 $20 $91
+.asc "BOOK. DESTROY IT!"
+.db $02 $20 $00
+
+.db $18 $20 $8C
+.asc "MANY THANKS!"
+.db $18 $20 $94
+.asc "ACCEPT THIS BOW AS A"
+.db $16 $20 $90
+.asc "REWARD! THERE IS"
+.db $02 $20 $00
+.db $14 $20 $94
+.asc "ALSO A SHORTCUT FROM"
+.db $15 $20 $92
+.asc "SHAGART TO DWARLE."
+.db $15 $20 $94
+.asc "COME VISIT ANYTIME! "
+.db $00 $15 $20 $92
+.asc "MY DEEPEST THANKS!"
+.db $17 $20 $90
+.asc "I HAVE HEARD THE"
+.db $17 $20 $91
+.asc "PIRATES KNOW MUCH"
+.db $02 $20 $00
+.db $14 $20 $94
+.asc "OF THE LORD OF ELDER"
+.db $15 $20 $91
+.asc "CASTLE IN THE FAR"
+.db $18 $20 $90
+.asc "LAND OF YAVANNA."
+.db $02 $20 $00
+.db $16 $20 $90
+.asc "MT.MORGOS TO THE"
+.db $16 $20 $93
+.asc "NORTH IS CALLED THE"
+.db $16 $20 $91
+.asc "MOUNTAIN OF FIRE!"
+.db $02 $20 $00
+.db $18 $20 $8B
+.asc "THY WEAPONS"
+.db $19 $20 $94
+.asc "WOULD NOT DEFEAT THE"
+.db $14 $20 $94
+.asc "BEAST OF MT.MORGOS! "
+.db $00 $14 $20 $94
+.asc "OF THE LORD OF ELDER"
+.db $15 $20 $91
+.asc "CASTLE IN THE FAR"
+.db $18 $20 $90
+.asc "LAND OF YAVANNA."
+.db $02 $20 $00
+.db $15 $20 $92
+.asc "THANK THEE KINDLY."
+.db $17 $20 $90
+.asc "PLEASE REST HERE"
+.db $1C $20 $87
+.asc "AWHILE."
+.db $07 $20 $00
+.db $14 $20 $94
+.asc "IF THOU CAN OVERCOME"
+.db $14 $20 $93
+.asc "5 MEN IN A DUEL,I'D"
+.db $15 $20 $94
+.asc "TELL THEE ANYTHING. "
+.db $00 $15 $20 $92
+.asc "FOR THE STATUE,USE"
+.db $16 $20 $91
+.asc "THIS HERB,A SWORD"
+.db $16 $20 $94
+.asc "LIES IN THE VALLEY. "
+.db $00 $15 $20 $92
+.asc "THERE IS A STRANGE"
+.db $16 $20 $92
+.asc "STATUE ON MT.OZGUL"
+.db $19 $20 $8C
+.asc "TO THE WEST."
+.db $04 $20 $00
+.db $16 $20 $8F
+.asc "THERE IS A PATH"
+.db $1B $20 $8C
+.asc "FROM HERE TO"
+.db $1F $20 $85
+.asc "AMON."
+.db $08 $20 $00
+.db $17 $20 $8D
+.asc "ON THE WAY TO"
+.db $18 $20 $93
+.asc "PHARAZON,THERE IS A"
+.db $15 $20 $94
+.asc "ROAD TO A MOUNTAIN. "
+.db $00 $15 $20 $92
+.asc "HAST THOU NOT CAST"
+.db $16 $20 $92
+.asc "THAT BOOK INTO THE"
+.db $16 $20 $91
+.asc "MOUNTAIN OF FIRE?"
+.db $02 $20 $00
+.db $14 $20 $93
+.asc "STRANGE PEOPLE HAVE"
+.db $15 $20 $94
+.asc "GATHERED AT SHAGART,"
+.db $15 $20 $91
+.asc "THIEVES AND SUCH."
+.db $02 $20 $00
+.db $17 $20 $8E
+.asc "JUST ONE MORE,"
+.db $1E $20 $86
+.asc "RIGHT?O "
+.db $00 $15 $20 $91
+.asc "KILL THE BEAST AT"
+.db $16 $20 $94
+.asc "THE MOUNTAIN OF FIRE"
+.db $14 $20 $94
+.asc "AND CLAIM A REWARD! "
+.db $00 $14 $20 $94
+.asc "GO NORTH FROM DWARLE"
+.db $14 $20 $94
+.asc "AND THOU WILT FIND A"
+.db $15 $20 $91
+.asc "PATH TO THE WEST."
+.db $02 $20 $00
+.db $14 $20 $93
+.asc "HAST THOU DESTROYED"
+.db $15 $20 $94
+.asc "THE BOOK? THIS SWORD"
+.db $16 $20 $8E
+.asc "IS THY REWARD!"
+.db $04 $20 $00
+.db $16 $20 $90
+.asc "PERSEVERE JUST A"
+.db $17 $20 $92
+.asc "LITTLE BIT LONGER.I "
+.db $00 $16 $20 $90
+.asc "SHAGART PLANS RA"
+.db $16 $20 $93
+.asc "GOAN'S RESTORATION!"
+.db $15 $20 $94
+.asc "THOU NEEDST WEAPONS!"
+.db $00
+
+.db $16 $20 $8F
+.asc "CONGRATULATION!"
+.db $17 $20 $93
+.asc "THOU HAST DONE MUCH"
+.db $1B $20 $89
+.asc "SO SOONS!"
+.db $05 $20 $00
+.db $15 $20 $92
+.asc "SHAGART HAS BECOME"
+.db $15 $20 $91
+.asc "STRANGE! GO AND S" $02 "E"
+.db $19 $20 $8C
+.asc "FOR THYSELF!"
+.db $04 $20 $00
+.db $16 $20 $90
+.asc "THOU HAST FOUGHT"
+.db $18 $20 $90
+.asc "HARD! THOU SHALT"
+.db $17 $20 $91
+.asc "MAKE A FINE KING!"
+.db $02 $20 $00
+.db $15 $20 $8F
+.asc "WELCOME THE NEW"
+.db $18 $20 $92
+.asc "KING! OUR LAND SHA" $02 "L"
+.db $1A $20 $88
+.asc "BE SAFE!"
+.db $06 $20 $00
+.db $17 $20 $8D
+.asc "BRAVE LANDAU!"
+.db $1A $20 $90
+.asc "RULE OUR COUNTRY"
+.db $1D $20 $85
+.asc "WELL!"
+.db $08 $20 $00
+.db $14 $20 $93
+.asc "HAST THOU DESTROYED"
+.db $15 $20 $93
+.asc "THE BOOK? DO SO,AND"
+.db $18 $20 $8E
+.asc "GAIN A REWARD!"
+.db $03 $20 $00
+.db $14 $20 $94
+.asc "THE BOOK WAS STOLEN?"
+.db $14 $20 $93
+.asc "THEN WE HAVE NAUGHT"
+.db $17 $20 $90
+.asc "BUT THY BRAVERY!"
+.db $02 $20 $00
+.db $15 $20 $8F
+.asc "WE HAVE ONLY TH" $02 "E"
+.db $1A $20 $8B
+.asc "TO RELY ON!"
+.db $2D $20 $00
+.db $17 $20 $8D
+.asc "THE PEOPLE OF"
+.db $1B $20 $8D
+.asc "ITHILE SUFFER"
+.db $1F $20 $88
+.asc "GREATLY!"
+.db $05 $20 $00
+.db $18 $20 $8C
+.asc "GO TO VARLIN"
+.db $1E $20 $87
+.asc "CASTLE!"
+.db $2F $20 $00 $17 $20 $8C
+.asc "BRAVE LANDAU"
+.db $1B $20 $8F
+.asc "WE PRAY FOR THY"
+.db $1D $20 $88
+.asc "SUCCESS!"
+.db $06 $20 $00
+.db $43 $20 $04
+.db $3C $31 $20
+.db $00
+
+.db $14 $20 $93
+.asc "THOU HAST FULFILLED"
+.db $16 $20 $92
+.asc "THY PROMISE TO THE"
+.db $15 $20 $94
+.asc "WIZARDS? GO SEE HIM!"
+.db $00 $14 $20 $93
+.asc "THE DAUGHTER OF THE"
+.db $17 $20 $8F
+.asc "MAYOR OF LINDON"
+.db $17 $20 $94
+.asc "KNOWS MORE DETAILS."
+.db $20 $00 $14 $20 $94
+.asc "PEOPLE FROM PHARAZON"
+.db $15 $20 $92
+.asc "OFTEN VISIT LINDON"
+.db $19 $20 $8C
+.asc "VIA SHAGART."
+.db $04 $20 $00
+.db $14 $20 $93
+.asc "PERHAPS THE TREE OF"
+.db $16 $20 $92
+.asc "MARILL LIES IN THE"
+.db $19 $20 $8B
+.asc "NAMO WOODS."
+.db $05 $20 $00
 
 ; 1st entry of Pointer Table from 221B (indexed by _RAM_BUILDING_INDEX)
 ; Data from 1ABC7 to 1ABFE (56 bytes)
@@ -19571,7 +19974,7 @@ _DATA_1C000:
 _DATA_1D1AC:
 .incbin "banks\lots_DATA_1D1AC.inc"
 
-; Data from 1DBAF to 1FFFF (9297 bytes)
+; Data from 1DBAF to 1F13F (5521 bytes)
 _DATA_1DBAF:
 .incbin "banks\lots_DATA_1DBAF.inc"
 
@@ -19723,7 +20126,7 @@ _DATA_2816B:
 .db $0A $1D $48 $60 $00 $00
 
 ; Pointer Table from 28171 to 28172 (1 entries, indexed by unknown)
-.dw _DATA_781F
+.dw $781F
 
 ; Data from 28173 to 2819F (45 bytes)
 .db $F0 $00 $00 $16 $98 $E0 $00 $00 $1A $98 $20 $01 $00 $1D $48 $80
@@ -19829,7 +20232,7 @@ _DATA_28384:
 .db $10 $24 $90 $B0 $00 $00
 
 ; Pointer Table from 2838A to 2838B (1 entries, indexed by unknown)
-.dw _DATA_781F
+.dw $781F
 
 ; Data from 2838C to 283D6 (75 bytes)
 .db $50 $01 $00 $20 $70 $50 $01 $00 $20 $60 $A0 $01 $00 $1F $78 $E0
@@ -19980,7 +20383,7 @@ _DATA_286D5:
 .db $0B $1F $40 $10 $00 $00
 
 ; Pointer Table from 286DB to 286DC (1 entries, indexed by unknown)
-.dw _DATA_7815
+.dw $7815
 
 ; Data from 286DD to 28716 (58 bytes)
 .db $C0 $00 $00 $13 $40 $F0 $00 $00 $13 $40 $10 $01 $00 $18 $90 $88
@@ -20064,7 +20467,7 @@ _DATA_2887A:
 .db $09 $1D $48 $60 $FE $00
 
 ; Pointer Table from 28880 to 28883 (2 entries, indexed by unknown)
-.dw _DATA_781F $FEF0
+.dw $781F $FEF0
 
 ; Data from 28884 to 288A9 (38 bytes)
 .db $00 $16 $98 $E0 $FE $00 $1A $98 $E0 $FE $00 $1D $48 $80 $FF $00
@@ -20162,7 +20565,7 @@ _DATA_28A84:
 .db $10 $24 $90 $B0 $FB $00
 
 ; Pointer Table from 28A8A to 28A8D (2 entries, indexed by unknown)
-.dw _DATA_781F $FC50
+.dw $781F $FC50
 
 ; Data from 28A8E to 28AD6 (73 bytes)
 .db $00 $20 $70 $70 $FC $00 $20 $60 $A0 $FC $00 $1F $78 $E0 $FC $00
@@ -20299,7 +20702,7 @@ _DATA_28DBC:
 .db $0B $1F $40 $10 $FE $00
 
 ; Pointer Table from 28DC2 to 28DC5 (2 entries, indexed by unknown)
-.dw _DATA_7815 $FEC0
+.dw $7815 $FEC0
 
 ; Data from 28DC6 to 28DF5 (48 bytes)
 .db $00 $13 $40 $40 $FE $00 $13 $40 $20 $FF $00 $18 $80 $88 $FF $00
@@ -21608,6 +22011,7 @@ _DATA_3649D:
 
 ; 10th entry of Pointer Table from 5520 (indexed by _RAM_C118)
 ; Data from 36C9B to 37FFF (4965 bytes)
+; TODO: There's unused free space at the end of this bin, remove it and adjust comments
 _DATA_36C9B:
 .incbin "banks\lots_DATA_36C9B.inc"
 
