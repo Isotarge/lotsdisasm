@@ -116,7 +116,7 @@ _RAM_C14D db
 .enum $C14F export
 _RAM_C14F dw
 _RAM_BOSS_FIGHT_INITIALIZED db
-_RAM_C152 db
+_RAM_BOSS_INDEX db
 _RAM_C153 db
 _RAM_C154 db
 _RAM_C155 db
@@ -470,7 +470,7 @@ _RAM_CC1E db
 .ende
 
 .enum $CC21 export
-_RAM_CC21 db ; Harfoot textbox flags start
+_RAM_FLAG_BUILDING_PROGRESS_HARFOOT_START db
 .ende
 
 .enum $CC27 export
@@ -478,7 +478,7 @@ _RAM_CC27 db ; Harfoot Medusa textbox flag
 .ende
 
 .enum $CC31 export
-_RAM_CC31 db ; Amon textbox flags start
+_RAM_FLAG_BUILDING_PROGRESS_AMON_START db
 .ende
 
 .enum $CC37 export
@@ -486,7 +486,7 @@ _RAM_CC37 db ; Amon Pharazon path textbox flag
 .ende
 
 .enum $CC41 export
-_RAM_CC41 db ; Dwarle textbox flags start
+_RAM_FLAG_BUILDING_PROGRESS_DWARLE_START db
 .ende
 
 .enum $CC48 export
@@ -497,11 +497,11 @@ _RAM_CC4B db ; Baruga Defeated?
 .ende
 
 .enum $CC51 export
-_RAM_CC51 db ; Ithile textbox flags start
+_RAM_FLAG_BUILDING_PROGRESS_ITHILE_START db
 .ende
 
 .enum $CC61 export
-_RAM_CC61 db ; Pharazon textbox flags start
+_RAM_FLAG_BUILDING_PROGRESS_PHARAZON_START db
 .ende
 
 .enum $CC67 export
@@ -513,7 +513,7 @@ _RAM_CC71 db ; Unused building index flags start
 .ende
 
 .enum $CC81 export
-_RAM_CC81 db ; Lindon textbox flags start
+_RAM_FLAG_BUILDING_PROGRESS_LINDON_START db
 .ende
 
 .enum $CC8A export
@@ -521,7 +521,7 @@ _RAM_CC8A db
 .ende
 
 .enum $CC91 export
-_RAM_CC91 db
+_RAM_FLAG_BUILDING_PROGRESS_ULMO_START db
 .ende
 
 .enum $CC93 export

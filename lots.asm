@@ -27,55 +27,18 @@ BANKS 14
 .BANK 0 SLOT 0
 .ORG $0000
 
-_LABEL_0:
+_START:
 	di
 	ld sp, $C07F
 	im 1
 	jr _LABEL_82
 
-; Data from 8 to 8 (1 bytes)
-_DATA_8:
-.db $FF
-
-; Data from 9 to A (2 bytes)
-_DATA_9:
-.db $FF $FF
-
-; Data from B to F (5 bytes)
-_DATA_B:
-.db $FF $FF $FF $FF $FF
-
-; Data from 10 to 14 (5 bytes)
-_DATA_10:
-.db $FF $FF $FF $FF $FF
-
-; Data from 15 to 2F (27 bytes)
-_DATA_15:
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-
-; Data from 30 to 37 (8 bytes)
-_DATA_30:
-.db $FF $FF $FF $FF $FF $FF $FF $FF
+.ORG $0038
 
 _IRQ_HANDLER:
 	jp HandleIRQ
 
-; Data from 3B to 3F (5 bytes)
-.db $FF $FF $FF $FF $FF
-
-; Data from 40 to 52 (19 bytes)
-_DATA_40:
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF
-
-; Data from 53 to 62 (16 bytes)
-_DATA_53:
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-
-; Data from 63 to 65 (3 bytes)
-_DATA_63:
-.db $FF $FF $FF
+.ORG $0066
 
 _NMI_HANDLER:
 	push af
@@ -661,7 +624,7 @@ _LABEL_3E3:
 	jp LoadVDPData
 
 ; Data from 3EC to 3FA (32 bytes)
-_DATA_3EC:
+_DATA_3EC: ; Default Palette?
 .db $00 $3F $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
 .db $00 $3F $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
 
@@ -4406,7 +4369,7 @@ _LABEL_1F39:
 	ld a, (_RAM_C118)
 	cp $07
 	jp z, _LABEL_21CB
-	ld a, (_RAM_C152)
+	ld a, (_RAM_BOSS_INDEX)
 	and $7F
 	cp $01
 	jp z, _LABEL_21CB
@@ -4449,7 +4412,7 @@ _LABEL_1FEA:
 	ld hl, $18A8
 	ld a, (_RAM_C141)
 	call _LABEL_201D
-	jp _LABEL_22DA ; Handle building extra effects (heals, flags, etc)
+	jp HandleBuildingExtraEffects
 
 _LABEL_201D:
 	ld (_RAM_CURRENT_MAP), a
@@ -4480,10 +4443,10 @@ _LABEL_201D:
 	ld (_RAM_C140), a
 	ld (_RAM_C141), a
 	ld (_RAM_C162), a
-	ld a, (_RAM_C152)
+	ld a, (_RAM_BOSS_INDEX)
 	and $7F
 	cp $01
-	jp z, _LABEL_22DA
+	jp z, HandleBuildingExtraEffects
 	cp $07
 	jp z, _LABEL_2419
 	cp $03
@@ -4724,14 +4687,14 @@ _LABEL_21DA:
 
 ; Pointer Table from 221B to 223A (16 entries, indexed by _RAM_BUILDING_INDEX)
 _DATA_221B:
-.dw _DATA_1ABC7 _RAM_CC21 ; Harfoot Text(?) & Flags
-.dw _DATA_1ABFF _RAM_CC31 ; Amon Text(?) & Flags
-.dw _DATA_1AC38 _RAM_CC41 ; Dwarle Text(?) & Flags
-.dw _DATA_1AC71 _RAM_CC51 ; Ithile Text(?) & Flags
-.dw _DATA_1ACAA _RAM_CC61 ; Pharazon Text(?) & Flags
+.dw _DATA_1ABC7 _RAM_FLAG_BUILDING_PROGRESS_HARFOOT_START
+.dw _DATA_1ABFF _RAM_FLAG_BUILDING_PROGRESS_AMON_START
+.dw _DATA_1AC38 _RAM_FLAG_BUILDING_PROGRESS_DWARLE_START
+.dw _DATA_1AC71 _RAM_FLAG_BUILDING_PROGRESS_ITHILE_START
+.dw _DATA_1ACAA _RAM_FLAG_BUILDING_PROGRESS_PHARAZON_START
 .dw _DATA_1ACE8 _RAM_CC71 ; ??? Text(?) & Flags
-.dw _DATA_1AD20 _RAM_CC81 ; Lindon Text(?) & Flags
-.dw _DATA_1AD59 _RAM_CC91 ; Ulmo Text(?) & Flags
+.dw _DATA_1AD20 _RAM_FLAG_BUILDING_PROGRESS_LINDON_START
+.dw _DATA_1AD59 _RAM_FLAG_BUILDING_PROGRESS_ULMO_START
 
 _LABEL_223B:
 	ld a, (_RAM_BUILDING_INDEX)
@@ -4838,24 +4801,24 @@ _LABEL_223B:
 _DATA_22D6:
 .db $25 $FF $26 $FF
 
-_LABEL_22DA:
+HandleBuildingExtraEffects:
 	ld a, (_RAM_BUILDING_INDEX)
-	ld hl, _DATA_22E3 - 2
+	ld hl, HandleBuildingExtraEffects_Pointers - 2
 	jp CallFunctionFromPointerTable
 
 ; Jump Table from 22E3 to 22F2 (8 entries, indexed by _RAM_BUILDING_INDEX)
-_DATA_22E3:
-.dw _LABEL_22F3 ; Harfoot
-.dw _LABEL_230B ; Amon
-.dw _LABEL_2355 ; Dwarle
-.dw _LABEL_2370 ; Ithile
-.dw _LABEL_2394 ; Pharazon
-.dw _LABEL_23C3 ; Unused 0x06
-.dw _LABEL_23C4 ; Lindon
-.dw _LABEL_23F0 ; Ulmo
+HandleBuildingExtraEffects_Pointers:
+.dw HandleBuildingExtraEffects_Harfoot
+.dw HandleBuildingExtraEffects_Amon
+.dw HandleBuildingExtraEffects_Dwarle
+.dw HandleBuildingExtraEffects_Ithile
+.dw HandleBuildingExtraEffects_Pharazon
+.dw HandleBuildingExtraEffects_Unused0x06
+.dw HandleBuildingExtraEffects_Lindon
+.dw HandleBuildingExtraEffects_Ulmo
 
 ; 1st entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
-_LABEL_22F3:
+HandleBuildingExtraEffects_Harfoot:
 	call _LABEL_2408
 	ld c, $30
 	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
@@ -4868,7 +4831,7 @@ _LABEL_22F3:
 	ret
 
 ; 2nd entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
-_LABEL_230B:
+HandleBuildingExtraEffects_Amon:
 	call _LABEL_2408
 	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $01
@@ -4886,7 +4849,7 @@ _LABEL_230B:
 	ld (_RAM_CCAD), a
 	ld (_RAM_C16D), a
 	ld b, $08
-	ld hl, _RAM_CC21
+	ld hl, _RAM_FLAG_BUILDING_PROGRESS_HARFOOT_START
 	ld de, $0010
 -:
 	ld (hl), $01
@@ -4913,7 +4876,7 @@ _LABEL_230B:
 	ret
 
 ; 3rd entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
-_LABEL_2355:
+HandleBuildingExtraEffects_Dwarle:
 	call _LABEL_2408
 	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $01
@@ -4936,7 +4899,7 @@ _LABEL_2355:
 	ret
 
 ; 4th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
-_LABEL_2370:
+HandleBuildingExtraEffects_Ithile:
 	call _LABEL_2408
 	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $04
@@ -4962,7 +4925,7 @@ _LABEL_2370:
 	jp ApplyLandauHealOrDamageFromC
 
 ; 5th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
-_LABEL_2394:
+HandleBuildingExtraEffects_Pharazon:
 	call _LABEL_2408
 	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $01
@@ -5000,11 +4963,11 @@ _LABEL_2394:
 	ret
 
 ; 6th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
-_LABEL_23C3:
+HandleBuildingExtraEffects_Unused0x06:
 	ret
 
 ; 7th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
-_LABEL_23C4:
+HandleBuildingExtraEffects_Lindon:
 	call _LABEL_2408
 	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $05
@@ -5033,7 +4996,7 @@ _LABEL_23C4:
 	jp ApplyLandauHealOrDamageFromC
 
 ; 8th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
-_LABEL_23F0:
+HandleBuildingExtraEffects_Ulmo:
 	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $02
 	jr z, +
@@ -5063,7 +5026,7 @@ _LABEL_240D:
 
 _LABEL_2419:
 	ld a, $08
-	ld (_RAM_C152), a
+	ld (_RAM_BOSS_INDEX), a
 	ld a, $01
 	ld (_RAM_FLAG_MAYORS_DAUGHTER_RETURNED), a
 	ret
@@ -5076,7 +5039,7 @@ _LABEL_2424:
 
 _LABEL_2430:
 	ld a, $03
-	ld (_RAM_C152), a
+	ld (_RAM_BOSS_INDEX), a
 	ld a, $01
 	ld (_RAM_C16D), a
 	ld a, $02
@@ -5101,7 +5064,7 @@ _LABEL_2459:
 	or a
 	jr nz, +
 	ld a, $06
-	ld (_RAM_C152), a
+	ld (_RAM_BOSS_INDEX), a
 	ret
 
 +:
@@ -5652,7 +5615,7 @@ _LABEL_28DA:
 _LABEL_2909:
 	call ApplyObjectXVelocity
 	ld de, $0040
-	call _LABEL_3084
+	call AddDEToYVelocity
 	jp ApplyObjectYVelocity
 
 ; 19th entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -5935,7 +5898,7 @@ _LABEL_2B31:
 	or a
 	jp z, +
 	ld de, $0040
-	call _LABEL_3084
+	call AddDEToYVelocity
 	call ApplyObjectYVelocity
 	ld de, $0000
 	call _LABEL_15E5
@@ -6010,7 +5973,7 @@ _LABEL_2BF0:
 	call _LABEL_84C
 	call ApplyObjectXVelocity
 	ld de, $0040
-	call _LABEL_3084
+	call AddDEToYVelocity
 	call ApplyObjectYVelocity
 	ld de, $0000
 	call _LABEL_15E5
@@ -6505,7 +6468,7 @@ _LABEL_3072:
 	ld (iy+39), a
 	ret
 
-_LABEL_3084:
+AddDEToYVelocity:
 	ld h, (iy+object.y_velocity_minor)
 	ld l, (iy+object.y_velocity_sub)
 	add hl, de
@@ -6619,7 +6582,7 @@ _LABEL_3152:
 	call ApplyObjectXVelocity
 	call _LABEL_84C
 	ld de, $0040
-	call _LABEL_3084
+	call AddDEToYVelocity
 	call ApplyObjectYVelocity
 	ld de, $0000
 	call _LABEL_15E5
@@ -6770,7 +6733,7 @@ _LABEL_321C:
 ++:
 	call ApplyObjectXVelocity
 	ld de, $0040
-	call _LABEL_3084
+	call AddDEToYVelocity
 	call ApplyObjectYVelocity
 	ld de, $0000
 	call _LABEL_15E5
@@ -7111,7 +7074,7 @@ _LABEL_35F9:
 +:
 	ld e, (iy+42)
 	ld d, $00
-	call _LABEL_3084
+	call AddDEToYVelocity
 	call ApplyObjectYVelocity
 	ld de, $0000
 	call _LABEL_15E5
@@ -10971,7 +10934,7 @@ _LABEL_56C3:
 
 +:
 	ld a, h
-	ld (_RAM_C152), a
+	ld (_RAM_BOSS_INDEX), a
 	ld a, Building_Status_Boss_Fight
 	ld (_RAM_BUILDING_STATUS), a
 	xor a
@@ -11035,7 +10998,7 @@ _LABEL_5740:
 	ret nz
 --:
 	ld a, c
-	ld (_RAM_C152), a
+	ld (_RAM_BOSS_INDEX), a
 	ld a, Building_Status_Boss_Fight
 	ld (_RAM_BUILDING_STATUS), a
 	ld a, $01
@@ -11110,7 +11073,7 @@ _LABEL_57C7:
 	cp $98
 	jp c, _LABEL_5695
 	xor a
-	ld (_RAM_C152), a
+	ld (_RAM_BOSS_INDEX), a
 	ld a, $0C
 	jr +
 
@@ -11125,7 +11088,7 @@ _LABEL_57DF:
 	or a
 	ret nz
 	ld a, $06
-	ld (_RAM_C152), a
+	ld (_RAM_BOSS_INDEX), a
 	ld a, $0B
 +:
 	ld (_RAM_BUILDING_INDEX), a
@@ -11407,7 +11370,7 @@ _LABEL_59CF:
 	ret nz
 	ld a, $01
 	ld (_RAM_C400), a
-	ld a, (_RAM_C152)
+	ld a, (_RAM_BOSS_INDEX)
 	and $7F
 	ld l, a
 	ld h, $00
@@ -11462,11 +11425,11 @@ _LABEL_5A9D:
 	xor a
 	ld (_RAM_C153), a
 	ld hl, _DATA_5AAC - 2
-	ld a, (_RAM_C152)
+	ld a, (_RAM_BOSS_INDEX)
 	and $7F
 	jp CallFunctionFromPointerTable
 
-; Jump Table from 5AAC to 5AC3 (12 entries, indexed by _RAM_C152)
+; Jump Table from 5AAC to 5AC3 (12 entries, indexed by _RAM_BOSS_INDEX)
 _DATA_5AAC:
 .dw _LABEL_5AD0
 .dw _LABEL_5ADA
@@ -11488,18 +11451,18 @@ _LABEL_5AC4:
 	ld (_RAM_SOUND_TO_PLAY), a
 	ret
 
-; 8th entry of Jump Table from 5AAC (indexed by _RAM_C152)
+; 8th entry of Jump Table from 5AAC (indexed by _RAM_BOSS_INDEX)
 _LABEL_5ACF:
 	ret
 
-; 1st entry of Jump Table from 5AAC (indexed by _RAM_C152)
+; 1st entry of Jump Table from 5AAC (indexed by _RAM_BOSS_INDEX)
 _LABEL_5AD0:
 	ld a, $83
 	ld (_RAM_SOUND_TO_PLAY), a
 	ld c, $0A
 	jp _LABEL_589F
 
-; 2nd entry of Jump Table from 5AAC (indexed by _RAM_C152)
+; 2nd entry of Jump Table from 5AAC (indexed by _RAM_BOSS_INDEX)
 _LABEL_5ADA:
 	ld c, $0B
 	call _LABEL_589F
@@ -11515,7 +11478,7 @@ _LABEL_5ADA:
 	ld e, $2B
 	jp _LABEL_5BF6
 
-; 3rd entry of Jump Table from 5AAC (indexed by _RAM_C152)
+; 3rd entry of Jump Table from 5AAC (indexed by _RAM_BOSS_INDEX)
 _LABEL_5AFA:
 	ld hl, _RAM_C16B
 	ld (hl), $00
@@ -11532,7 +11495,7 @@ _LABEL_5AFA:
 	ld e, $37
 	jp _LABEL_5BF6
 
-; 4th entry of Jump Table from 5AAC (indexed by _RAM_C152)
+; 4th entry of Jump Table from 5AAC (indexed by _RAM_BOSS_INDEX)
 _LABEL_5B1C:
 	ld a, (_RAM_FLAG_MEDUSA_DEFEATED)
 	or a
@@ -11562,7 +11525,7 @@ _LABEL_5B1C:
 _DATA_5B54:
 .db $15 $25 $2A $2F $3F
 
-; 5th entry of Jump Table from 5AAC (indexed by _RAM_C152)
+; 5th entry of Jump Table from 5AAC (indexed by _RAM_BOSS_INDEX)
 _LABEL_5B59:
 	ld a, (_RAM_FLAG_NECROMANCER_DEFEATED)
 	or a
@@ -11576,7 +11539,7 @@ _LABEL_5B59:
 	ld e, $2E
 	jp _LABEL_5BF6
 
-; 6th entry of Jump Table from 5AAC (indexed by _RAM_C152)
+; 6th entry of Jump Table from 5AAC (indexed by _RAM_BOSS_INDEX)
 _LABEL_5B74:
 	ld a, (_RAM_FLAG_DUELS_DEFEATED)
 	or a
@@ -11590,7 +11553,7 @@ _LABEL_5B74:
 	ld e, $3A
 	jp _LABEL_5BF6
 
-; 7th entry of Jump Table from 5AAC (indexed by _RAM_C152)
+; 7th entry of Jump Table from 5AAC (indexed by _RAM_BOSS_INDEX)
 _LABEL_5B8F:
 	ld a, (_RAM_FLAG_PIRATE_DEFEATED)
 	or a
@@ -11603,10 +11566,10 @@ _LABEL_5B8F:
 
 +:
 	ld a, $89
-	ld (_RAM_C152), a
+	ld (_RAM_BOSS_INDEX), a
 	ret
 
-; 11th entry of Jump Table from 5AAC (indexed by _RAM_C152)
+; 11th entry of Jump Table from 5AAC (indexed by _RAM_BOSS_INDEX)
 _LABEL_5BA8:
 	ld a, (_RAM_FLAG_DARK_SUMA_DEFEATED)
 	or a
@@ -11633,7 +11596,7 @@ _LABEL_5BA8:
 _DATA_5BDD:
 .db $04 $08 $03 $0C $23
 
-; 12th entry of Jump Table from 5AAC (indexed by _RAM_C152)
+; 12th entry of Jump Table from 5AAC (indexed by _RAM_BOSS_INDEX)
 _LABEL_5BE2:
 	ld a, (_RAM_FLAG_RA_GOAN_DEFEATED)
 	or a
@@ -11679,11 +11642,11 @@ _LABEL_5BF6:
 
 _LABEL_5C2B:
 	ld hl, _DATA_5C36 - 2
-	ld a, (_RAM_C152)
+	ld a, (_RAM_BOSS_INDEX)
 	and $7F
 	jp CallFunctionFromPointerTable
 
-; Jump Table from 5C36 to 5C4D (12 entries, indexed by _RAM_C152)
+; Jump Table from 5C36 to 5C4D (12 entries, indexed by _RAM_BOSS_INDEX)
 _DATA_5C36:
 .dw _LABEL_5C4E
 .dw _LABEL_5C6F
@@ -11698,7 +11661,7 @@ _DATA_5C36:
 .dw _LABEL_5D34
 .dw _LABEL_5D37
 
-; 1st entry of Jump Table from 5C36 (indexed by _RAM_C152)
+; 1st entry of Jump Table from 5C36 (indexed by _RAM_BOSS_INDEX)
 _LABEL_5C4E:
 	ld a, (_RAM_C155)
 	or a
@@ -11715,11 +11678,11 @@ _LABEL_5C4E:
 	ld (_RAM_BUILDING_INDEX), a
 	ret
 
-; 2nd entry of Jump Table from 5C36 (indexed by _RAM_C152)
+; 2nd entry of Jump Table from 5C36 (indexed by _RAM_BOSS_INDEX)
 _LABEL_5C6F:
 	jp _LABEL_5D3A
 
-; 3rd entry of Jump Table from 5C36 (indexed by _RAM_C152)
+; 3rd entry of Jump Table from 5C36 (indexed by _RAM_BOSS_INDEX)
 _LABEL_5C72:
 	ld a, (_RAM_C16B)
 	or a
@@ -11739,15 +11702,15 @@ _LABEL_5C72:
 	ld a, $0A
 	jp +
 
-; 4th entry of Jump Table from 5C36 (indexed by _RAM_C152)
+; 4th entry of Jump Table from 5C36 (indexed by _RAM_BOSS_INDEX)
 _LABEL_5C9B:
 	jp _LABEL_5D3A
 
-; 5th entry of Jump Table from 5C36 (indexed by _RAM_C152)
+; 5th entry of Jump Table from 5C36 (indexed by _RAM_BOSS_INDEX)
 _LABEL_5C9E:
 	jp _LABEL_5D3A
 
-; 6th entry of Jump Table from 5C36 (indexed by _RAM_C152)
+; 6th entry of Jump Table from 5C36 (indexed by _RAM_BOSS_INDEX)
 _LABEL_5CA1:
 	ld a, (_RAM_C153)
 	or a
@@ -11767,7 +11730,7 @@ _LABEL_5CA1:
 	ld (_RAM_BUILDING_STATUS), a
 	ret
 
-; 7th entry of Jump Table from 5C36 (indexed by _RAM_C152)
+; 7th entry of Jump Table from 5C36 (indexed by _RAM_BOSS_INDEX)
 _LABEL_5CC5:
 	ld a, (_RAM_C153)
 	or a
@@ -11789,7 +11752,7 @@ _LABEL_5CC5:
 	ld (_RAM_BUILDING_INDEX), a
 	ret
 
-; 9th entry of Jump Table from 5C36 (indexed by _RAM_C152)
+; 9th entry of Jump Table from 5C36 (indexed by _RAM_BOSS_INDEX)
 _LABEL_5CEE:
 	ld a, $5D
 	ld (_RAM_C154), a
@@ -11802,14 +11765,14 @@ _LABEL_5CEE:
 	cp $8C
 	ret nc
 	ld a, $08
-	ld (_RAM_C152), a
+	ld (_RAM_BOSS_INDEX), a
 	xor a
 	ld (_RAM_BOSS_FIGHT_INITIALIZED), a
 	ld (_RAM_C153), a
 	ld (_RAM_C155), a
 	ret
 
-; 8th entry of Jump Table from 5C36 (indexed by _RAM_C152)
+; 8th entry of Jump Table from 5C36 (indexed by _RAM_BOSS_INDEX)
 _LABEL_5D14:
 	ld a, $1D
 	ld (_RAM_C154), a
@@ -11819,18 +11782,18 @@ _LABEL_5D14:
 	cp $14
 	ret nc
 	ld a, $89
-	ld (_RAM_C152), a
+	ld (_RAM_BOSS_INDEX), a
 	xor a
 	ld (_RAM_BOSS_FIGHT_INITIALIZED), a
 	ld (_RAM_C153), a
 	ld (_RAM_C155), a
 	ret
 
-; 11th entry of Jump Table from 5C36 (indexed by _RAM_C152)
+; 11th entry of Jump Table from 5C36 (indexed by _RAM_BOSS_INDEX)
 _LABEL_5D34:
 	jp _LABEL_5D3A
 
-; 12th entry of Jump Table from 5C36 (indexed by _RAM_C152)
+; 12th entry of Jump Table from 5C36 (indexed by _RAM_BOSS_INDEX)
 _LABEL_5D37:
 	jp _LABEL_5D3A
 
@@ -11841,7 +11804,7 @@ _LABEL_5D3A:
 	ret
 
 _LABEL_5D42:
-	ld a, (_RAM_C152)
+	ld a, (_RAM_BOSS_INDEX)
 	bit 7, a
 	jp nz, +
 	ld a, (_RAM_X_POSITION_MINOR)
@@ -11856,7 +11819,7 @@ _LABEL_5D42:
 _LABEL_5D59:
 	xor a
 	ld (_RAM_BOSS_FIGHT_INITIALIZED), a
-	ld (_RAM_C152), a
+	ld (_RAM_BOSS_INDEX), a
 	ld (_RAM_C153), a
 	ld (_RAM_C155), a
 	ld a, Building_Status_Load_Map
@@ -13495,7 +13458,7 @@ Handle_Map_Status_Story:
 	jp SendVDPCommand
 
 ; Data from 6BBA to 6BD9 (32 bytes)
-_DATA_6BBA:
+_DATA_6BBA: ; Palette?
 .db $2F $1A $05 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
 .db $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
 
@@ -15270,7 +15233,7 @@ _LABEL_C35B:
 	ld h, b
 	ld l, c
 	push de
-	ld de, _DATA_B
+	ld de, $000B
 	add hl, de
 	pop de
 	ld a, (hl)
@@ -17326,7 +17289,7 @@ _DATA_E5EE:
 .db $02 $80 $14 $01 $14 $A6
 
 ; Pointer Table from E5F4 to E5F7 (2 entries, indexed by unknown)
-.dw _DATA_314 _DATA_53
+.dw _DATA_314 $0053
 
 ; Data from E5F8 to E600 (9 bytes)
 .db $80 $15 $01 $14 $A6 $10 $03 $53 $00
@@ -17375,7 +17338,7 @@ _DATA_E66F:
 .db $02 $88 $14 $01 $95 $A6
 
 ; Pointer Table from E675 to E676 (1 entries, indexed by unknown)
-.dw _DATA_9
+.dw $0009
 
 ; Data from E677 to E681 (11 bytes)
 .db $A3 $00 $88 $15 $01 $9C $A6 $0E $00 $A3 $00
@@ -17463,7 +17426,7 @@ _DATA_E722:
 .db $01 $A8 $15 $01 $36 $A7
 
 ; Pointer Table from E728 to E729 (1 entries, indexed by unknown)
-.dw _DATA_30
+.dw $0030
 
 ; Data from E72A to E72B (2 bytes)
 .db $03 $00
@@ -17510,7 +17473,7 @@ _DATA_E76F:
 .db $01 $88 $15 $01 $83 $A7
 
 ; Pointer Table from E775 to E778 (2 entries, indexed by unknown)
-.dw _DATA_30 _DATA_63
+.dw $0030 $0063
 
 ; 13th entry of Pointer Table from C25F (indexed by _RAM_DE03)
 ; Data from E779 to E77C (4 bytes)
@@ -17518,7 +17481,7 @@ _DATA_E779:
 .db $01 $88 $C0 $01
 
 ; Pointer Table from E77D to E780 (2 entries, indexed by unknown)
-.dw _DATA_E787 _DATA_8
+.dw _DATA_E787 $0008
 
 ; Data from E781 to E786 (6 bytes)
 .db $00 $00 $03 $80 $05 $F2
@@ -17575,7 +17538,7 @@ _DATA_E7F1:
 .db $01 $A8 $15 $01 $05 $A8
 
 ; Pointer Table from E7F7 to E7F8 (1 entries, indexed by unknown)
-.dw _DATA_40
+.dw $0040
 
 ; Data from E7F9 to E7FA (2 bytes)
 .db $00 $00
@@ -17602,7 +17565,7 @@ _DATA_E820:
 .db $01 $A8 $15 $01 $34 $A8
 
 ; Pointer Table from E826 to E827 (1 entries, indexed by unknown)
-.dw _DATA_15
+.dw $0015
 
 ; Data from E828 to E829 (2 bytes)
 .db $00 $00
@@ -17656,7 +17619,7 @@ _DATA_E8A4:
 .db $01 $A8 $E0 $01
 
 ; Pointer Table from E8A8 to E8AD (3 entries, indexed by unknown)
-.dw _DATA_E8BC _DATA_30E _DATA_10
+.dw _DATA_E8BC _DATA_30E $0010
 
 ; Data from E8AE to E8BB (14 bytes)
 .db $FF $31 $31 $05 $06 $F2 $52 $0A $DF $01 $A0 $D0 $06 $F2
@@ -17713,7 +17676,7 @@ _DATA_E90F:
 .db $01 $A8 $15 $01 $23 $A9
 
 ; Pointer Table from E915 to E916 (1 entries, indexed by unknown)
-.dw _DATA_10
+.dw $0010
 
 ; Data from E917 to E918 (2 bytes)
 .db $00 $00
@@ -17742,7 +17705,7 @@ _DATA_E966:
 .db $01 $A8 $15 $01 $7A $A9
 
 ; Pointer Table from E96C to E96D (1 entries, indexed by unknown)
-.dw _DATA_10
+.dw $0010
 
 ; Data from E96E to E96F (2 bytes)
 .db $00 $00
@@ -17753,7 +17716,7 @@ _DATA_E970:
 .db $01 $A8 $C0 $01
 
 ; Pointer Table from E974 to E977 (2 entries, indexed by unknown)
-.dw _DATA_E98C _DATA_10
+.dw _DATA_E98C $0010
 
 ; Data from E978 to E98B (20 bytes)
 .db $00 $00 $FF $30 $31 $02 $05 $31 $30 $83 $8F $00 $60 $85 $03 $00
@@ -18241,7 +18204,7 @@ _DATA_16A89: ; Intro Story Text
 .asc "IN A SCHEME TO RESTORE  THEIR MASTER,THE"
 .db $08 $20 $C5
 .asc "FOLLOWERS OF RA GOAN HADKILLED THE RIGHTFUL KINGAS AN EVIL SACRIFICE."
-.asc $03 $20 $A7
+.db $03 $20 $A7
 .asc "FEAR OVERRAN THE TOWNS  OF BALJINYA,AND"
 .db $09 $20 $95
 .asc "LAWLESSNESS RULED THE"
@@ -18318,8 +18281,8 @@ _DATA_16DC2: ; Credits Text
 .db $07 $20 $00 $64 $00 $00 $93
 .asc "RESTORE OUR LAND TO"
 .db $19 $20 $83
-.asc "ITSG "
-.db $87
+.asc "ITS"
+.db $27 $20 $87
 .asc "BEAUTY!"
 .db $07 $20 $00 $64 $00 $00 $93
 .asc " THOU ART NOW KING,"
@@ -18915,12 +18878,16 @@ _DATA_1A016:
 .db $00 $15 $20 $91
 .asc "STILL BE FOUND IN"
 .db $17 $20 $92
-.asc "THE WOODS OF NAMO?I " ; TODO: Pretty sure this is part of the command
-.db $00 $15 $20 $91
+.asc "THE WOODS OF NAMO?"
+.db $29 $20 $00
+
+.db $15 $20 $91
 .asc "HAST THOU MET THE"
 .db $1A $20 $8C
-.asc "TREE PEOPLE?L " ; TODO: Pretty sure this is part of the command
-.db $00 $16 $20 $8F
+.asc "TREE PEOPLE?"
+.db $2C $20 $00
+
+.db $16 $20 $8F
 .asc "THOSE WOODS ARE"
 .db $17 $20 $93
 .asc "HAUNTED BY FEARSOME"
@@ -18959,14 +18926,15 @@ _DATA_1A016:
 .db $17 $20 $90
 .asc "FALAS! SAVE HER,"
 .db $02 $20 $00
-
 .db $14 $20 $91
 .asc "AND THY REWARD WI" $02 "L"
 .db $15 $20 $94
 .asc "BE GREAT! FOLLOW THE"
 .db $14 $20 $94
 .asc "COAST TO THE ISLAND."
-.db $00 $14 $20 $94
+.db $00
+
+.db $14 $20 $94
 .asc "RA GOAN'S EVIL POWER"
 .db $14 $20 $94
 .asc "IS SEALED WITHIN THE"
@@ -19034,7 +19002,9 @@ _DATA_1A016:
 .asc "5 MEN IN A DUEL,I'D"
 .db $15 $20 $94
 .asc "TELL THEE ANYTHING. "
-.db $00 $15 $20 $92
+.db $00
+
+.db $15 $20 $92
 .asc "FOR THE STATUE,USE"
 .db $16 $20 $91
 .asc "THIS HERB,A SWORD"
@@ -19193,7 +19163,9 @@ _DATA_1A016:
 .asc "THY PROMISE TO THE"
 .db $15 $20 $94
 .asc "WIZARDS? GO SEE HIM!"
-.db $00 $14 $20 $93
+.db $00
+
+.db $14 $20 $93
 .asc "THE DAUGHTER OF THE"
 .db $17 $20 $8F
 .asc "MAYOR OF LINDON"
