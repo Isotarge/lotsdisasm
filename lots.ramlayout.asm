@@ -509,7 +509,7 @@ _RAM_CC67 db ; Pharazon path to Amon textbox flag
 .ende
 
 .enum $CC71 export
-_RAM_CC71 db ; Unused building index flags start
+_RAM_FLAG_BUILDING_PROGRESS_SHAGART_START db ; Unused but flags are still set by Ra Goan
 .ende
 
 .enum $CC81 export

@@ -4371,13 +4371,13 @@ _LABEL_1F39:
 	jp z, _LABEL_21CB
 	ld a, (_RAM_BOSS_INDEX)
 	and $7F
-	cp $01
+	cp Boss_Index_Ulmo
 	jp z, _LABEL_21CB
-	cp $07
+	cp Boss_Index_Pirate1
 	jp z, _LABEL_240D
-	cp $03
+	cp Boss_Index_Baruga
 	jp z, _LABEL_2424
-	cp $06
+	cp Boss_Index_Duels
 	jp z, _LABEL_2444
 	ld a, (_RAM_BUILDING_INDEX)
 	cp Building_Varlin
@@ -4445,13 +4445,13 @@ _LABEL_201D:
 	ld (_RAM_C162), a
 	ld a, (_RAM_BOSS_INDEX)
 	and $7F
-	cp $01
+	cp Boss_Index_Ulmo
 	jp z, HandleBuildingExtraEffects
-	cp $07
+	cp Boss_Index_Pirate1
 	jp z, _LABEL_2419
-	cp $03
+	cp Boss_Index_Baruga
 	jp z, _LABEL_2430
-	cp $06
+	cp Boss_Index_Duels
 	jp z, _LABEL_2459
 	ret
 
@@ -4692,7 +4692,7 @@ _DATA_221B:
 .dw _DATA_1AC38 _RAM_FLAG_BUILDING_PROGRESS_DWARLE_START
 .dw _DATA_1AC71 _RAM_FLAG_BUILDING_PROGRESS_ITHILE_START
 .dw _DATA_1ACAA _RAM_FLAG_BUILDING_PROGRESS_PHARAZON_START
-.dw _DATA_1ACE8 _RAM_CC71 ; ??? Text(?) & Flags
+.dw _DATA_1ACE8 _RAM_FLAG_BUILDING_PROGRESS_SHAGART_START
 .dw _DATA_1AD20 _RAM_FLAG_BUILDING_PROGRESS_LINDON_START
 .dw _DATA_1AD59 _RAM_FLAG_BUILDING_PROGRESS_ULMO_START
 
@@ -4813,7 +4813,7 @@ HandleBuildingExtraEffects_Pointers:
 .dw HandleBuildingExtraEffects_Dwarle
 .dw HandleBuildingExtraEffects_Ithile
 .dw HandleBuildingExtraEffects_Pharazon
-.dw HandleBuildingExtraEffects_Unused0x06
+.dw HandleBuildingExtraEffects_Shagart
 .dw HandleBuildingExtraEffects_Lindon
 .dw HandleBuildingExtraEffects_Ulmo
 
@@ -4963,7 +4963,7 @@ HandleBuildingExtraEffects_Pharazon:
 	ret
 
 ; 6th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
-HandleBuildingExtraEffects_Unused0x06:
+HandleBuildingExtraEffects_Shagart:
 	ret
 
 ; 7th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
@@ -5025,7 +5025,7 @@ _LABEL_240D:
 	jp _LABEL_1FE4
 
 _LABEL_2419:
-	ld a, $08
+	ld a, Boss_Index_Pirate2
 	ld (_RAM_BOSS_INDEX), a
 	ld a, $01
 	ld (_RAM_FLAG_MAYORS_DAUGHTER_RETURNED), a
@@ -5038,7 +5038,7 @@ _LABEL_2424:
 	jp _LABEL_1FE4
 
 _LABEL_2430:
-	ld a, $03
+	ld a, Boss_Index_Baruga
 	ld (_RAM_BOSS_INDEX), a
 	ld a, $01
 	ld (_RAM_C16D), a
@@ -5063,7 +5063,7 @@ _LABEL_2459:
 	ld a, (_RAM_FLAG_DUELS_DEFEATED)
 	or a
 	jr nz, +
-	ld a, $06
+	ld a, Boss_Index_Duels
 	ld (_RAM_BOSS_INDEX), a
 	ret
 
@@ -10880,11 +10880,11 @@ ProcessWarpsAndDoors:
 	cp $7E ; Dark Suma's Dungeon 1F (DL)
 	jp nc, _LABEL_56E5
 	cp $78 ; Castle Elder
-	jp z, _LABEL_57DF
+	jp z, HandleElderDoor
 	cp $7C ; Castle Varlin (DL, Open)
-	jp z, _LABEL_57C7
+	jp z, HandleVarlinDoor
 	cp $7D ; Castle Varlin (UL, Open)
-	jp z, _LABEL_57C7
+	jp z, HandleVarlinDoor
 	ld hl, (_RAM_C115)
 	ld a, (_RAM_SCREEN_X_TILE)
 	cp h
@@ -11065,7 +11065,7 @@ _LABEL_57B1:
 	ld c, $82
 	jp _LABEL_56C3
 
-_LABEL_57C7:
+HandleVarlinDoor:
 	ld a, (_RAM_SCREEN_X_TILE)
 	cp $14
 	jp c, _LABEL_5695
@@ -11074,10 +11074,10 @@ _LABEL_57C7:
 	jp c, _LABEL_5695
 	xor a
 	ld (_RAM_BOSS_INDEX), a
-	ld a, $0C
+	ld a, Building_Varlin
 	jr +
 
-_LABEL_57DF:
+HandleElderDoor:
 	ld c, $1E
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp $14
@@ -11087,9 +11087,9 @@ _LABEL_57DF:
 	ld a, (_RAM_FLAG_DUELS_DEFEATED)
 	or a
 	ret nz
-	ld a, $06
+	ld a, Boss_Index_Duels
 	ld (_RAM_BOSS_INDEX), a
-	ld a, $0B
+	ld a, Building_Elder
 +:
 	ld (_RAM_BUILDING_INDEX), a
 	ld a, Building_Status_Building
@@ -11142,8 +11142,32 @@ _LABEL_5820:
 
 ; Data from 5854 to 586D (26 bytes)
 _DATA_5854:
-.db $01 $01 $04 $04 $02 $02 $02 $02 $02 $02 $03 $03 $03 $05 $05 $05
-.db $05 $05 $05 $05 $06 $06 $06 $06 $07 $07
+.db Building_Harfoot
+.db Building_Harfoot
+.db Building_Ithile
+.db Building_Ithile
+.db Building_Amon
+.db Building_Amon
+.db Building_Amon
+.db Building_Amon
+.db Building_Amon
+.db Building_Amon
+.db Building_Dwarle
+.db Building_Dwarle
+.db Building_Dwarle
+.db Building_Pharazon
+.db Building_Pharazon
+.db Building_Pharazon
+.db Building_Pharazon
+.db Building_Pharazon
+.db Building_Pharazon
+.db Building_Pharazon
+.db Building_Shagart
+.db Building_Shagart
+.db Building_Shagart
+.db Building_Shagart
+.db Building_Lindon
+.db Building_Lindon
 
 _LABEL_586E:
 	ld a, (_RAM_BUILDING_INDEX)
@@ -11565,7 +11589,7 @@ _LABEL_5B8F:
 	jp _LABEL_5BF6
 
 +:
-	ld a, $89
+	ld a, $80|Boss_Index_Pirate3
 	ld (_RAM_BOSS_INDEX), a
 	ret
 
@@ -11764,7 +11788,7 @@ _LABEL_5CEE:
 	ld a, (_RAM_Y_POSITION_MINOR)
 	cp $8C
 	ret nc
-	ld a, $08
+	ld a, Boss_Index_Pirate2
 	ld (_RAM_BOSS_INDEX), a
 	xor a
 	ld (_RAM_BOSS_FIGHT_INITIALIZED), a
@@ -11781,7 +11805,7 @@ _LABEL_5D14:
 	jp nc, _LABEL_5D59
 	cp $14
 	ret nc
-	ld a, $89
+	ld a, $80|Boss_Index_Pirate3
 	ld (_RAM_BOSS_INDEX), a
 	xor a
 	ld (_RAM_BOSS_FIGHT_INITIALIZED), a

@@ -49,10 +49,10 @@
 ; Buildings
 .define	Building_Harfoot $01
 .define	Building_Amon $02
-.define	Building_Dawrle $03
+.define	Building_Dwarle $03
 .define	Building_Ithile $04
 .define	Building_Pharazon $05
-.define	Building_Unused_6 $06 ; Unused but the progress flags are still set by Ra Goan
+.define	Building_Shagart $06 ; Unused but the progress flags are still set by Ra Goan
 .define	Building_Lindon $07
 .define	Building_Ulmo $08
 .define	Building_Mayors_Daughter $09 ; After Pirate
@@ -80,6 +80,20 @@
 .define	Movement_Damaged_11 $11
 .define	Movement_Crouching_Sword_Left $12
 .define	Movement_Crouching_Sword_Right $13
+
+; Bosses
+.define	Boss_Index_Ulmo $01
+.define	Boss_Index_Namo $02
+.define	Boss_Index_Baruga $03 ; Mt. Morgos
+.define	Boss_Index_Medusa $04
+.define	Boss_Index_Necromancer $05
+.define	Boss_Index_Duels $06
+.define	Boss_Index_Pirate1 $07 ; The actual fight
+.define	Boss_Index_Pirate2 $08 ; Map to the right of Pirate?
+.define	Boss_Index_Pirate3 $09 ; Empty map w/cave?
+.define	Boss_Index_Pirate4 $0A ; Empty map to the right?
+.define	Boss_Index_Dark_Suma $0B
+.define	Boss_Index_Ra_Goan $0C
 
 .struct object
 	type db
