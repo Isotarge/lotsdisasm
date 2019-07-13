@@ -18236,22 +18236,22 @@ MAP '3' = 68
 _DATA_16A89: ; Intro Story Text
 .db $AD
 .asc "SEVERAL THOUSAND YEARS  AFTER THE DOWNFALL OF"
-.asc $03 " " $F0
+.db $03 $20 $F0
 .asc "THE DEMON LORD RA GOAN, BALJINYA WAS ONCE MORE  FACED WITH GREAT PERIL. "
 .asc "IN A SCHEME TO RESTORE  THEIR MASTER,THE"
-.asc $08 " " $C5
+.db $08 $20 $C5
 .asc "FOLLOWERS OF RA GOAN HADKILLED THE RIGHTFUL KINGAS AN EVIL SACRIFICE."
-.asc $03 " " $A7
+.asc $03 $20 $A7
 .asc "FEAR OVERRAN THE TOWNS  OF BALJINYA,AND"
-.asc $09 " " $95
+.db $09 $20 $95
 .asc "LAWLESSNESS RULED THE"
-.asc $03 " " $85
+.db $03 $20 $85
 .asc "LAND."
-.asc $13 " " $94
+.db $13 $20 $94
 .asc "A COUNCIL OF ELDERS,"
-.asc $04 " " $92
+.db $04 $20 $92
 .asc "SEEKING TO RESTORE"
-.asc $06 " " $AC
+.db $06 $20 $AC
 .asc "ORDER,DECREED THAT ANY  WHO SOUGHT THE CROWN"
 .db $04 $20 $00 $6C $00 $6C $00 $6C $00 $6C $00 $00
 
@@ -18259,7 +18259,7 @@ _DATA_16A89: ; Intro Story Text
 _DATA_16C23:
 .db $93
 .asc "MUST FIRST PASS THR" $02 "E"
-.asc $03 " " $86
+.db $03 $20 $86
 .asc "TESTS."
 .db $12 $20 $00 $30 $00 $00
 
@@ -18267,9 +18267,9 @@ _DATA_16C23:
 _DATA_16C48:
 .db $93
 .asc "LANDAU,A BRAVE LAD,"
-.asc $05 " " $93
+.db $05 $20 $93
 .asc "RESOLVED TO ATTEMPT"
-.asc $05 " " $C8
+.db $05 $20 $C8
 .asc "THESE FEATS FOR THE LANDHE LOVED,AND SET OFF TO FIND THE WIZARD IN AMON."
 .db $00 $3C $00 $3C $00 $00
 
@@ -19101,8 +19101,9 @@ _DATA_1A016:
 .db $16 $20 $90
 .asc "PERSEVERE JUST A"
 .db $17 $20 $92
-.asc "LITTLE BIT LONGER.I "
-.db $00 $16 $20 $90
+.asc "LITTLE BIT LONGER."
+.db $29 $20 $00
+.db $16 $20 $90
 .asc "SHAGART PLANS RA"
 .db $16 $20 $93
 .asc "GOAN'S RESTORATION!"
@@ -20902,58 +20903,7 @@ _DATA_2FBB1:
 _DATA_2FCA3:
 .db $A1 $20 $21 $22 $23 $24 $25 $26 $27 $24 $28 $29 $2A $2B $2C $2D
 .db $2E $2F $30 $31 $32 $33 $24 $34 $35 $36 $37 $38 $39 $3A $3B $3C
-.db $3D $3E $00 $21 $00 $00 $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
+.db $3D $3E $00 $21 $00 $00
 
 .BANK 12
 .ORG $0000
@@ -21676,11 +21626,5 @@ _DATA_3FC2D:
 ; Data from 3FF8F to 3FFFF (113 bytes)
 _DATA_3FF8F:
 .db $03 $00 $83 $07 $0F $1C $0A $18 $03 $00 $02 $FF $03 $00 $00 $18
-.db $00 $00 $18 $00 $00 $18 $00 $00 $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF
+.db $00 $00 $18 $00 $00 $18 $00 $00
 
