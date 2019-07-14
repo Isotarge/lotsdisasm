@@ -31,7 +31,7 @@ _START:
 	di
 	ld sp, $C07F
 	im 1
-	jr _LABEL_82
+	jr StartGame
 
 .ORG $0038
 
@@ -42,8 +42,8 @@ _IRQ_HANDLER:
 
 _NMI_HANDLER:
 	push af
-	ld a, (_RAM_C118)
-	cp $07
+	ld a, (_RAM_MAP_TYPE)
+	cp Map_Type_Town
 	jr nz, +
 	ld a, (_RAM_C13F)
 	or a
@@ -57,7 +57,7 @@ _NMI_HANDLER:
 	pop af
 	ret
 
-_LABEL_82:
+StartGame:
 	ld a, (_RAM_C000)
 	ld (_RAM_C000), a
 	ld a, $00
@@ -152,7 +152,7 @@ HandleIRQ:
 	ld a, (_RAM_GAME_LOOP_IS_RUNNING)
 	or a
 	jr z, _LABEL_1B2
-	ld a, (_RAM_C0A2)
+	ld a, (_RAM_MAP_BACKGROUND_IS_SCROLLABLE)
 	or a
 	jr z, +
 	ld a, $FF
@@ -175,7 +175,7 @@ HandleIRQ:
 	ld a, (_RAM_C0A7)
 	or a
 	jr nz, _LABEL_1A6
-	ld a, (_RAM_C0A2)
+	ld a, (_RAM_MAP_BACKGROUND_IS_SCROLLABLE)
 	or a
 	jp nz, +
 	ld a, (_RAM_C111)
@@ -950,7 +950,7 @@ ProcessObjects:
 	call nz, +
 	pop iy
 	pop bc
-	ld de, $0040
+	ld de, _sizeof_object
 	add iy, de
 	djnz -
 	ret
@@ -970,81 +970,81 @@ ProcessObjects:
 	jp CallFunctionFromPointerTable
 
 ; Jump Table from 6E4 to 767 (66 entries, indexed by _RAM_C400)
-; Object Behaviour Handlers, Collision?
+; Object Behaviour Handlers
 _DATA_6E4:
-.dw _LABEL_F55 ; Landau
-.dw _LABEL_168E ; Arrow
-.dw _LABEL_769 ; Sword Upgrade
-.dw _LABEL_7C3 ; Bow Upgrade
-.dw _LABEL_7E3 ; Sign
-.dw _LABEL_768 ; Null
-.dw _LABEL_768 ; Null
-.dw _LABEL_768 ; Null
-.dw _LABEL_768 ; Null
-.dw _LABEL_768 ; Null
-.dw _LABEL_768 ; Null
-.dw _LABEL_768 ; Null
-.dw _LABEL_768 ; Null
-.dw _LABEL_768 ; Null
-.dw _LABEL_768 ; Null
-.dw _LABEL_2555 ; Slime
-.dw _LABEL_3853 ; Eye Part
-.dw _LABEL_2621 ; Giant Bat
-.dw _LABEL_2915 ; Bird
-.dw _LABEL_2A4E ; Killer Fish
-.dw _LABEL_3C17 ; Clown
-.dw _LABEL_2B31 ; Knight
-.dw _LABEL_2CB1 ; Scorpion
-.dw _LABEL_2FB0 ; Spider
-.dw _LABEL_321C ; White Wolf
-.dw _LABEL_3D54 ; Caterpillar
-.dw _LABEL_3912 ; Eye Part
-.dw _LABEL_3092 ; Skeleton
-.dw _LABEL_2E6D ; Demon (Red Flying Thingy)
-.dw _LABEL_2D88 ; Snake
-.dw _LABEL_2F55 ; Giant Bat
-.dw _LABEL_3B86 ; Straw Fly
-.dw _LABEL_3389 ; Book Thief
-.dw _LABEL_3A85 ; Dragon Enemy (Unused?)
-.dw _LABEL_34F0 ; Dark Shunaida
-.dw _LABEL_3930 ; Lizard Man
-.dw _LABEL_3635 ; Dagon
-.dw _LABEL_3785 ; Zombie
-.dw _LABEL_3DF2 ; Damaged (0x27)
-.dw _LABEL_3CD8 ; Snake
-.dw _LABEL_26DD ; Projectile (Straw Fly)
-.dw _LABEL_3ECB ; Damaged (0x2A)
-.dw _LABEL_3EFC ; Tree Spirit (Boss)
-.dw _LABEL_412D ; Projectile (Tree Spirit)
-.dw _LABEL_41AB ; Projectile (Tree Spirit)
-.dw _LABEL_4226 ; Necromancer (Boss)
-.dw _LABEL_5FD6 ; Stone Hammer (Boss)
-.dw _LABEL_4A85 ; Dark Suma (Boss)
-.dw _LABEL_435A ; Necromancer's Clone (Boss)
-.dw _LABEL_6194 ; Golden Guard (Boss)
-.dw _LABEL_663B ; Paradin (Boss)
-.dw _LABEL_483F ; Pirate (Boss)
-.dw _LABEL_49FC ; Projecile (Pirate's Sword)
-.dw _LABEL_6787 ; Medusa (Boss)
-.dw _LABEL_4576 ; Baruga (Boss)
-.dw _LABEL_768 ; Null
-.dw _LABEL_643D ; Court Jester (Boss)
-.dw _LABEL_5E7D ; The Ripper (Boss)
-.dw _LABEL_47D9 ; Projectile (Baruga)
-.dw _LABEL_6612 ; Projectile (Court Jester)
-.dw _LABEL_4CAB ; Skull (Dark Suma)
-.dw _LABEL_4DFE ; Projectile (Dark Suma)
-.dw _LABEL_50CB ; Shield (Ra Goan)
-.dw _LABEL_503F ; Projectile (Ra Goan)
-.dw _LABEL_508B ; Projectile (Ra Goan)
-.dw _LABEL_4E7A ; Ra Goan (Boss)
+.dw HandleObject_Landau
+.dw HandleObject_Landau_Arrow
+.dw HandleObject_Sword_Upgrade
+.dw HandleObject_Bow_Upgrade
+.dw HandleObject_Sign
+.dw HandleObject_Null
+.dw HandleObject_Null
+.dw HandleObject_Null
+.dw HandleObject_Null
+.dw HandleObject_Null
+.dw HandleObject_Null
+.dw HandleObject_Null
+.dw HandleObject_Null
+.dw HandleObject_Null
+.dw HandleObject_Null
+.dw HandleObject_Slime
+.dw HandleObject_Eye_Part
+.dw HandleObject_Giant_Bat
+.dw HandleObject_Bird
+.dw HandleObject_Killer_Fish
+.dw HandleObject_Clown
+.dw HandleObject_Knight
+.dw HandleObject_Scorpion
+.dw HandleObject_Spider
+.dw HandleObject_White_Wolf
+.dw HandleObject_Caterpillar
+.dw HandleObject_Eye_Part_2
+.dw HandleObject_Skeleton
+.dw HandleObject_Demon
+.dw HandleObject_Snake
+.dw HandleObject_Giant_Bat_2
+.dw HandleObject_Straw_Fly
+.dw HandleObject_Book_Thief
+.dw HandleObject_Dragon
+.dw HandleObject_Dark_Shunaida
+.dw HandleObject_Lizard_Man
+.dw HandleObject_Dagon
+.dw HandleObject_Zombie
+.dw HandleObject_Damaged_0x27
+.dw HandleObject_Snake_2
+.dw HandleObject_Projectile_Straw_Fly
+.dw HandleObject_Damaged_0x2A
+.dw HandleObject_Tree_Spirit
+.dw HandleObject_Projectile_Tree_Spirit
+.dw HandleObject_Projectile_Tree_Spirit_2
+.dw HandleObject_Necromancer
+.dw HandleObject_Stone_Hammer
+.dw HandleObject_Dark_Suma
+.dw HandleObject_Necromancer_Clone
+.dw HandleObject_Golden_Guard
+.dw HandleObject_Paradin
+.dw HandleObject_Pirate
+.dw HandleObject_Pirate_Sword
+.dw HandleObject_Medusa
+.dw HandleObject_Baruga
+.dw HandleObject_Null
+.dw HandleObject_Court_Jester
+.dw HandleObject_The_Ripper
+.dw HandleObject_Projectile_Baruga
+.dw HandleObject_Projectile_Court_Jester
+.dw HandleObject_Skull_Dark_Suma
+.dw HandleObject_Projectile_Dark_Suma
+.dw HandleObject_Shield_Ra_Goan
+.dw HandleObject_Projectile_Ra_Goan
+.dw HandleObject_Projectile_Ra_Goan_2
+.dw HandleObject_Ra_Goan
 
 ; 6th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_768:
+HandleObject_Null:
 	ret
 
 ; 3rd entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_769:
+HandleObject_Sword_Upgrade:
 	ld a, (_RAM_C483)
 	or a
 	jr nz, +
@@ -1084,7 +1084,7 @@ _LABEL_775:
 	jp _LABEL_8AC
 
 ; 4th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_7C3:
+HandleObject_Bow_Upgrade:
 	ld a, (_RAM_C483)
 	or a
 	jr z, _LABEL_775
@@ -1101,7 +1101,7 @@ _LABEL_7C3:
 	jp _LABEL_8AC
 
 ; 5th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_7E3:
+HandleObject_Sign:
 	ld a, (_RAM_C4C3)
 	or a
 	jr nz, +
@@ -1310,7 +1310,7 @@ Handle_Map_Status_Start_Game:
 	ld a, Map_Status_Map
 	ld (_RAM_MAP_STATUS), a
 	xor a
-	ld (_RAM_C093), a
+	ld (_RAM_SCORE_COUNTER_SHOULD_UPDATE), a
 	ld (_RAM_SCORE_RIGHT_DIGIT), a
 	ld (_RAM_SCORE_MIDDLE_DIGIT), a
 	ld (_RAM_SCORE_LEFT_DIGIT), a
@@ -2069,7 +2069,7 @@ _LABEL_A2D:
 	ret
 
 ; 1st entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_F55:
+HandleObject_Landau:
 	ld a, (_RAM_C403)
 	or a
 	jp nz, +
@@ -3021,7 +3021,7 @@ _LABEL_161E:
 	ret
 
 ; 2nd entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_168E:
+HandleObject_Landau_Arrow:
 	ld a, (_RAM_C460)
 	or a
 	jp nz, ++
@@ -3083,9 +3083,9 @@ _LABEL_168E:
 	ld (iy+33), $01
 	ld (iy+object.boss_teleport_timer), $08
 	ld a, (_RAM_C500)
-	cp $2B
+	cp $2B ; Tree Spirit
 	ret c
-	cp $43
+	cp $43 ; First index past the end of the object list, probably a safety check
 	ret nc
 	xor a
 	ld (_RAM_C52F), a
@@ -3093,9 +3093,9 @@ _LABEL_168E:
 
 _LABEL_1720:
 	ld a, (_RAM_C500)
-	cp $2B
+	cp $2B ; Tree Spirit
 	jp c, +
-	cp $43
+	cp $43 ; ; First index past the end of the object list, probably a safety check
 	jp nc, +
 	ld ix, _RAM_C500
 	call _LABEL_1C59
@@ -3122,8 +3122,8 @@ _LABEL_173E:
 	xor a
 	ret
 
-_LABEL_175F:
-	ld de, _RAM_C093
+AwardScore:
+	ld de, _RAM_SCORE_COUNTER_SHOULD_UPDATE
 	ld a, $01
 	ld (de), a
 	ld a, (_RAM_MAP_STATUS)
@@ -3157,16 +3157,26 @@ _LABEL_175F:
 
 ; Data from 1787 to 17AA (36 bytes)
 _DATA_1787:
-.db $00 $00 $00 $00 $01 $00 $00 $02 $00 $00 $03 $00 $00 $10 $00 $00
-.db $20 $00 $00 $30 $00 $00 $40 $00 $00 $50 $00 $00 $60 $00 $00 $70
-.db $00 $00 $80 $00
+; Possible enemy score values, object + 0x1B upper 4 bits
+.db $00 $00 $00
+.db $00 $01 $00
+.db $00 $02 $00
+.db $00 $03 $00
+.db $00 $10 $00
+.db $00 $20 $00
+.db $00 $30 $00
+.db $00 $40 $00
+.db $00 $50 $00
+.db $00 $60 $00
+.db $00 $70 $00
+.db $00 $80 $00
 
 UpdateScoreCounter:
-	ld a, (_RAM_C093)
+	ld a, (_RAM_SCORE_COUNTER_SHOULD_UPDATE)
 	or a
 	ret z
 	xor a
-	ld (_RAM_C093), a
+	ld (_RAM_SCORE_COUNTER_SHOULD_UPDATE), a
 	ld hl, _RAM_SCORE_LEFT_DIGIT
 	ld de, $7846
 	ld bc, $0601
@@ -3529,7 +3539,7 @@ _LABEL_1A12:
 	ld h, $7A
 	ld bc, $0E40
 	ld de, _RAM_D430
-	ld a, (_RAM_C0A2)
+	ld a, (_RAM_MAP_BACKGROUND_IS_SCROLLABLE)
 	or a
 	jp nz, _LABEL_1A46
 	ld h, $78
@@ -3554,7 +3564,7 @@ _LABEL_1A46:
 	ret
 
 _LABEL_1A5C:
-	ld a, (_RAM_C0A2)
+	ld a, (_RAM_MAP_BACKGROUND_IS_SCROLLABLE)
 	or a
 	ret z
 	call ++
@@ -3662,7 +3672,7 @@ _LABEL_1AB3:
 	ret
 
 _LABEL_1B1D:
-	ld a, (_RAM_C0A2)
+	ld a, (_RAM_MAP_BACKGROUND_IS_SCROLLABLE)
 	or a
 	jr z, +
 	ld a, (_RAM_C117)
@@ -4344,7 +4354,7 @@ _LABEL_1F39:
 	ld a, $01
 	ld (_RAM_C13F), a
 	xor a
-	ld (_RAM_C0A2), a
+	ld (_RAM_MAP_BACKGROUND_IS_SCROLLABLE), a
 	ld (_RAM_C109), a
 	ld (_RAM_C111), a
 	ld iy, _RAM_C400
@@ -4366,8 +4376,8 @@ _LABEL_1F39:
 	ld de, $7BC8
 	ld a, $18
 	call _LABEL_1E9A
-	ld a, (_RAM_C118)
-	cp $07
+	ld a, (_RAM_MAP_TYPE)
+	cp Map_Type_Town
 	jp z, _LABEL_21CB
 	ld a, (_RAM_BOSS_INDEX)
 	and $7F
@@ -4406,8 +4416,8 @@ _LABEL_1FEA:
 	ld a, (_RAM_BUILDING_INDEX)
 	cp Building_Varlin
 	jp z, _LABEL_2077
-	ld a, (_RAM_C118)
-	cp $07
+	ld a, (_RAM_MAP_TYPE)
+	cp Map_Type_Town
 	jr nz, +
 	ld hl, $18A8
 	ld a, (_RAM_C141)
@@ -5211,7 +5221,7 @@ _LABEL_2542:
 	jp _LABEL_24E0
 
 ; 16th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_2555:
+HandleObject_Slime:
 	ld a, (iy+3)
 	or a
 	jp nz, +
@@ -5299,7 +5309,7 @@ _LABEL_25DC:
 	jp _LABEL_24E0
 
 ; 18th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_2621:
+HandleObject_Giant_Bat:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -5385,7 +5395,7 @@ _LABEL_2621:
 	ret
 
 ; 41st entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_26DD:
+HandleObject_Projectile_Straw_Fly:
 	ld a, (iy+3)
 	or a
 	jp nz, _LABEL_286D
@@ -5619,7 +5629,7 @@ _LABEL_2909:
 	jp ApplyObjectYVelocity
 
 ; 19th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_2915:
+HandleObject_Bird:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -5767,7 +5777,7 @@ _LABEL_2A20:
 	ret
 
 ; 20th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_2A4E:
+HandleObject_Killer_Fish:
 	ld a, (iy+3)
 	or a
 	jr nz, ++
@@ -5860,7 +5870,7 @@ _LABEL_2AE2:
 	jp _LABEL_252E
 
 ; 22nd entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_2B31:
+HandleObject_Knight:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -6029,7 +6039,7 @@ _LABEL_2C9A:
 	ret
 
 ; 23rd entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_2CB1:
+HandleObject_Scorpion:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -6127,7 +6137,7 @@ _DATA_2D84:
 .db $01 $01 $02 $02
 
 ; 30th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_2D88:
+HandleObject_Snake:
 	ld a, (iy+3)
 	or a
 	jr nz, ++
@@ -6236,7 +6246,7 @@ _LABEL_2D88:
 	ret
 
 ; 29th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_2E6D:
+HandleObject_Demon:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -6342,7 +6352,7 @@ _LABEL_2EE9:
 	jp -
 
 ; 31st entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_2F55:
+HandleObject_Giant_Bat_2:
 	ld a, (iy+3)
 	or a
 	jp nz, _LABEL_2F9F
@@ -6378,7 +6388,7 @@ _LABEL_2F9F:
 	jp ApplyObjectXVelocity
 
 ; 24th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_2FB0:
+HandleObject_Spider:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -6477,7 +6487,7 @@ AddDEToYVelocity:
 	ret
 
 ; 28th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_3092:
+HandleObject_Skeleton:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -6648,7 +6658,7 @@ _LABEL_31AE:
 	ret
 
 ; 25th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_321C:
+HandleObject_White_Wolf:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -6804,7 +6814,7 @@ _LABEL_3349:
 	ret
 
 ; 33rd entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_3389:
+HandleObject_Book_Thief:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -6946,7 +6956,7 @@ _LABEL_3493:
 	jp _LABEL_24A3
 
 ; 35th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_34F0:
+HandleObject_Dark_Shunaida:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -7093,7 +7103,7 @@ _LABEL_35F9:
 	ret
 
 ; 37th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_3635:
+HandleObject_Dagon:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -7241,7 +7251,7 @@ _LABEL_3778:
 	ret
 
 ; 38th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_3785:
+HandleObject_Zombie:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -7328,7 +7338,7 @@ _LABEL_3785:
 	ret
 
 ; 17th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_3853:
+HandleObject_Eye_Part:
 	ld a, (iy+3)
 	or a
 	jp nz, _LABEL_38A5
@@ -7414,7 +7424,7 @@ _LABEL_38A5:
 	ret
 
 ; 27th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_3912:
+HandleObject_Eye_Part_2:
 	ld a, (iy+3)
 	or a
 	jp nz, +
@@ -7433,7 +7443,7 @@ _LABEL_3912:
 	jp _LABEL_3EA3
 
 ; 36th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_3930:
+HandleObject_Lizard_Man:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -7577,7 +7587,7 @@ _LABEL_3A0E:
 	jp _LABEL_24A3
 
 ; 34th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_3A85:
+HandleObject_Dragon:
 	ld a, (iy+3)
 	or a
 	jp nz, _LABEL_3ADD
@@ -7685,7 +7695,7 @@ _LABEL_3B39:
 	jp _LABEL_252E
 
 ; 32nd entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_3B86:
+HandleObject_Straw_Fly:
 	ld a, (iy+3)
 	or a
 	jp nz, +
@@ -7749,7 +7759,7 @@ _LABEL_3B86:
 	ret
 
 ; 21st entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_3C17:
+HandleObject_Clown:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -7827,7 +7837,7 @@ _LABEL_3C17:
 	jp _LABEL_24A3
 
 ; 40th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_3CD8:
+HandleObject_Snake_2:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -7885,7 +7895,7 @@ _LABEL_3CD8:
 	jp _LABEL_252E
 
 ; 26th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_3D54:
+HandleObject_Caterpillar:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
@@ -7954,7 +7964,7 @@ _LABEL_3D54:
 	jp _LABEL_252E
 
 ; 39th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_3DF2:
+HandleObject_Damaged_0x27:
 	ld a, (iy+object.boss_hp)
 	or a
 	jp nz, ++
@@ -8021,7 +8031,7 @@ _LABEL_3DF2:
 	rrca
 	rrca
 	ld c, a
-	call _LABEL_175F
+	call AwardScore
 	dec (iy+63)
 	jp nz, _LABEL_3EA3
 	ld a, (iy+object.type)
@@ -8058,7 +8068,7 @@ _LABEL_3EBE:
 	ret
 
 ; 42nd entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_3ECB:
+HandleObject_Damaged_0x2A:
 	ld l, (iy+object.respawn_timer_minor)
 	ld h, (iy+object.respawn_timer_major)
 	dec hl
@@ -8082,7 +8092,7 @@ _LABEL_3ECB:
 	ret
 
 ; 43rd entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_3EFC:
+HandleObject_Tree_Spirit:
 	ld a, (iy+3)
 	or a
 	jp nz, +
@@ -8359,7 +8369,7 @@ _LABEL_40B7:
 	ret
 
 ; 44th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_412D:
+HandleObject_Projectile_Tree_Spirit:
 	ld a, (iy+3)
 	or a
 	jp nz, _LABEL_4178
@@ -8419,7 +8429,7 @@ _LABEL_4178:
 	jp _LABEL_869
 
 ; 45th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_41AB:
+HandleObject_Projectile_Tree_Spirit_2:
 	ld a, (iy+3)
 	or a
 	jp nz, _LABEL_41FE
@@ -8474,7 +8484,7 @@ _LABEL_41FE:
 	ret
 
 ; 46th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_4226:
+HandleObject_Necromancer:
 	ld a, (_RAM_C503)
 	or a
 	jp nz, _LABEL_4278
@@ -8618,7 +8628,7 @@ _LABEL_42FD:
 	jp _LABEL_252E
 
 ; 49th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_435A:
+HandleObject_Necromancer_Clone:
 	ld a, (iy+3)
 	or a
 	jp nz, _LABEL_43A8
@@ -8855,7 +8865,7 @@ _DATA_456E:
 .db $00 $FC $80 $FB $40 $FB $80 $FC
 
 ; 55th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_4576:
+HandleObject_Baruga:
 	ld a, (_RAM_C503)
 	or a
 	jp nz, +
@@ -9142,7 +9152,7 @@ _DATA_47C9:
 .db $C8 $A6 $08 $0A $D5 $A6 $0C $0E $E2 $A6 $10 $12 $EF $A6 $14 $16
 
 ; 59th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_47D9:
+HandleObject_Projectile_Baruga:
 	ld a, (iy+3)
 	or a
 	jp nz, +
@@ -9187,7 +9197,7 @@ _LABEL_47D9:
 	ret
 
 ; 52nd entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_483F:
+HandleObject_Pirate:
 	ld a, (_RAM_C503)
 	or a
 	jp nz, +
@@ -9420,7 +9430,7 @@ _LABEL_4998:
 	jp _LABEL_24E0
 
 ; 53rd entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_49FC:
+HandleObject_Pirate_Sword:
 	ld a, (_RAM_C543)
 	or a
 	jp nz, +
@@ -9485,7 +9495,7 @@ _LABEL_49FC:
 	jp _LABEL_8AC
 
 ; 48th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_4A85:
+HandleObject_Dark_Suma:
 	ld a, (_RAM_C503)
 	or a
 	jp nz, +
@@ -9754,7 +9764,7 @@ _LABEL_4C7F:
 	ret
 
 ; 61st entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_4CAB:
+HandleObject_Skull_Dark_Suma:
 	ld a, (iy+3)
 	or a
 	jp nz, _LABEL_4D71
@@ -9900,7 +9910,7 @@ _LABEL_4DE8:
 	ret
 
 ; 62nd entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_4DFE:
+HandleObject_Projectile_Dark_Suma:
 	ld a, (_RAM_C543)
 	or a
 	jp nz, _LABEL_4E4B
@@ -9959,7 +9969,7 @@ _LABEL_4E4B:
 	ret
 
 ; 66th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_4E7A:
+HandleObject_Ra_Goan:
 	ld a, (_RAM_C503)
 	or a
 	jp nz, +
@@ -10190,7 +10200,7 @@ _LABEL_502B:
 	ret
 
 ; 64th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_503F:
+HandleObject_Projectile_Ra_Goan:
 	ld a, (_RAM_C543)
 	or a
 	jp nz, _LABEL_5072
@@ -10224,7 +10234,7 @@ _LABEL_5072:
 	jp _LABEL_8AC
 
 ; 65th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_508B:
+HandleObject_Projectile_Ra_Goan_2:
 	ld a, (_RAM_C543)
 	or a
 	jp nz, _LABEL_5072
@@ -10257,7 +10267,7 @@ _LABEL_50BE:
 	ret
 
 ; 63rd entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_50CB:
+HandleObject_Shield_Ra_Goan:
 	ld a, (_RAM_C583)
 	or a
 	jp nz, ++
@@ -10577,7 +10587,7 @@ _LABEL_52BC:
 	ld a, $01
 	ld (_RAM_C12A), a
 	ld (_RAM_C16D), a
-	ld (_RAM_C093), a
+	ld (_RAM_SCORE_COUNTER_SHOULD_UPDATE), a
 	call _LABEL_5483
 	call _LABEL_586E
 	call _LABEL_544F
@@ -10626,7 +10636,7 @@ _LABEL_535B:
 	ld (_RAM_C117), a
 	inc hl
 	ld a, (hl)
-	ld (_RAM_C118), a
+	ld (_RAM_MAP_TYPE), a
 	inc hl
 	ld a, (hl)
 	ld (_RAM_C115), a
@@ -10648,29 +10658,29 @@ _LABEL_535B:
 	ld hl, $C07E
 	ld (_RAM_C112), hl
 	ld a, $01
-	ld (_RAM_C0A2), a
-	ld a, (_RAM_C118)
-	cp $01
+	ld (_RAM_MAP_BACKGROUND_IS_SCROLLABLE), a
+	ld a, (_RAM_MAP_TYPE)
+	cp Map_Type_Swamp
 	ret z
-	cp $03
+	cp Map_Type_Coast
 	ret z
 	xor a
-	ld (_RAM_C0A2), a
+	ld (_RAM_MAP_BACKGROUND_IS_SCROLLABLE), a
 	ret
 
 _LABEL_53D3:
 	ld hl, (_RAM_C10C)
 	call _LABEL_1E50
 	ld c, :Bank13
-	ld a, (_RAM_C118)
-	cp $06
+	ld a, (_RAM_MAP_TYPE)
+	cp Map_Type_Dark_Forest
 	jr c, +
 	ld c, :Bank14
 +:
 	ld a, c
 	ld (_RAM_FFFF), a
 	ld hl, $551C
-	ld a, (_RAM_C118)
+	ld a, (_RAM_MAP_TYPE)
 	add a, a
 	add a, a
 	ld e, a
@@ -10691,8 +10701,8 @@ _LABEL_53D3:
 	jp _LABEL_1DC8
 
 _LABEL_540B:
-	ld a, (_RAM_C118)
-	cp $03
+	ld a, (_RAM_MAP_TYPE)
+	cp Map_Type_Coast
 	ret nz
 	ld hl, _RAM_C14D
 	inc (hl)
@@ -10736,12 +10746,12 @@ _LABEL_544F:
 	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	ld c, $85
-	ld a, (_RAM_C118)
-	cp $07
+	ld a, (_RAM_MAP_TYPE)
+	cp Map_Type_Town
 	jr z, _LABEL_5467
-	cp $09
+	cp Map_Type_Dungeon_Suma
 	jr z, +
-	cp $0A
+	cp Map_Type_Dungeon_Ra_Goan
 	jr z, +
 	ld c, $83
 _LABEL_5467:
@@ -10780,10 +10790,10 @@ _LABEL_5483:
 	jp _LABEL_1DC8
 
 _LABEL_54AB:
-	ld a, (_RAM_C118)
-	cp $09
+	ld a, (_RAM_MAP_TYPE)
+	cp Map_Type_Dungeon_Suma
 	jr z, +
-	cp $0A
+	cp Map_Type_Dungeon_Ra_Goan
 	jr nz, ++
 +:
 	ld a, (_RAM_CURRENT_MAP)
@@ -10837,7 +10847,7 @@ _LABEL_550F:
 	ld bc, $0040
 	jp LoadVDPData
 
-; Pointer Table from 5520 to 5545 (19 entries, indexed by _RAM_C118)
+; Pointer Table from 5520 to 5545 (19 entries, indexed by _RAM_MAP_TYPE)
 _DATA_5520:
 .dw _DATA_34000 _DATA_34000 _DATA_34288 _DATA_34CDD _DATA_34578 _DATA_35C42 _DATA_346C8 _DATA_3649D
 .dw _DATA_34988 _DATA_36C9B _DATA_34C28 _DATA_34000 _DATA_34D80 _DATA_34D4C _DATA_34F80 _DATA_35832
@@ -10864,8 +10874,8 @@ _DATA_5546:
 .dw _DATA_2C2D0 _DATA_2C2DC _DATA_2C2E8 _DATA_2C2F4 _DATA_2C300 _DATA_2C30C _DATA_2C318
 
 ProcessWarpsAndDoors:
-	ld a, (_RAM_C118)
-	cp $07
+	ld a, (_RAM_MAP_TYPE)
+	cp Map_Type_Town
 	jp nz, +
 	ld a, (_RAM_CONTROLLER_INPUT)
 	bit ButtonUp, a ; Enter Door
@@ -10918,9 +10928,9 @@ _LABEL_5695:
 	ld c, l
 	ld a, (_RAM_Y_POSITION_MINOR)
 	cp $78
-	jp c, _LABEL_56C3
+	jp c, SetCurrentMapFromCIfNot0
 	ld c, h
-_LABEL_56C3:
+SetCurrentMapFromCIfNot0:
 	ld a, c
 	or a
 	ret z
@@ -11062,8 +11072,8 @@ _LABEL_57B1:
 	ret
 
 +:
-	ld c, $82
-	jp _LABEL_56C3
+	ld c, $82 ; Ra Goan's Dungeon Entrance
+	jp SetCurrentMapFromCIfNot0
 
 HandleVarlinDoor:
 	ld a, (_RAM_SCREEN_X_TILE)
@@ -11078,10 +11088,10 @@ HandleVarlinDoor:
 	jr +
 
 HandleElderDoor:
-	ld c, $1E
+	ld c, $1E ; Swamp (Castle Elder +1L) (R)
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp $14
-	jp c, _LABEL_56C3
+	jp c, SetCurrentMapFromCIfNot0
 	cp $7C
 	ret c
 	ld a, (_RAM_FLAG_DUELS_DEFEATED)
@@ -11115,11 +11125,11 @@ _LABEL_5820:
 	ld a, (_RAM_CURRENT_MAP)
 	ld (_RAM_CONTINUE_MAP), a
 	ld c, $7E ; Dark Suma's Dungeon 1F (DL)
-	ld a, (_RAM_C118)
-	cp $09
+	ld a, (_RAM_MAP_TYPE)
+	cp Map_Type_Dungeon_Suma
 	jr z, +
 	ld c, $82 ; Ra Goan's Dungeon Entrance
-	cp $0A
+	cp Map_Type_Dungeon_Ra_Goan
 	jr nz, ++
 +:
 	ld a, c
@@ -11127,8 +11137,8 @@ _LABEL_5820:
 ++:
 	xor a
 	ld (_RAM_BUILDING_INDEX), a
-	ld a, (_RAM_C118)
-	cp $07
+	ld a, (_RAM_MAP_TYPE)
+	cp Map_Type_Town
 	ret nz
 	ld a, (_RAM_CURRENT_MAP)
 	sub $5E ; Harfoot (L)
@@ -11172,10 +11182,10 @@ _DATA_5854:
 _LABEL_586E:
 	ld a, (_RAM_BUILDING_INDEX)
 	ld c, a
-	ld a, (_RAM_C118)
-	cp $07
+	ld a, (_RAM_MAP_TYPE)
+	cp Map_Type_Town
 	jr z, +
-	cp $08
+	cp Map_Type_Castle
 	ret nz
 	ld c, $09
 	ld a, (_RAM_CURRENT_MAP)
@@ -11224,7 +11234,7 @@ _LABEL_58B7:
 	ld a, $01
 	ld (_RAM_C16A), a
 	xor a
-	ld (_RAM_C0A2), a
+	ld (_RAM_MAP_BACKGROUND_IS_SCROLLABLE), a
 	ld (_RAM_C109), a
 	ld (_RAM_C111), a
 	ld iy, _RAM_C400
@@ -11367,7 +11377,7 @@ _LABEL_59CF:
 	ld bc, $FF0A
 	call SendVDPCommand
 	xor a
-	ld (_RAM_C0A2), a
+	ld (_RAM_MAP_BACKGROUND_IS_SCROLLABLE), a
 	ld hl, _RAM_C109
 	ld de, _RAM_C109 + 1
 	ld bc, $001F
@@ -11936,7 +11946,7 @@ _LABEL_5DA6:
 .db $B8 $BB $AB $00 $00 $83 $CB $AB $C8 $B8 $BB $AB
 
 ; 58th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_5E7D:
+HandleObject_The_Ripper:
 	ld a, (_RAM_C503)
 	or a
 	jr nz, +
@@ -12087,11 +12097,11 @@ _LABEL_5FB9:
 	ld c, $10
 	call ApplyLandauHealOrDamageFromC
 	ld c, $07
-	call _LABEL_175F
+	call AwardScore
 	jp _LABEL_8AC
 
 ; 47th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_5FD6:
+HandleObject_Stone_Hammer:
 	ld a, (_RAM_C503)
 	or a
 	jr nz, +
@@ -12277,11 +12287,11 @@ _LABEL_6177:
 	ld c, $10
 	call ApplyLandauHealOrDamageFromC
 	ld c, $07
-	call _LABEL_175F
+	call AwardScore
 	jp _LABEL_8AC
 
 ; 50th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_6194:
+HandleObject_Golden_Guard:
 	ld a, (_RAM_C503)
 	or a
 	jr nz, +
@@ -12462,7 +12472,7 @@ _LABEL_6312:
 	ld c, $10
 	call ApplyLandauHealOrDamageFromC
 	ld c, $07
-	call _LABEL_175F
+	call AwardScore
 	jp _LABEL_8AC
 
 _LABEL_632F:
@@ -12608,7 +12618,7 @@ _LABEL_642E:
 .db $38 $64 $01 $F0 $FC $FF $00
 
 ; 57th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_643D:
+HandleObject_Court_Jester:
 	ld a, (_RAM_C503)
 	or a
 	jr nz, +
@@ -12814,11 +12824,11 @@ _LABEL_65F5:
 	ld c, $10
 	call ApplyLandauHealOrDamageFromC
 	ld c, $07
-	call _LABEL_175F
+	call AwardScore
 	jp _LABEL_8AC
 
 ; 60th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_6612:
+HandleObject_Projectile_Court_Jester:
 	ld a, (iy+object.y_velocity_minor)
 	or a
 	call nz, +
@@ -12840,7 +12850,7 @@ _LABEL_6612:
 	ret
 
 ; 51st entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_663B:
+HandleObject_Paradin:
 	ld a, (_RAM_C503)
 	or a
 	jr nz, +
@@ -12979,7 +12989,7 @@ _LABEL_674A:
 	ld c, $10
 	call ApplyLandauHealOrDamageFromC
 	ld c, $07
-	call _LABEL_175F
+	call AwardScore
 	jp _LABEL_8AC
 
 _LABEL_676B:
@@ -12999,7 +13009,7 @@ _LABEL_676B:
 	jp _LABEL_66FA
 
 ; 54th entry of Jump Table from 6E4 (indexed by _RAM_C400)
-_LABEL_6787:
+HandleObject_Medusa:
 	ld a, (_RAM_C503)
 	or a
 	jr nz, _LABEL_67F5
@@ -13251,7 +13261,7 @@ _LABEL_69B2:
 	ld (_RAM_FLAG_MEDUSA_DEFEATED), a
 	ld (_RAM_FLAG_VARLIN_OPEN), a
 	ld c, $0A
-	call _LABEL_175F
+	call AwardScore
 	xor a
 	ld (_RAM_INVENTORY_HERB), a
 	jp _LABEL_8AC
@@ -13382,7 +13392,7 @@ _LABEL_6AC2:
 	ld a, $01
 	ld (hl), a
 	ld (_RAM_C153), a
-	call _LABEL_175F
+	call AwardScore
 	ld c, $10
 	call ApplyLandauHealOrDamageFromC
 	ld ix, _RAM_C540
@@ -20912,7 +20922,7 @@ Bank12:
 .ORG $0000
 Bank13:
 
-; 1st entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 1st entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 34000 to 34287 (648 bytes)
 _DATA_34000:
 .db $24 $3F $00 $25 $34 $3D $38 $2A $0C $09 $04 $00 $0B $06 $01 $10
@@ -20957,7 +20967,7 @@ _DATA_34000:
 .db $44 $C4 $98 $AE $AA $A6 $16 $11 $35 $0F $6F $6F $2D $6D $DC $4D
 .db $8F $DB $04 $DD $A6 $02 $04 $01
 
-; 3rd entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 3rd entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 34288 to 34577 (752 bytes)
 _DATA_34288:
 .db $08 $28 $36 $31 $15 $00 $00 $44 $C4 $98 $AE $AA $A6 $2A $6A $32
@@ -21008,7 +21018,7 @@ _DATA_34288:
 .db $00 $C0 $20 $10 $00 $06 $05 $04 $0E $0A $0D $01 $06 $80 $02 $00
 .db $02 $0D $89 $09 $1A $14 $16 $12 $15 $00 $80 $00 $03 $80 $DA $00
 
-; 5th entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 5th entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 34578 to 346C7 (336 bytes)
 _DATA_34578:
 .db $40 $00 $72 $10 $0A $16 $61 $91 $02 $A0 $40 $40 $48 $92 $94 $38
@@ -21033,7 +21043,7 @@ _DATA_34578:
 .db $E0 $00 $00 $07 $0F $1F $3F $3F $7F $00 $00 $C0 $E0 $F0 $F8 $F8
 .db $FC $06 $FF $82 $7F $3F $02 $FE $04 $FF $82 $FE $F8 $03 $00 $85
 
-; 7th entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 7th entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 346C8 to 34987 (704 bytes)
 _DATA_346C8:
 .db $02 $25 $D8 $00 $01 $04 $00 $A4 $89 $76 $04 $18 $1E $60 $08 $86
@@ -21081,7 +21091,7 @@ _DATA_346C8:
 .db $01 $05 $C0 $03 $E0 $52 $00 $83 $30 $78 $7C $03 $FC $8E $00 $04
 .db $0E $0F $0F $07 $00 $00 $78 $31 $01 $03 $83 $C1 $03 $00 $87 $70
 
-; 9th entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 9th entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 34988 to 34C27 (672 bytes)
 _DATA_34988:
 .db $60 $00 $18 $3C $7D $F3 $07 $00 $8D $C0 $E3 $C0 $8E $9F $1F $1F
@@ -21127,7 +21137,7 @@ _DATA_34988:
 .db $F9 $9E $8E $27 $29 $5A $04 $06 $02 $9F $A7 $43 $5B $E7 $57 $D7
 .db $67 $70 $EA $EC $D3 $E0 $F8 $C4 $C2 $67 $27 $B7 $F3 $FF $7F $1F
 
-; 11th entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 11th entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 34C28 to 34CDC (181 bytes)
 _DATA_34C28:
 .db $1F $A4 $33 $4E $8D $20 $5E $99 $A0 $3F $4F $8F $AF $17 $1F $07
@@ -21143,7 +21153,7 @@ _DATA_34C28:
 .db $FE $FE $FF $AA $55 $AA $55 $AA $55 $AA $55 $9F $BF $06 $FF $82
 .db $FA $FE $06 $FF $00
 
-; 4th entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 4th entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 34CDD to 34D4B (111 bytes)
 _DATA_34CDD:
 .db $00 $3F $00 $19 $14 $0A $16 $2B $0C $09 $04 $00 $1B $06 $01 $30
@@ -21154,7 +21164,7 @@ _DATA_34CDD:
 .db $80 $07 $00 $02 $2F $02 $4F $89 $0F $00 $80 $00 $F8 $FC $FE $FC
 .db $F8 $03 $00 $88 $20 $00 $00 $80 $40 $40 $00 $40 $02 $00 $02
 
-; 14th entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 14th entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 34D4C to 34D7F (52 bytes)
 _DATA_34D4C:
 .db $40 $05 $00 $E9 $80 $40 $80 $40 $40 $00 $01 $04 $01 $04 $01 $05
@@ -21162,7 +21172,7 @@ _DATA_34D4C:
 .db $18 $24 $89 $8A $90 $80 $24 $11 $08 $16 $20 $49 $A6 $00 $20 $02
 .db $25 $40 $11 $91
 
-; 13th entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 13th entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 34D80 to 34F7F (512 bytes)
 _DATA_34D80:
 .db $4A $80 $00 $09 $05 $40 $02 $00 $04 $00 $11 $40 $20 $09 $01 $03
@@ -21198,7 +21208,7 @@ _DATA_34D80:
 .db $0E $08 $04 $00 $01 $06 $11 $50 $30 $50 $00 $48 $00 $48 $08 $00
 .db $02 $01 $04 $01 $03 $00 $8B $10 $0C $40 $30 $01 $09 $06 $02 $00
 
-; 15th entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 15th entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 34F80 to 3511F (416 bytes)
 _DATA_34F80:
 .db $00 $18 $06 $00 $87 $11 $88 $20 $0B $02 $00 $18 $08 $00 $A9 $10
@@ -21228,7 +21238,7 @@ _DATA_34F80:
 .db $23 $4C $20 $32 $A4 $44 $C9 $1A $D0 $45 $19 $22 $6B $40 $98 $25
 .db $43 $09 $0C $72 $92 $9F $76 $48 $DC $16 $A4 $34 $46 $CC $0B $10
 
-; 17th entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 17th entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 35120 to 351AF (144 bytes)
 _DATA_35120:
 .db $23 $0D $38 $4D $35 $9C $4C $35 $1E $F6 $33 $14 $23 $4C $00 $01
@@ -21241,17 +21251,17 @@ _DATA_35120:
 .db $2C $14 $00 $EF $94 $08 $20 $57 $F9 $0E $16 $FD $B9 $0D $4F $0E
 .db $DC $BC $13 $61 $80 $68 $75 $0F $13 $00 $87 $11 $44 $11 $AA $55
 
-; 19th entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 19th entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 351B0 to 35831 (1666 bytes)
 _DATA_351B0:
 .incbin "banks\lots_DATA_351B0.inc"
 
-; 16th entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 16th entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 35832 to 35C41 (1040 bytes)
 _DATA_35832:
 .incbin "banks\lots_DATA_35832.inc"
 
-; 6th entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 6th entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 35C42 to 35DC9 (392 bytes)
 _DATA_35C42:
 .db $10 $3F $00 $34 $1F $10 $15 $2A $3C $38 $06 $01 $0B $3C $38 $34
@@ -21280,17 +21290,17 @@ _DATA_35C42:
 .db $20 $F6 $50 $10 $30 $50 $50 $B0 $A0 $05 $1E $33 $98 $4E $48 $A1
 .db $67 $67 $58 $E2 $38 $03 $B8 $43
 
-; 18th entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 18th entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 35DCA to 3649C (1747 bytes)
 _DATA_35DCA:
 .incbin "banks\lots_DATA_35DCA.inc"
 
-; 8th entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 8th entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 3649D to 36C9A (2046 bytes)
 _DATA_3649D:
 .incbin "banks\lots_DATA_3649D.inc"
 
-; 10th entry of Pointer Table from 5520 (indexed by _RAM_C118)
+; 10th entry of Pointer Table from 5520 (indexed by _RAM_MAP_TYPE)
 ; Data from 36C9B to 37FFF (4965 bytes)
 ; TODO: There's unused free space at the end of this bin, remove it and adjust comments
 _DATA_36C9B:

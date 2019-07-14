@@ -95,6 +95,18 @@
 .define	Boss_Index_Dark_Suma $0B
 .define	Boss_Index_Ra_Goan $0C
 
+; Map Types
+.define	Map_Type_Swamp $01
+.define	Map_Type_Forest $02
+.define	Map_Type_Coast $03
+.define	Map_Type_Cave $04
+.define	Map_Type_Mountains $05
+.define	Map_Type_Dark_Forest $06
+.define	Map_Type_Town $07
+.define	Map_Type_Castle $08
+.define	Map_Type_Dungeon_Suma $09
+.define	Map_Type_Dungeon_Ra_Goan $0A
+
 .struct object
 	type db
 	unknown_0x01 db
@@ -123,7 +135,7 @@
 	unknown_0x18 db
 	unknown_0x19 db
 	unknown_0x1A db
-	unknown_0x1B db
+	unknown_0x1B db ; Upper 4 bits are score table index, not sure what lower 4 do
 	unknown_0x1C db
 	unknown_0x1D db
 	unknown_0x1E db
@@ -139,7 +151,7 @@
 	unknown_0x28 db
 	unknown_0x29 db
 	unknown_0x2A db
-	unknown_0x2B db
+	unknown_0x2B db ; 43 - Damage to be applied after knockback
 	unknown_0x2C db
 	unknown_0x2D db
 	unknown_0x2E db
