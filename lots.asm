@@ -245,15 +245,8 @@ _LABEL_1BC:
 	ei
 	ret
 
-; Data from 1E6 to 1F3 (14 bytes)
-.db $AF $32 $BE $C0 $3E $F5 $D3 $3F $DB $DD $E6 $C0 $FE $C0
-
-; Data from 1F4 to 1F5 (2 bytes)
-_DATA_1F4:
-.db $C0 $3E
-
-; Data from 1F6 to 208 (19 bytes)
-_DATA_1F6:
+; Data from 1E6 to 208 (35 bytes)
+.db $AF $32 $BE $C0 $3E $F5 $D3 $3F $DB $DD $E6 $C0 $FE $C0 $C0 $3E
 .db $55 $D3 $3F $DB $DD $E6 $C0 $B7 $C0 $3E $FF $D3 $DE $3E $01 $32
 .db $BE $C0 $C9
 
@@ -482,53 +475,9 @@ LoadVDPData:
 	jp nz, -
 	ret
 
-; Data from 357 to 357 (1 bytes)
-.db $7B
-
-; 5th entry of Pointer Table from 3C13A (indexed by unknown)
-; Data from 358 to 358 (1 bytes)
-_DATA_358:
-.db $D3
-
-; 4th entry of Pointer Table from 3C13A (indexed by unknown)
-; Data from 359 to 359 (1 bytes)
-_DATA_359:
-.db $BF
-
-; 1st entry of Pointer Table from 3C146 (indexed by unknown)
-; Data from 35A to 35A (1 bytes)
-_DATA_35A:
-.db $7A
-
-; 6th entry of Pointer Table from 3C13A (indexed by unknown)
-; Data from 35B to 35B (1 bytes)
-_DATA_35B:
-.db $D3
-
-; 3rd entry of Pointer Table from 3C13A (indexed by unknown)
-; Data from 35C to 35C (1 bytes)
-_DATA_35C:
-.db $BF
-
-; 1st entry of Pointer Table from 3C152 (indexed by unknown)
-; Data from 35D to 35E (2 bytes)
-_DATA_35D:
-.db $5E $23
-
-; 3rd entry of Pointer Table from 3C152 (indexed by unknown)
-; Data from 35F to 35F (1 bytes)
-_DATA_35F:
-.db $7E
-
-; 2nd entry of Pointer Table from 3C152 (indexed by unknown)
-; Data from 360 to 36C (13 bytes)
-_DATA_360:
-.db $D3 $BE $7B $F5 $F1 $D3 $BE $0B $79 $B0 $C2 $5E $03
-
-; 1st entry of Pointer Table from 3C1BE (indexed by unknown)
-; Data from 36D to 36D (1 bytes)
-_DATA_36D:
-.db $C9
+; Data from 357 to 36D (23 bytes)
+.db $7B $D3 $BF $7A $D3 $BF $5E $23 $7E $D3 $BE $7B $F5 $F1 $D3 $BE
+.db $0B $79 $B0 $C2 $5E $03 $C9
 
 _LABEL_36E:
 	push bc
@@ -8288,7 +8237,7 @@ _LABEL_407B:
 	ret nz
 	ld a, (iy+object.boss_defeated)
 	or a
-	jp nz, _LABEL_6A47
+	jp nz, _LABEL_6A47 ; Handle boss defeated flags
 	ld a, (iy+29)
 	ld (iy+1), a
 	ld a, (iy+30)
@@ -8790,7 +8739,7 @@ _LABEL_44E0:
 	dec (iy+53)
 	jr nz, +
 	cp $03
-	jp z, _LABEL_6A47
+	jp z, _LABEL_6A47 ; Handle boss defeated flags
 	ld (iy+31), $00
 	ret
 
@@ -13435,7 +13384,7 @@ _LABEL_69D4:
 ; Data from 6A38 to 6A46 (15 bytes)
 .db $01 $02 $03 $07 $0F $11 $12 $13 $17 $1F $21 $22 $23 $27 $2F
 
-_LABEL_6A47:
+_LABEL_6A47: ; Handle boss defeated flags
 	call +
 	jp _LABEL_8AC
 
@@ -13912,9 +13861,6 @@ _DATA_DEMO_INPUTS:
 .repeat 35
 .db ButtonRight_Mask ~ $FF
 .endr
-
-; TODO: Remove this, just for testing weird demo inputs
-;.ORG $6E95
 
 _LABEL_6E95:
 	ld a, (_RAM_C180)
@@ -17436,7 +17382,7 @@ _DATA_DFF4:
 .db $06 $80 $10 $01
 
 ; Pointer Table from DFF8 to DFFB (2 entries, indexed by unknown)
-.dw _DATA_D890 _DATA_1F6
+.dw _DATA_D890 $01F6
 
 ; Data from DFFC to E02A (47 bytes)
 .db $C0 $03 $80 $11 $01 $10 $99 $02 $00 $10 $03 $80 $12 $01 $BD $99
@@ -17581,7 +17527,7 @@ _DATA_E599:
 .db $01 $A8 $E0 $01
 
 ; Pointer Table from E59D to E5A0 (2 entries, indexed by unknown)
-.dw _DATA_E5B1 _DATA_1F6
+.dw _DATA_E5B1 $01F6
 
 ; Data from E5A1 to E5B0 (16 bytes)
 .db $00 $00 $FF $F7 $60 $02 $06 $83 $D3 $F1 $7A $00 $70 $2E $05 $F2
@@ -17927,7 +17873,7 @@ _DATA_E867:
 .db $02 $80 $A0 $01
 
 ; Pointer Table from E86B to E86E (2 entries, indexed by unknown)
-.dw _DATA_E88A _DATA_1F4
+.dw _DATA_E88A $01F4
 
 ; Data from E86F to E889 (27 bytes)
 .db $00 $00 $80 $C0 $01 $92 $A8 $F4 $01 $00 $00 $B6 $03 $B5 $B3 $B6
@@ -21809,16 +21755,16 @@ Bank15:
 .db $5D $01 $5E $01 $5F $01 $60 $01 $21 $01
 
 ; Pointer Table from 3C13A to 3C145 (6 entries, indexed by unknown)
-.dw $0121 $0121 _DATA_35C _DATA_359 _DATA_358 _DATA_35B
+.dw $0121 $0121 $035C $0359 $0358 $035B
 
 ; Pointer Table from 3C146 to 3C147 (1 entries, indexed by unknown)
-.dw _DATA_35A
+.dw $035A
 
 ; Data from 3C148 to 3C151 (10 bytes)
 .db $56 $03 $21 $01 $57 $03 $21 $01 $5E $03
 
 ; Pointer Table from 3C152 to 3C157 (3 entries, indexed by unknown)
-.dw _DATA_35D _DATA_360 _DATA_35F
+.dw $035D $0360 $035F
 
 ; Data from 3C158 to 3C175 (30 bytes)
 .db $61 $01 $62 $01 $63 $01 $64 $01 $21 $01 $65 $01 $21 $01 $21 $01
@@ -21835,7 +21781,7 @@ Bank15:
 .db $6C $03 $6B $03 $6E $03
 
 ; Pointer Table from 3C1BE to 3C1BF (1 entries, indexed by unknown)
-.dw _DATA_36D
+.dw $036D
 
 ; Data from 3C1C0 to 3C1F9 (58 bytes)
 .db $87 $11 $88 $11 $89 $11 $8A $11 $21 $11 $21 $11 $8B $11 $8C $11
