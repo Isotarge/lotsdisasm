@@ -70,7 +70,7 @@ StartGame:
 	ld (_RAM_FFFE), a
 	ld a, :Bank2
 	ld (_RAM_FFFF), a
-	ld hl, _RAM_C000
+	ld hl, _RAM_C000 ; Clear entire RAM
 	ld de, _RAM_C000 + 1
 	ld bc, $2000
 	ld (hl), $00
@@ -83,7 +83,7 @@ StartGame:
 	ld (_RAM_BOW_DAMAGE), a
 	ld a, $5E ; Harfoot (L)
 	ld (_RAM_CONTINUE_MAP), a
-_LABEL_C2:
+SoftResetGame:
 	ld bc, $8001
 	call SendVDPCommand
 	call _LABEL_38E
@@ -101,9 +101,9 @@ _LABEL_C2:
 	call _LABEL_3B7
 	ld bc, $E001
 	call SendVDPCommand
-	ld a, $03
+	ld a, Map_Status_Title_Screen
 	ld (_RAM_MAP_STATUS), a
-_LABEL_F7:
+WaitForVerticalInterrupt: ; Called when the game loop has finished for a frame
 	ld a, $01
 	ld (_RAM_GAME_LOOP_IS_RUNNING), a
 -:
@@ -136,7 +136,7 @@ _DATA_114:
 
 ; 1st entry of Jump Table from 114 (indexed by _RAM_MAP_STATUS)
 Handle_Map_Status_Reset:
-	jp _LABEL_C2
+	jp SoftResetGame
 
 HandleIRQ:
 	di
@@ -192,7 +192,7 @@ HandleIRQ:
 	jp _LABEL_1A6
 
 +:
-	call _LABEL_2AA
+	call ReadControllerInput
 	call UpdateScoreCounter
 	call DrawHealthBar
 	call _LABEL_14F8
@@ -308,7 +308,7 @@ Handle_Map_Status_Map:
 	call _LABEL_540B
 	call ProcessWarpsAndDoors
 	call _LABEL_467
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 +:
 	ld hl, _DATA_26E - 2
@@ -326,12 +326,12 @@ _DATA_26E:
 ; 1st entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
 Handle_Building_Status_Load_Map:
 	call _LABEL_52BC
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 ; 2nd entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
 Handle_Building_Status_Building:
 	call _LABEL_1F39
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 ; 3rd entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
 Handle_Building_Status_Boss_Fight:
@@ -339,25 +339,25 @@ Handle_Building_Status_Boss_Fight:
 	call UpdateLandauGraphics
 	call _LABEL_59CF
 	call _LABEL_467
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 ; 4th entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
 Handle_Building_Status_Map_Screen:
 	call _LABEL_58B7
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 ; 5th entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
 Handle_Building_Status_Ending:
 	call _LABEL_6E95
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 ; 6th entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
 Handle_Building_Status_Death:
-	call _LABEL_2E5
+	call _LABEL_2E5 ; Check for reset input (buttons 1 or 2)
 	call _LABEL_467
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
-_LABEL_2AA:
+ReadControllerInput:
 	ld a, (_RAM_MAP_STATUS)
 	cp Map_Status_Demo
 	jr z, +
@@ -389,7 +389,7 @@ _LABEL_2AA:
 	ld hl, $0000
 	ld (_RAM_C17C), hl
 +:
-	ld de, _DATA_6C95
+	ld de, _DATA_DEMO_INPUTS
 	add hl, de
 	ld a, (hl)
 	ld hl, _RAM_CONTROLLER_INPUT
@@ -422,16 +422,8 @@ SendVDPCommand:
 	out (Port_VDPAddress), a
 	ret
 
-; Data from 30B to 30D (3 bytes)
-.db $7B $D3 $BF
-
-; Data from 30E to 313 (6 bytes)
-_DATA_30E:
-.db $7A $D3 $BF $F5 $F1 $DB
-
-; Data from 314 to 315 (2 bytes)
-_DATA_314:
-.db $BE $C9
+; Data from 30B to 315 (11 bytes)
+.db $7B $D3 $BF $7A $D3 $BF $F5 $F1 $DB $BE $C9
 
 _LABEL_316:
 	push af
@@ -785,7 +777,7 @@ Handle_Map_Status_Title_Screen:
 	ld (_RAM_SOUND_TO_PLAY), a
 	ld bc, $E001
 	call SendVDPCommand
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 _LABEL_56F:
 	ld a, (_RAM_NEW_CONTROLLER_INPUT)
@@ -803,12 +795,12 @@ _LABEL_56F:
 	ld a, h
 	or l
 	jr z, +
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 +:
 	ld a, Map_Status_Demo
 	ld (_RAM_MAP_STATUS), a
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 ++:
 	ld a, Map_Status_Story
@@ -820,18 +812,18 @@ _LABEL_56F:
 	inc (hl)
 	ld a, (hl)
 	cp $0B
-	jp c, _LABEL_F7
+	jp c, WaitForVerticalInterrupt
 	call ++
 	xor a
 	ld a, $01
 	ld (_RAM_CONTINUES_USED), a
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 +:
 	call ++
 	ld a, $01
 	ld (_RAM_CONTINUES_USED), a
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 ++:
 	ld bc, $C001
@@ -920,7 +912,7 @@ Handle_Map_Status_Sega_Logo:
 	ld (_RAM_C177), a
 	ld bc, $E001
 	call SendVDPCommand
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 +:
 	ld a, (_RAM_NEW_CONTROLLER_INPUT)
@@ -928,11 +920,11 @@ Handle_Map_Status_Sega_Logo:
 	jr nz, +
 	ld hl, _RAM_C177
 	dec (hl)
-	jp nz, _LABEL_F7
+	jp nz, WaitForVerticalInterrupt
 +:
 	ld a, Map_Status_Title_Screen
 	ld (_RAM_MAP_STATUS), a
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 ; Data from 68C to 6AB (32 bytes)
 _DATA_68C:
@@ -1340,7 +1332,7 @@ Handle_Map_Status_Start_Game:
 	call +
 	ld bc, $E201
 	call SendVDPCommand
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 +:
 	ld c, $5E ; Harfoot (L)
@@ -3095,7 +3087,7 @@ _LABEL_1720:
 	ld a, (_RAM_C500)
 	cp $2B ; Tree Spirit
 	jp c, +
-	cp $43 ; ; First index past the end of the object list, probably a safety check
+	cp $43 ; First index past the end of the object list, probably a safety check
 	jp nc, +
 	ld ix, _RAM_C500
 	call _LABEL_1C59
@@ -4222,7 +4214,10 @@ _LABEL_1E72:
 _DATA_1E95:
 .db $3C $00 $3C $00 $00
 
-_LABEL_1E9A: ; Something to do with drawing building backgrounds, also title screen
+; Something to do with drawing building backgrounds
+; also title screen?
+; also inventory?
+_LABEL_1E9A:
 	ld iy, _RAM_C0BC
 	ld (iy+0), a
 	ld (iy+1), a
@@ -4686,11 +4681,11 @@ _LABEL_21DA:
 	ret
 
 +:
-	ld c, $07
+	ld c, Building_Lindon
 	ld a, (_RAM_FLAG_MAYORS_DAUGHTER_RETURNED)
 	or a
 	jr z, +
-	ld c, $09
+	ld c, Building_Mayors_Daughter
 +:
 	ld a, c
 	jr -
@@ -10340,7 +10335,7 @@ LoadMapEnemies:
 	ld (iy+63), $03
 	call _LABEL_524C
 	call _LABEL_5223
-	ld de, $0040
+	ld de, _sizeof_object
 	add iy, de
 	djnz -
 	inc hl
@@ -10415,7 +10410,7 @@ _LABEL_516A:
 	ld de, $C018
 	call LoadVDPData
 	ld a, (_RAM_C500)
-	cp $2B
+	cp $2B ; Tree Spirit
 	ret nc
 	ld de, $4400
 	ld hl, _DATA_21178
@@ -10591,7 +10586,7 @@ _LABEL_52BC:
 	call _LABEL_5483
 	call _LABEL_586E
 	call _LABEL_544F
-	call _LABEL_550F
+	call _LABEL_550F ; Load some tiles, sword tip
 	xor a
 	ld (_RAM_C0A7), a
 	ld bc, $7600
@@ -10609,7 +10604,7 @@ _LABEL_535B:
 	ld a, c
 	ld (_RAM_FFFF), a
 	ld a, (_RAM_CURRENT_MAP)
-	ld de, _DATA_5546
+	ld de, MapMetadataPointers
 	ld l, a
 	ld h, $00
 	add hl, hl
@@ -10823,7 +10818,7 @@ _LABEL_54D5:
 	and $F8
 	ld (_RAM_C132), a
 	ld b, $10
-	ld de, $0040
+	ld de, _sizeof_object
 	ld iy, _RAM_C500
 -:
 	ld a, (_RAM_C131)
@@ -10854,24 +10849,142 @@ _DATA_5520:
 .dw _DATA_35120 _DATA_35DCA _DATA_351B0
 
 ; Pointer Table from 5546 to 5653 (135 entries, indexed by _RAM_CURRENT_MAP)
-_DATA_5546:
-.dw _DATA_2E1B2 _DATA_2C000 _DATA_2C00C _DATA_2C018 _DATA_2C024 _DATA_2C030 _DATA_2C03C _DATA_2C048
-.dw _DATA_2C054 _DATA_2C060 _DATA_2C06C _DATA_2C078 _DATA_2C084 _DATA_2C090 _DATA_2C09C _DATA_2C0A8
-.dw _DATA_2C0B4 _DATA_2C0C0 _DATA_2C0CC _DATA_2C0D8 _DATA_2C0E4 _DATA_2C0F0 _DATA_2C0FC _DATA_2C108
-.dw _DATA_2C114 _DATA_2C120 _DATA_2C12C _DATA_2C138 _DATA_2C144 _DATA_2C150 _DATA_2C15C _DATA_2C168
-.dw _DATA_2C174 _DATA_2C180 _DATA_2C18C _DATA_2C198 _DATA_2C1A4 _DATA_2C1B0 _DATA_2C1BC _DATA_2C1C8
-.dw _DATA_2C1D4 _DATA_2C1E0 _DATA_2C1EC _DATA_2C1F8 _DATA_2C204 _DATA_2C210 _DATA_2C21C _DATA_2C228
-.dw _DATA_2C234 _DATA_2C240 _DATA_2C24C _DATA_2C258 _DATA_2C264 _DATA_2C270 _DATA_2C27C _DATA_2C288
-.dw _DATA_2C294 _DATA_2C2A0 _DATA_2C2AC _DATA_2C2B8 _DATA_2C2C4 _DATA_2C2D0 _DATA_2C2DC _DATA_2C2E8
-.dw _DATA_2C2F4 _DATA_2C300 _DATA_2C30C _DATA_2C318 _DATA_2C000 _DATA_2C00C _DATA_2C030 _DATA_2C03C
-.dw _DATA_2C048 _DATA_2C054 _DATA_2C018 _DATA_2C024 _DATA_2C060 _DATA_2C06C _DATA_2C078 _DATA_2C084
-.dw _DATA_2C090 _DATA_2C09C _DATA_2C0A8 _DATA_2C0B4 _DATA_2C0C0 _DATA_2C0CC _DATA_2C0D8 _DATA_2C0E4
-.dw _DATA_2C0F0 _DATA_2C0FC _DATA_2C108 _DATA_2C114 _DATA_2C120 _DATA_2C12C _DATA_2C138 _DATA_2C144
-.dw _DATA_2C150 _DATA_2C15C _DATA_2C168 _DATA_2C174 _DATA_2C180 _DATA_2C18C _DATA_2C198 _DATA_2C1A4
-.dw _DATA_2C1B0 _DATA_2C1BC _DATA_2C1C8 _DATA_2C1D4 _DATA_2C1E0 _DATA_2C1EC _DATA_2C1F8 _DATA_2C204
-.dw _DATA_2C210 _DATA_2C21C _DATA_2C228 _DATA_2C234 _DATA_2C240 _DATA_2C24C _DATA_2C258 _DATA_2C264
-.dw _DATA_2C270 _DATA_2C27C _DATA_2C288 _DATA_2C294 _DATA_2C2A0 _DATA_2C2AC _DATA_2C2C4 _DATA_2C2B8
-.dw _DATA_2C2D0 _DATA_2C2DC _DATA_2C2E8 _DATA_2C2F4 _DATA_2C300 _DATA_2C30C _DATA_2C318
+MapMetadataPointers:
+.dw _DATA_2E1B2
+.dw _DATA_2C000
+.dw _DATA_2C00C
+.dw _DATA_2C018
+.dw _DATA_2C024
+.dw _DATA_2C030
+.dw _DATA_2C03C
+.dw _DATA_2C048
+.dw _DATA_2C054
+.dw _DATA_2C060
+.dw _DATA_2C06C
+.dw _DATA_2C078
+.dw _DATA_2C084
+.dw _DATA_2C090
+.dw _DATA_2C09C
+.dw _DATA_2C0A8
+.dw _DATA_2C0B4
+.dw _DATA_2C0C0
+.dw _DATA_2C0CC
+.dw _DATA_2C0D8
+.dw _DATA_2C0E4
+.dw _DATA_2C0F0
+.dw _DATA_2C0FC
+.dw _DATA_2C108
+.dw _DATA_2C114
+.dw _DATA_2C120
+.dw _DATA_2C12C
+.dw _DATA_2C138
+.dw _DATA_2C144
+.dw _DATA_2C150
+.dw _DATA_2C15C
+.dw _DATA_2C168
+.dw _DATA_2C174
+.dw _DATA_2C180
+.dw _DATA_2C18C
+.dw _DATA_2C198
+.dw _DATA_2C1A4
+.dw _DATA_2C1B0
+.dw _DATA_2C1BC
+.dw _DATA_2C1C8
+.dw _DATA_2C1D4
+.dw _DATA_2C1E0
+.dw _DATA_2C1EC
+.dw _DATA_2C1F8
+.dw _DATA_2C204
+.dw _DATA_2C210
+.dw _DATA_2C21C
+.dw _DATA_2C228
+.dw _DATA_2C234
+.dw _DATA_2C240
+.dw _DATA_2C24C
+.dw _DATA_2C258
+.dw _DATA_2C264
+.dw _DATA_2C270
+.dw _DATA_2C27C
+.dw _DATA_2C288
+.dw _DATA_2C294
+.dw _DATA_2C2A0
+.dw _DATA_2C2AC
+.dw _DATA_2C2B8
+.dw _DATA_2C2C4
+.dw _DATA_2C2D0
+.dw _DATA_2C2DC
+.dw _DATA_2C2E8
+.dw _DATA_2C2F4
+.dw _DATA_2C300
+.dw _DATA_2C30C
+.dw _DATA_2C318
+.dw _DATA_2C000
+.dw _DATA_2C00C
+.dw _DATA_2C030
+.dw _DATA_2C03C
+.dw _DATA_2C048
+.dw _DATA_2C054
+.dw _DATA_2C018
+.dw _DATA_2C024
+.dw _DATA_2C060
+.dw _DATA_2C06C
+.dw _DATA_2C078
+.dw _DATA_2C084
+.dw _DATA_2C090
+.dw _DATA_2C09C
+.dw _DATA_2C0A8
+.dw _DATA_2C0B4
+.dw _DATA_2C0C0
+.dw _DATA_2C0CC
+.dw _DATA_2C0D8
+.dw _DATA_2C0E4
+.dw _DATA_2C0F0
+.dw _DATA_2C0FC
+.dw _DATA_2C108
+.dw _DATA_2C114
+.dw _DATA_2C120
+.dw _DATA_2C12C
+.dw _DATA_2C138
+.dw _DATA_2C144
+.dw _DATA_2C150
+.dw _DATA_2C15C
+.dw _DATA_2C168
+.dw _DATA_2C174
+.dw _DATA_2C180
+.dw _DATA_2C18C
+.dw _DATA_2C198
+.dw _DATA_2C1A4
+.dw _DATA_2C1B0
+.dw _DATA_2C1BC
+.dw _DATA_2C1C8
+.dw _DATA_2C1D4
+.dw _DATA_2C1E0
+.dw _DATA_2C1EC
+.dw _DATA_2C1F8
+.dw _DATA_2C204
+.dw _DATA_2C210
+.dw _DATA_2C21C
+.dw _DATA_2C228
+.dw _DATA_2C234
+.dw _DATA_2C240
+.dw _DATA_2C24C
+.dw _DATA_2C258
+.dw _DATA_2C264
+.dw _DATA_2C270
+.dw _DATA_2C27C
+.dw _DATA_2C288
+.dw _DATA_2C294
+.dw _DATA_2C2A0
+.dw _DATA_2C2AC
+.dw _DATA_2C2C4
+.dw _DATA_2C2B8
+.dw _DATA_2C2D0
+.dw _DATA_2C2DC
+.dw _DATA_2C2E8
+.dw _DATA_2C2F4
+.dw _DATA_2C300
+.dw _DATA_2C30C
+.dw _DATA_2C318
 
 ProcessWarpsAndDoors:
 	ld a, (_RAM_MAP_TYPE)
@@ -11638,7 +11751,7 @@ _LABEL_5BE2:
 	ld hl, _DATA_2AF80
 	ld bc, $609E
 	ld a, :Bank10
-	ld e, $42
+	ld e, $42 ; Ra Goan
 	jp _LABEL_5BF6
 
 _LABEL_5BF6:
@@ -13268,7 +13381,7 @@ _LABEL_69B2:
 
 _LABEL_69D4:
 	ld a, (_RAM_C500)
-	cp $36
+	cp $36 ; Medusa
 	ret nz
 	ld a, (_RAM_C502)
 	or a
@@ -13444,7 +13557,7 @@ _LABEL_6B01:
 ; 7th entry of Jump Table from 114 (indexed by _RAM_MAP_STATUS)
 Handle_Map_Status_Story:
 	call +
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 +:
 	ld a, (_RAM_C171)
@@ -13568,7 +13681,7 @@ Handle_Map_Status_Demo:
 	ld (_RAM_CURRENT_MAP), a
 	ld bc, $E201
 	call SendVDPCommand
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 _LABEL_6C7B:
 	in a, (Port_IOPort1)
@@ -13584,42 +13697,224 @@ _LABEL_6C7B:
 +:
 	xor a
 	ld (_RAM_MAP_STATUS), a
-	jp _LABEL_F7
+	jp WaitForVerticalInterrupt
 
 ; Data from 6C95 to 6E94 (512 bytes)
-_DATA_6C95:
-.db $00 $00 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7
-.db $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7
-.db $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7
-.db $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $FF
-.db $FB $DB $DB $DB $DB $DB $DB $FB $FB $FF $FF $F7 $F7 $F7 $F7 $F7
-.db $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7
-.db $F7 $F7 $FF $FF $FB $FB $FB $DB $DB $DB $DB $DB $DB $DB $DB $DB
-.db $FB $DB $DB $DB $FB $FB $FB $FB $FB $FB $FB $FF $FF $F7 $F7 $F7
-.db $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $FF $FF $FF $FF $FF $FF $FF $FF
-.db $FF $DF $DF $DF $DF $FF $FF $FF $FF $FF $FF $FF $FF $F7 $F7 $F7
-.db $F7 $F7 $E7 $E7 $E7 $E7 $E7 $E7 $E7 $E7 $E7 $E7 $E7 $E7 $E7 $E7
-.db $E7 $E7 $E7 $E7 $EF $EF $EB $EB $EB $EB $EB $EB $EB $EB $EB $EB
-.db $EB $FB $FB $FB $FB $FB $FB $FB $FF $FF $FF $F7 $F7 $F7 $F7 $F7
-.db $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7
-.db $FF $FF $FF $FF $FF $FF $FF $F7 $F7 $F7 $FF $FF $FF $FF $FF $FF
-.db $DF $DF $FF $FF $FF $DF $DF $DF $DF $DF $FF $FF $FF $FF $FF $FF
-.db $FF $FF $FE $FE $FE $F6 $F6 $F6 $F6 $F6 $F7 $F7 $F7 $F7 $F7 $F7
-.db $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $FF $FF $FF $FF
-.db $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $FF $DF $DF $DF
-.db $DF $DF $DF $DF $DF $FF $FF $FF $FF $FF $FF $F7 $F7 $F7 $F7 $F7
-.db $F7 $F7 $FF $FF $FF $FF $FF $F7 $F6 $F6 $F6 $F6 $F6 $F6 $F7 $F7
-.db $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F6 $F6 $F6
-.db $F6 $F6 $F6 $F6 $F6 $F6 $F6 $F6 $F6 $F6 $F6 $F6 $F6 $F6 $F6 $F6
-.db $F6 $F6 $F6 $F6 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7
-.db $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7
-.db $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $FB $DB $DB $DB
-.db $DB $DB $DB $DB $DB $DB $DB $DB $DB $FB $FB $FB $FB $FB $FB $FB
-.db $FB $FB $FB $FB $FB $FB $EB $EB $EB $EB $EB $EB $EB $EB $EB $EB
-.db $EB $EB $EB $EB $EB $EB $EB $EB $EB $EB $FB $FB $FB $FB $FB $FB
-.db $FB $FB $FB $FB $FB $FB $FB $FB $FB $FB $FB $FF $FF $F7 $F7 $F7
-.db $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7
-.db $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7 $F7
+_DATA_DEMO_INPUTS:
+.repeat 2
+.db $00
+.endr
+
+.repeat 61
+.db ButtonRight_Mask ~ $FF
+.endr
+
+.repeat 1
+.db ~ $FF
+.endr
+
+.repeat 1
+.db ButtonLeft_Mask ~ $FF
+.endr
+
+.repeat 6
+.db ButtonLeft_Mask|Button_2_Mask ~ $FF
+.endr
+
+.repeat 2
+.db ButtonLeft_Mask ~ $FF
+.endr
+
+.repeat 2
+.db ~ $FF
+.endr
+
+.repeat 23
+.db ButtonRight_Mask ~ $FF
+.endr
+
+.repeat 2
+.db ~ $FF
+.endr
+
+.repeat 3
+.db ButtonLeft_Mask ~ $FF
+.endr
+
+.repeat 9
+.db ButtonLeft_Mask|Button_2_Mask ~ $FF
+.endr
+
+.repeat 1
+.db ButtonLeft_Mask ~ $FF
+.endr
+
+.repeat 3
+.db ButtonLeft_Mask|Button_2_Mask ~ $FF
+.endr
+
+.repeat 7
+.db ButtonLeft_Mask ~ $FF
+.endr
+
+.repeat 2
+.db ~ $FF
+.endr
+
+.repeat 11
+.db ButtonRight_Mask ~ $FF
+.endr
+
+.repeat 9
+.db ~ $FF
+.endr
+
+.repeat 4
+.db Button_2_Mask ~ $FF
+.endr
+
+.repeat 8
+.db ~ $FF
+.endr
+
+.repeat 5
+.db ButtonRight_Mask ~ $FF
+.endr
+
+.repeat 18
+.db ButtonRight_Mask|Button_1_Mask ~ $FF
+.endr
+
+.repeat 2
+.db Button_1_Mask ~ $FF
+.endr
+
+.repeat 11
+.db ButtonLeft_Mask|Button_1_Mask ~ $FF
+.endr
+
+.repeat 7
+.db ButtonLeft_Mask ~ $FF
+.endr
+
+.repeat 3
+.db ~ $FF
+.endr
+
+.repeat 21
+.db ButtonRight_Mask ~ $FF
+.endr
+
+.repeat 7
+.db ~ $FF
+.endr
+
+.repeat 3
+.db ButtonRight_Mask ~ $FF
+.endr
+
+.repeat 6
+.db ~ $FF
+.endr
+
+.repeat 2
+.db Button_2_Mask ~ $FF
+.endr
+
+.repeat 3
+.db ~ $FF
+.endr
+
+.repeat 5
+.db Button_2_Mask ~ $FF
+.endr
+
+.repeat 8
+.db ~ $FF
+.endr
+
+.repeat 3
+.db ButtonUp_Mask ~ $FF
+.endr
+
+.repeat 5
+.db ButtonUp_Mask|ButtonRight_Mask ~ $FF
+.endr
+
+.repeat 18
+.db ButtonRight_Mask ~ $FF
+.endr
+
+.repeat 17
+.db ~ $FF
+.endr
+
+.repeat 8
+.db Button_2_Mask ~ $FF
+.endr
+
+.repeat 6
+.db ~ $FF
+.endr
+
+.repeat 7
+.db ButtonRight_Mask ~ $FF
+.endr
+
+.repeat 5
+.db ~ $FF
+.endr
+
+.repeat 1
+.db ButtonRight_Mask ~ $FF
+.endr
+
+.repeat 6
+.db ButtonUp_Mask|ButtonRight_Mask ~ $FF
+.endr
+
+.repeat 15
+.db ButtonRight_Mask ~ $FF
+.endr
+
+.repeat 23
+.db ButtonUp_Mask|ButtonRight_Mask ~ $FF
+.endr
+
+.repeat 40
+.db ButtonRight_Mask ~ $FF
+.endr
+
+.repeat 1
+.db ButtonLeft_Mask ~ $FF
+.endr
+
+.repeat 12
+.db ButtonLeft_Mask|Button_2_Mask ~ $FF
+.endr
+
+.repeat 13
+.db ButtonLeft_Mask ~ $FF
+.endr
+
+.repeat 20
+.db ButtonLeft_Mask|Button_1_Mask ~ $FF
+.endr
+
+.repeat 17
+.db ButtonLeft_Mask ~ $FF
+.endr
+
+.repeat 2
+.db ~ $FF
+.endr
+
+.repeat 35
+.db ButtonRight_Mask ~ $FF
+.endr
+
+; TODO: Remove this, just for testing weird demo inputs
+;.ORG $6E95
 
 _LABEL_6E95:
 	ld a, (_RAM_C180)
@@ -17323,7 +17618,7 @@ _DATA_E5EE:
 .db $02 $80 $14 $01 $14 $A6
 
 ; Pointer Table from E5F4 to E5F7 (2 entries, indexed by unknown)
-.dw _DATA_314 $0053
+.dw $0314 $0053
 
 ; Data from E5F8 to E600 (9 bytes)
 .db $80 $15 $01 $14 $A6 $10 $03 $53 $00
@@ -17471,7 +17766,7 @@ _DATA_E72C:
 .db $01 $A8 $E0 $01
 
 ; Pointer Table from E730 to E733 (2 entries, indexed by unknown)
-.dw _DATA_E748 _DATA_30E
+.dw _DATA_E748 $030E
 
 ; Data from E734 to E747 (20 bytes)
 .db $01 $00 $FF $F6 $3A $02 $05 $A6 $42 $08 $3A $02 $38 $0B $02 $02
@@ -17556,7 +17851,7 @@ _DATA_E7C2:
 .db $01 $A8 $E0 $01
 
 ; Pointer Table from E7C6 to E7C9 (2 entries, indexed by unknown)
-.dw _DATA_E7E5 _DATA_30E
+.dw _DATA_E7E5 $030E
 
 ; Data from E7CA to E7E4 (27 bytes)
 .db $00 $00 $FF $30 $30 $00 $07 $35 $70 $3F $68 $00 $17 $63 $03 $03
@@ -17653,7 +17948,7 @@ _DATA_E8A4:
 .db $01 $A8 $E0 $01
 
 ; Pointer Table from E8A8 to E8AD (3 entries, indexed by unknown)
-.dw _DATA_E8BC _DATA_30E $0010
+.dw _DATA_E8BC $030E $0010
 
 ; Data from E8AE to E8BB (14 bytes)
 .db $FF $31 $31 $05 $06 $F2 $52 $0A $DF $01 $A0 $D0 $06 $F2
@@ -18063,9 +18358,12 @@ _DATA_10080:
 ; Data from 1008E to 137DF (14162 bytes)
 .incbin "banks\lots_DATA_1008E.inc"
 
-; Data from 137E0 to 13FFF (2080 bytes)
+; Data from 137E0 to 1380F (48 bytes)
 _DATA_137E0:
-.incbin "banks\lots_DATA_137E0.inc"
+.db $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
+.db $02 $02 $00 $00 $0E $0C $00 $00 $3C $30 $00 $00 $F8 $C0 $00 $00
+.db $E0 $00 $00 $00 $80 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
+.db $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00 $00
 
 .BANK 5
 .ORG $0000
@@ -18849,18 +19147,48 @@ _DATA_19F97:
 
 ; Pointer Table from 19FE6 to 19FFD (12 entries, indexed by _RAM_BUILDING_INDEX)
 _DATA_19FE6:
-.dw _DATA_19E81 _DATA_19ED1 _DATA_19E91 _DATA_19EA1 _DATA_19EB1 _DATA_19E81 _DATA_19EC1 _DATA_19F11
-.dw _DATA_19EE1 _DATA_19F21 _DATA_19EF1 _DATA_19F01
+.dw _DATA_19E81 ; Harfoot
+.dw _DATA_19ED1 ; Amon
+.dw _DATA_19E91 ; Dwarle
+.dw _DATA_19EA1 ; Ithile
+.dw _DATA_19EB1 ; Pharazon
+.dw _DATA_19E81 ; Shagart
+.dw _DATA_19EC1 ; Lindon
+.dw _DATA_19F11 ; Ulmo
+.dw _DATA_19EE1 ; Mayor's Daughter
+.dw _DATA_19F21 ; Unknown 0A
+.dw _DATA_19EF1 ; Elder
+.dw _DATA_19F01 ; Varlin
 
 ; Pointer Table from 19FFE to 1A015 (12 entries, indexed by _RAM_BUILDING_INDEX)
 _DATA_19FFE:
-.dw _DATA_186E2 _DATA_18B15 _DATA_186E2 _DATA_186E2 _DATA_186E2 _DATA_186E2 _DATA_186E2 _DATA_1959F
-.dw _DATA_18EE4 _DATA_19911 _DATA_1929C _DATA_1929C
+.dw _DATA_186E2 ; Harfoot
+.dw _DATA_18B15 ; Amon
+.dw _DATA_186E2 ; Dwarle
+.dw _DATA_186E2 ; Ithile
+.dw _DATA_186E2 ; Pharazon
+.dw _DATA_186E2 ; Shagart
+.dw _DATA_186E2 ; Lindon
+.dw _DATA_1959F ; Ulmo
+.dw _DATA_18EE4 ; Mayor's Daughter
+.dw _DATA_19911 ; Unknown 0A
+.dw _DATA_1929C ; Elder
+.dw _DATA_1929C ; Varlin
 
 ; Pointer Table from 1A016 to 1A02D (12 entries, indexed by _RAM_BUILDING_INDEX)
 _DATA_1A016:
-.dw _DATA_18227 _DATA_182DC _DATA_18227 _DATA_18227 _DATA_18227 _DATA_18227 _DATA_18227 _DATA_18566
-.dw _DATA_183A6 _DATA_18607 _DATA_18480 _DATA_18480
+.dw _DATA_18227 ; Harfoot
+.dw _DATA_182DC ; Amon
+.dw _DATA_18227 ; Dwarle
+.dw _DATA_18227 ; Ithile
+.dw _DATA_18227 ; Pharazon
+.dw _DATA_18227 ; Shagart
+.dw _DATA_18227 ; Lindon
+.dw _DATA_18566 ; Ulmo
+.dw _DATA_183A6 ; Mayor's Daughter
+.dw _DATA_18607 ; Unknown 0A
+.dw _DATA_18480 ; Elder
+.dw _DATA_18480 ; Varlin
 
 ; Data from 1A02E to 1ABC6 (2969 bytes)
 ; NPC Text

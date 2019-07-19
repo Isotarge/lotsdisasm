@@ -56,6 +56,7 @@
 .define	Building_Lindon $07
 .define	Building_Ulmo $08
 .define	Building_Mayors_Daughter $09 ; After Pirate
+.define	Building_Unknown_0A $0A ; Not sure what this is
 .define	Building_Elder $0B
 .define	Building_Varlin $0C
 
@@ -142,7 +143,7 @@
 	unknown_0x1F db
 	unknown_0x20 db
 	unknown_0x21 db
-	boss_teleport_timer db ; 34
+	boss_teleport_timer db ; 34 - Hm, also seems to be "in air" flag for the player
 	unknown_0x23 db
 	boss_flash_timer db ; 36
 	unknown_0x25 db
