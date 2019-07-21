@@ -995,10 +995,10 @@ _LABEL_775:
 	ld hl, $85E7
 	ld (_RAM_C484), hl
 	ld (iy+3), $01
-	ld (iy+22), $E0
-	ld (iy+23), $20
-	ld (iy+24), $F8
-	ld (iy+25), $10
+	ld (iy+object.hitbox_y_offset), $E0
+	ld (iy+object.hitbox_height), $20
+	ld (iy+object.hitbox_x_offset), $F8
+	ld (iy+object.hitbox_width), $10
 	ld (iy+1), $00
 	ret
 
@@ -2017,10 +2017,10 @@ HandleObject_Landau:
 	ld hl, _DATA_8000
 	ld (_RAM_C404), hl
 	ld (iy+3), $01
-	ld (iy+22), $E0
-	ld (iy+23), $20
-	ld (iy+24), $FC
-	ld (iy+25), $08
+	ld (iy+object.hitbox_y_offset), $E0
+	ld (iy+object.hitbox_height), $20
+	ld (iy+object.hitbox_x_offset), $FC
+	ld (iy+object.hitbox_width), $08
 	ld (iy+1), $00
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp $80
@@ -2342,11 +2342,11 @@ Handle_Movement_Sword_Right:
 	cp $02
 	ret nz
 	ld (iy+37), $01
-	ld (iy+22), $D0
+	ld (iy+object.hitbox_y_offset), $D0
 	ld a, (_RAM_MOVEMENT_STATE)
 	cp Movement_Bow_Left
 	ret c
-	ld (iy+22), $E8
+	ld (iy+object.hitbox_y_offset), $E8
 	ret
 
 ++:
@@ -2665,7 +2665,7 @@ _LABEL_1441:
 	ld (_RAM_C421), a
 	ex de, hl
 +:
-	ld (iy+22), $00
+	ld (iy+object.hitbox_y_offset), $00
 	ld (iy+37), $00
 	call _LABEL_146A
 	ld a, $92
@@ -3050,7 +3050,7 @@ _LABEL_173E:
 	cp $27 ; Damaged (Knight)
 	jr z, +
 	ld ix, _RAM_C440
-	call _LABEL_1C59
+	call _LABEL_1C59 ; Check hitbox collision
 	jr nc, +
 	ld a, $01
 	ld (_RAM_C460), a
@@ -3303,12 +3303,7 @@ _DATA_18F4:
 
 ; Data from 18FC to 18FF (4 bytes)
 _DATA_18FC:
-.db $10 $09 $10 $09
-
-; 7th entry of Pointer Table from 8000 (indexed by unknown)
-; Data from 1900 to 1907 (8 bytes)
-_DATA_1900:
-.db $10 $09 $10 $09 $10 $09 $11 $09
+.db $10 $09 $10 $09 $10 $09 $10 $09 $10 $09 $11 $09
 
 ; Data from 1908 to 1913 (12 bytes)
 _DATA_1908:
@@ -3824,24 +3819,24 @@ _LABEL_1C0E:
 	ret
 
 _LABEL_1C59:
-	ld a, (iy+7)
-	add a, (iy+22)
+	ld a, (iy+object.y_position_minor)
+	add a, (iy+object.hitbox_y_offset)
 	ld h, a
-	add a, (iy+23)
+	add a, (iy+object.hitbox_height)
 	ld l, a
-	ld a, (ix+7)
-	add a, (ix+22)
+	ld a, (ix+object.y_position_minor)
+	add a, (ix+object.hitbox_y_offset)
 	ld d, a
-	add a, (ix+23)
+	add a, (ix+object.hitbox_height)
 	ld e, a
 	call _LABEL_1DBE
 	ret nc
-	ld a, (iy+10)
-	add a, (iy+24)
+	ld a, (iy+object.x_position_minor)
+	add a, (iy+object.hitbox_x_offset)
 	ld h, a
-	add a, (iy+25)
+	add a, (iy+object.hitbox_width)
 	ld l, a
-	ld a, (ix+10)
+	ld a, (ix+object.x_position_minor)
 	add a, (ix+24)
 	ld d, a
 	add a, (ix+25)
@@ -3882,9 +3877,9 @@ _LABEL_1C8C:
 	ld c, $00
 ++:
 	ld a, (iy+object.y_position_minor)
-	add a, (iy+22)
+	add a, (iy+object.hitbox_y_offset)
 	ld h, a
-	add a, (iy+23)
+	add a, (iy+object.hitbox_height)
 	ld l, a
 	ld a, (_RAM_Y_POSITION_MINOR)
 	add a, (ix+22)
@@ -3894,9 +3889,9 @@ _LABEL_1C8C:
 	call _LABEL_1DBE
 	ret nc
 	ld a, (iy+object.x_position_minor)
-	add a, (iy+24)
+	add a, (iy+object.hitbox_x_offset)
 	ld h, a
-	add a, (iy+25)
+	add a, (iy+object.hitbox_width)
 	ld l, a
 	ld a, (_RAM_X_POSITION_MINOR)
 	add a, c
@@ -3920,9 +3915,9 @@ _LABEL_1D0B:
 	or a
 	ret nz
 	ld a, (iy+object.y_position_minor)
-	add a, (iy+22)
+	add a, (iy+object.hitbox_y_offset)
 	ld h, a
-	add a, (iy+23)
+	add a, (iy+object.hitbox_height)
 	ld l, a
 	ld a, (_RAM_Y_POSITION_MINOR)
 	add a, $E0
@@ -3932,9 +3927,9 @@ _LABEL_1D0B:
 	call _LABEL_1DBE
 	ret nc
 	ld a, (iy+object.x_position_minor)
-	add a, (iy+24)
+	add a, (iy+object.hitbox_x_offset)
 	ld h, a
-	add a, (iy+25)
+	add a, (iy+object.hitbox_width)
 	ld l, a
 	ld a, (_RAM_X_POSITION_MINOR)
 	add a, $F8
@@ -5169,10 +5164,10 @@ HandleObject_Slime:
 	ld a, (iy+3)
 	or a
 	jp nz, +
-	ld (iy+24), $FA
-	ld (iy+25), $0C
-	ld (iy+22), $F0
-	ld (iy+23), $0C
+	ld (iy+object.hitbox_x_offset), $FA
+	ld (iy+object.hitbox_width), $0C
+	ld (iy+object.hitbox_y_offset), $F0
+	ld (iy+object.hitbox_height), $0C
 	ld hl, _DATA_85F2
 	ld (iy+12), $03
 	ld (iy+13), $08
@@ -5257,10 +5252,10 @@ HandleObject_Giant_Bat:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
-	ld (iy+24), $F8
-	ld (iy+25), $10
-	ld (iy+22), $F0
-	ld (iy+23), $10
+	ld (iy+object.hitbox_x_offset), $F8
+	ld (iy+object.hitbox_width), $10
+	ld (iy+object.hitbox_y_offset), $F0
+	ld (iy+object.hitbox_height), $10
 	call _LABEL_24B4
 	ld hl, _DATA_8690
 	ld de, $FE80
@@ -5403,10 +5398,10 @@ _LABEL_2764:
 	jp _LABEL_249F
 
 _LABEL_2779:
-	ld (iy+24), $FC
-	ld (iy+25), $08
-	ld (iy+22), $F0
-	ld (iy+23), $10
+	ld (iy+object.hitbox_x_offset), $FC
+	ld (iy+object.hitbox_width), $08
+	ld (iy+object.hitbox_y_offset), $F0
+	ld (iy+object.hitbox_height), $10
 	ld a, (iy+object.y_position_minor)
 	ld b, $F0
 	add a, b
@@ -5431,10 +5426,10 @@ _LABEL_2779:
 	jp _LABEL_24A3
 
 _LABEL_27C3:
-	ld (iy+24), $FC
-	ld (iy+25), $08
-	ld (iy+22), $F4
-	ld (iy+23), $04
+	ld (iy+object.hitbox_x_offset), $FC
+	ld (iy+object.hitbox_width), $08
+	ld (iy+object.hitbox_y_offset), $F4
+	ld (iy+object.hitbox_height), $04
 	ld a, (iy+object.y_position_minor)
 	add a, $E7
 	ld (iy+object.y_position_minor), a
@@ -5451,10 +5446,10 @@ _LABEL_27C3:
 	jp _LABEL_249F
 
 _LABEL_27F8:
-	ld (iy+24), $FC
-	ld (iy+25), $08
-	ld (iy+22), $F0
-	ld (iy+23), $10
+	ld (iy+object.hitbox_x_offset), $FC
+	ld (iy+object.hitbox_width), $08
+	ld (iy+object.hitbox_y_offset), $F0
+	ld (iy+object.hitbox_height), $10
 	ld (iy+15), $10
 	ld b, $EC
 	ld hl, _DATA_94E7
@@ -5476,10 +5471,10 @@ _LABEL_27F8:
 
 _LABEL_2834:
 	call _LABEL_24AE
-	ld (iy+24), $FC
-	ld (iy+25), $08
-	ld (iy+22), $F0
-	ld (iy+23), $10
+	ld (iy+object.hitbox_x_offset), $FC
+	ld (iy+object.hitbox_width), $08
+	ld (iy+object.hitbox_y_offset), $F0
+	ld (iy+object.hitbox_height), $10
 	ld (iy+3), $01
 	ld a, (iy+46)
 	add a, a
@@ -5582,10 +5577,10 @@ HandleObject_Bird:
 	ld (iy+56), a
 	and $01
 	ld (iy+1), a
-	ld (iy+24), $F1
-	ld (iy+25), $1E
-	ld (iy+22), $E0
-	ld (iy+23), $1C
+	ld (iy+object.hitbox_x_offset), $F1
+	ld (iy+object.hitbox_width), $1E
+	ld (iy+object.hitbox_y_offset), $E0
+	ld (iy+object.hitbox_height), $1C
 	call _LABEL_24AE
 	ld hl, _DATA_93DA
 	ld a, (iy+55)
@@ -5725,10 +5720,10 @@ HandleObject_Killer_Fish:
 	ld a, (iy+3)
 	or a
 	jr nz, ++
-	ld (iy+24), $F4
-	ld (iy+25), $18
-	ld (iy+22), $F0
-	ld (iy+23), $10
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $18
+	ld (iy+object.hitbox_y_offset), $F0
+	ld (iy+object.hitbox_height), $10
 	ld hl, _DATA_86D2
 	ld de, $FF00
 	ld a, (iy+55)
@@ -5829,10 +5824,10 @@ HandleObject_Knight:
 	ld (iy+object.x_velocity_sub), e
 	ld (iy+object.x_velocity_minor), d
 	call _LABEL_24AE
-	ld (iy+22), $D0
-	ld (iy+23), $30
-	ld (iy+24), $F4
-	ld (iy+25), $18
+	ld (iy+object.hitbox_y_offset), $D0
+	ld (iy+object.hitbox_height), $30
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $18
 	jp _LABEL_249F
 
 ++:
@@ -5905,10 +5900,10 @@ _LABEL_2BF0:
 	ld (iy+14), $02
 	ld (iy+39), $10
 	ld (iy+2), $01
-	ld (iy+22), $D0
-	ld (iy+23), $30
-	ld (iy+24), $EC
-	ld (iy+25), $20
+	ld (iy+object.hitbox_y_offset), $D0
+	ld (iy+object.hitbox_height), $30
+	ld (iy+object.hitbox_x_offset), $EC
+	ld (iy+object.hitbox_width), $20
 	ret
 
 +:
@@ -5932,10 +5927,10 @@ _LABEL_2BF0:
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
-	ld (iy+22), $D0
-	ld (iy+23), $30
-	ld (iy+24), $F4
-	ld (iy+25), $18
+	ld (iy+object.hitbox_y_offset), $D0
+	ld (iy+object.hitbox_height), $30
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $18
 	ld (iy+1), $00
 	ld (iy+2), $00
 	ld (iy+38), $00
@@ -5990,10 +5985,10 @@ HandleObject_Scorpion:
 	call _LABEL_24B4
 	ld (iy+object.x_velocity_sub), $80
 	ld (iy+object.x_velocity_minor), $FF
-	ld (iy+24), $F0
-	ld (iy+25), $20
-	ld (iy+22), $F0
-	ld (iy+23), $10
+	ld (iy+object.hitbox_x_offset), $F0
+	ld (iy+object.hitbox_width), $20
+	ld (iy+object.hitbox_y_offset), $F0
+	ld (iy+object.hitbox_height), $10
 	ld de, $0100
 	ld hl, _DATA_88EF
 	ld a, (iy+55)
@@ -6086,10 +6081,10 @@ HandleObject_Snake:
 	or a
 	jr nz, ++
 	call _LABEL_24AE
-	ld (iy+24), $F4
-	ld (iy+25), $18
-	ld (iy+22), $FA
-	ld (iy+23), $06
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $18
+	ld (iy+object.hitbox_y_offset), $FA
+	ld (iy+object.hitbox_height), $06
 	ld hl, _DATA_8D5A
 	ld a, (iy+55)
 	or a
@@ -6195,10 +6190,10 @@ HandleObject_Demon:
 	or a
 	jp nz, ++
 	call _LABEL_24AE
-	ld (iy+24), $F4
-	ld (iy+25), $18
-	ld (iy+22), $D8
-	ld (iy+23), $28
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $18
+	ld (iy+object.hitbox_y_offset), $D8
+	ld (iy+object.hitbox_height), $28
 	ld hl, _DATA_8C05
 	ld a, (iy+55)
 	or a
@@ -6300,10 +6295,10 @@ HandleObject_Giant_Bat_2:
 	ld a, (iy+3)
 	or a
 	jp nz, _LABEL_2F9F
-	ld (iy+24), $F8
-	ld (iy+25), $10
-	ld (iy+22), $F0
-	ld (iy+23), $10
+	ld (iy+object.hitbox_x_offset), $F8
+	ld (iy+object.hitbox_width), $10
+	ld (iy+object.hitbox_y_offset), $F0
+	ld (iy+object.hitbox_height), $10
 	ld de, $0120
 	ld a, (iy+55)
 	or a
@@ -6336,10 +6331,10 @@ HandleObject_Spider:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
-	ld (iy+24), $F8
-	ld (iy+25), $10
-	ld (iy+22), $E8
-	ld (iy+23), $10
+	ld (iy+object.hitbox_x_offset), $F8
+	ld (iy+object.hitbox_width), $10
+	ld (iy+object.hitbox_y_offset), $E8
+	ld (iy+object.hitbox_height), $10
 	ld hl, _DATA_894C
 	ld de, $FEC0
 	ld a, (iy+55)
@@ -6435,10 +6430,10 @@ HandleObject_Skeleton:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
-	ld (iy+24), $F8
-	ld (iy+25), $10
-	ld (iy+22), $D4
-	ld (iy+23), $2C
+	ld (iy+object.hitbox_x_offset), $F8
+	ld (iy+object.hitbox_width), $10
+	ld (iy+object.hitbox_y_offset), $D4
+	ld (iy+object.hitbox_height), $2C
 	call _LABEL_24AE
 	ld hl, _DATA_8B33
 	ld de, $FED0
@@ -6528,8 +6523,8 @@ _LABEL_3152:
 	ld (iy+object.y_velocity_sub), $00
 	ld (iy+object.y_velocity_minor), $FA
 	call _LABEL_24B4
-	ld (iy+24), $E8
-	ld (iy+25), $1C
+	ld (iy+object.hitbox_x_offset), $E8
+	ld (iy+object.hitbox_width), $1C
 	ret
 
 +:
@@ -6559,8 +6554,8 @@ _LABEL_31AE:
 	ld a, (iy+2)
 	or a
 	jp nz, ++
-	ld (iy+24), $F4
-	ld (iy+25), $14
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $14
 	ld (iy+42), $20
 	ld (iy+2), $01
 	ld (iy+14), $00
@@ -6606,10 +6601,10 @@ HandleObject_White_Wolf:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
-	ld (iy+24), $F4
-	ld (iy+25), $0C
-	ld (iy+22), $F0
-	ld (iy+23), $08
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $0C
+	ld (iy+object.hitbox_y_offset), $F0
+	ld (iy+object.hitbox_height), $08
 	ld (iy+12), $04
 	ld (iy+13), $08
 	ld hl, _DATA_8A1E
@@ -6763,10 +6758,10 @@ HandleObject_Book_Thief:
 	or a
 	jp nz, ++
 	call _LABEL_24AE
-	ld (iy+24), $F4
-	ld (iy+25), $18
-	ld (iy+22), $D0
-	ld (iy+23), $30
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $18
+	ld (iy+object.hitbox_y_offset), $D0
+	ld (iy+object.hitbox_height), $30
 	ld de, $0120
 	ld hl, _DATA_8DFC
 	ld a, (iy+55)
@@ -6832,10 +6827,10 @@ HandleObject_Book_Thief:
 	ld (iy+1), $01
 	ld (iy+14), $02
 	ld (iy+3), $02
-	ld (iy+24), $FC
-	ld (iy+25), $08
-	ld (iy+22), $F0
-	ld (iy+23), $10
+	ld (iy+object.hitbox_x_offset), $FC
+	ld (iy+object.hitbox_width), $08
+	ld (iy+object.hitbox_y_offset), $F0
+	ld (iy+object.hitbox_height), $10
 	ld (iy+object.x_position_minor), $00
 	ld (iy+object.y_position_minor), $00
 	ret
@@ -6849,10 +6844,10 @@ _LABEL_344D:
 	ld (iy+3), $01
 	ld (iy+2), $01
 	ld (iy+14), $00
-	ld (iy+24), $F0
-	ld (iy+25), $20
-	ld (iy+22), $D0
-	ld (iy+23), $30
+	ld (iy+object.hitbox_x_offset), $F0
+	ld (iy+object.hitbox_width), $20
+	ld (iy+object.hitbox_y_offset), $D0
+	ld (iy+object.hitbox_height), $30
 	ld hl, _DATA_8E40
 	ld b, $0C
 	ld a, (_RAM_MOVEMENT_STATE)
@@ -6883,10 +6878,10 @@ _LABEL_3493:
 	ld (iy+40), $40
 	ld (iy+object.y_velocity_sub), $00
 	ld (iy+object.y_velocity_minor), $00
-	ld (iy+24), $F4
-	ld (iy+25), $18
-	ld (iy+22), $D0
-	ld (iy+23), $30
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $18
+	ld (iy+object.hitbox_y_offset), $D0
+	ld (iy+object.hitbox_height), $30
 	ld hl, _DATA_8DB3
 	ld de, $FEE0
 	ld a, (_RAM_X_POSITION_MINOR)
@@ -6904,10 +6899,10 @@ HandleObject_Dark_Shunaida:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
-	ld (iy+24), $F0
-	ld (iy+25), $20
-	ld (iy+22), $E0
-	ld (iy+23), $20
+	ld (iy+object.hitbox_x_offset), $F0
+	ld (iy+object.hitbox_width), $20
+	ld (iy+object.hitbox_y_offset), $E0
+	ld (iy+object.hitbox_height), $20
 	ld (iy+12), $02
 	ld (iy+13), $08
 	ld (iy+1), $01
@@ -6935,10 +6930,10 @@ HandleObject_Dark_Shunaida:
 	or a
 	jp nz, ++
 	ld (iy+2), $01
-	ld (iy+22), $D0
-	ld (iy+23), $30
-	ld (iy+24), $F4
-	ld (iy+25), $18
+	ld (iy+object.hitbox_y_offset), $D0
+	ld (iy+object.hitbox_height), $30
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $18
 	ld (iy+14), $00
 	ld (iy+12), $02
 	ld de, $FE80
@@ -7010,10 +7005,10 @@ _LABEL_3593:
 	ret z
 	dec a
 	ret z
-	ld (iy+24), $F0
-	ld (iy+25), $20
-	ld (iy+22), $F0
-	ld (iy+23), $10
+	ld (iy+object.hitbox_x_offset), $F0
+	ld (iy+object.hitbox_width), $20
+	ld (iy+object.hitbox_y_offset), $F0
+	ld (iy+object.hitbox_height), $10
 	ret
 
 _LABEL_35F9:
@@ -7052,10 +7047,10 @@ HandleObject_Dagon:
 	or a
 	jp nz, ++
 	call _LABEL_24AE
-	ld (iy+24), $F4
-	ld (iy+25), $18
-	ld (iy+22), $F8
-	ld (iy+23), $08
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $18
+	ld (iy+object.hitbox_y_offset), $F8
+	ld (iy+object.hitbox_height), $08
 	ld hl, _DATA_91CC
 	ld de, $FEE0
 	ld a, (iy+55)
@@ -7114,8 +7109,8 @@ _LABEL_36BB:
 	jp nz, +
 	ld (iy+2), $01
 	ld (iy+14), $00
-	ld (iy+22), $D0
-	ld (iy+23), $28
+	ld (iy+object.hitbox_y_offset), $D0
+	ld (iy+object.hitbox_height), $28
 	ld (iy+object.y_velocity_sub), $00
 	ld (iy+object.y_velocity_minor), $F9
 _LABEL_36DA:
@@ -7135,8 +7130,8 @@ _LABEL_36DA:
 	ld a, (iy+object.y_position_minor)
 	cp $B0
 	jp c, +
-	ld (iy+22), $F8
-	ld (iy+23), $08
+	ld (iy+object.hitbox_y_offset), $F8
+	ld (iy+object.hitbox_height), $08
 	ld (iy+1), $00
 	ld (iy+2), $00
 	ld (iy+14), $00
@@ -7199,10 +7194,10 @@ HandleObject_Zombie:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
-	ld (iy+24), $F4
-	ld (iy+25), $18
-	ld (iy+22), $D0
-	ld (iy+23), $30
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $18
+	ld (iy+object.hitbox_y_offset), $D0
+	ld (iy+object.hitbox_height), $30
 	ld (iy+42), $40
 	ld (iy+12), $02
 	ld (iy+13), $10
@@ -7286,10 +7281,10 @@ HandleObject_Eye_Part:
 	ld a, (iy+3)
 	or a
 	jp nz, _LABEL_38A5
-	ld (iy+24), $F4
-	ld (iy+25), $18
-	ld (iy+22), $E0
-	ld (iy+23), $20
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $18
+	ld (iy+object.hitbox_y_offset), $E0
+	ld (iy+object.hitbox_height), $20
 	ld (iy+object.y_velocity_sub), $00
 	ld (iy+object.y_velocity_minor), $FF
 	ld (iy+39), $02
@@ -7391,10 +7386,10 @@ HandleObject_Lizard_Man:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
-	ld (iy+24), $F0
-	ld (iy+25), $20
-	ld (iy+22), $D0
-	ld (iy+23), $30
+	ld (iy+object.hitbox_x_offset), $F0
+	ld (iy+object.hitbox_width), $20
+	ld (iy+object.hitbox_y_offset), $D0
+	ld (iy+object.hitbox_height), $30
 	call _LABEL_24AE
 	ld hl, _DATA_90D2
 	ld de, $FF00
@@ -7535,10 +7530,10 @@ HandleObject_Dragon:
 	ld a, (iy+3)
 	or a
 	jp nz, _LABEL_3ADD
-	ld (iy+24), $F4
-	ld (iy+25), $18
-	ld (iy+22), $C0
-	ld (iy+23), $30
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $18
+	ld (iy+object.hitbox_y_offset), $C0
+	ld (iy+object.hitbox_height), $30
 	call _LABEL_24AE
 	ld (iy+object.y_velocity_sub), $00
 	ld (iy+object.y_velocity_minor), $FF
@@ -7643,10 +7638,10 @@ HandleObject_Straw_Fly:
 	ld a, (iy+3)
 	or a
 	jp nz, +
-	ld (iy+24), $F8
-	ld (iy+25), $10
-	ld (iy+22), $F0
-	ld (iy+23), $10
+	ld (iy+object.hitbox_x_offset), $F8
+	ld (iy+object.hitbox_width), $10
+	ld (iy+object.hitbox_y_offset), $F0
+	ld (iy+object.hitbox_height), $10
 	ld (iy+object.y_velocity_sub), $00
 	ld (iy+object.y_velocity_minor), $01
 	ld (iy+object.respawn_timer_minor), $F8
@@ -7707,10 +7702,10 @@ HandleObject_Clown:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
-	ld (iy+24), $F4
-	ld (iy+25), $10
-	ld (iy+22), $E0
-	ld (iy+23), $20
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $10
+	ld (iy+object.hitbox_y_offset), $E0
+	ld (iy+object.hitbox_height), $20
 	ld (iy+object.y_velocity_sub), $00
 	ld (iy+object.y_velocity_minor), $FB
 	ld (iy+14), $01
@@ -7785,10 +7780,10 @@ HandleObject_Snake_2:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
-	ld (iy+24), $F0
-	ld (iy+25), $20
-	ld (iy+22), $F8
-	ld (iy+23), $08
+	ld (iy+object.hitbox_x_offset), $F0
+	ld (iy+object.hitbox_width), $20
+	ld (iy+object.hitbox_y_offset), $F8
+	ld (iy+object.hitbox_height), $08
 	call _LABEL_24AE
 	ld hl, _DATA_9466
 	ld de, $FE00
@@ -7843,10 +7838,10 @@ HandleObject_Caterpillar:
 	ld a, (iy+3)
 	or a
 	jp nz, ++
-	ld (iy+24), $F0
-	ld (iy+25), $20
-	ld (iy+22), $F8
-	ld (iy+23), $08
+	ld (iy+object.hitbox_x_offset), $F0
+	ld (iy+object.hitbox_width), $20
+	ld (iy+object.hitbox_y_offset), $F8
+	ld (iy+object.hitbox_height), $08
 	ld (iy+12), $03
 	ld (iy+13), $04
 	ld hl, _DATA_8ABA
@@ -8335,10 +8330,10 @@ HandleObject_Projectile_Tree_Spirit:
 	inc hl
 	ld a, (hl)
 	ld (iy+object.y_velocity_sub), a
-	ld (iy+24), $FA
-	ld (iy+25), $0C
-	ld (iy+22), $F2
-	ld (iy+23), $0C
+	ld (iy+object.hitbox_x_offset), $FA
+	ld (iy+object.hitbox_width), $0C
+	ld (iy+object.hitbox_y_offset), $F2
+	ld (iy+object.hitbox_height), $0C
 	ld hl, _DATA_975E
 	jp _LABEL_249F
 
@@ -8396,10 +8391,10 @@ HandleObject_Projectile_Tree_Spirit_2:
 	inc hl
 	ld a, (hl)
 	ld (iy+object.x_velocity_minor), a
-	ld (iy+24), $FC
-	ld (iy+25), $08
-	ld (iy+22), $F8
-	ld (iy+23), $08
+	ld (iy+object.hitbox_x_offset), $FC
+	ld (iy+object.hitbox_width), $08
+	ld (iy+object.hitbox_y_offset), $F8
+	ld (iy+object.hitbox_height), $08
 	call _LABEL_24AE
 	ld hl, _DATA_9774
 	jp _LABEL_249F
@@ -8577,10 +8572,10 @@ HandleObject_Necromancer_Clone:
 	or a
 	jp nz, _LABEL_43A8
 	ld (iy+object.y_position_minor), $A0
-	ld (iy+24), $F4
-	ld (iy+25), $18
-	ld (iy+22), $D0
-	ld (iy+23), $30
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $18
+	ld (iy+object.hitbox_y_offset), $D0
+	ld (iy+object.hitbox_height), $30
 	ld (iy+26), $02
 	ld (iy+27), $40
 	ld (iy+28), $10
@@ -9106,10 +9101,10 @@ HandleObject_Projectile_Baruga:
 	ld a, (_RAM_C507)
 	add a, $10
 	ld (iy+object.y_position_minor), a
-	ld (iy+24), $FC
-	ld (iy+25), $08
-	ld (iy+22), $FC
-	ld (iy+23), $08
+	ld (iy+object.hitbox_x_offset), $FC
+	ld (iy+object.hitbox_width), $08
+	ld (iy+object.hitbox_y_offset), $FC
+	ld (iy+object.hitbox_height), $08
 	ld (iy+3), $01
 	ld (iy+56), $02
 +:
@@ -9712,10 +9707,10 @@ HandleObject_Skull_Dark_Suma:
 	ld a, (iy+3)
 	or a
 	jp nz, _LABEL_4D71
-	ld (iy+22), $F0
-	ld (iy+23), $10
-	ld (iy+24), $F8
-	ld (iy+25), $10
+	ld (iy+object.hitbox_y_offset), $F0
+	ld (iy+object.hitbox_height), $10
+	ld (iy+object.hitbox_x_offset), $F8
+	ld (iy+object.hitbox_width), $10
 	ld (iy+object.respawn_timer_minor), $FC
 	ld (iy+object.respawn_timer_major), $FF
 	ld a, (iy+60)
@@ -10793,9 +10788,25 @@ _LABEL_550F:
 
 ; Pointer Table from 5520 to 5545 (19 entries, indexed by _RAM_MAP_TYPE)
 _DATA_5520:
-.dw _DATA_34000 _DATA_34000 _DATA_34288 _DATA_34CDD _DATA_34578 _DATA_35C42 _DATA_346C8 _DATA_3649D
-.dw _DATA_34988 _DATA_36C9B _DATA_34C28 _DATA_34000 _DATA_34D80 _DATA_34D4C _DATA_34F80 _DATA_35832
-.dw _DATA_35120 _DATA_35DCA _DATA_351B0
+.dw _DATA_34000
+.dw _DATA_34000
+.dw _DATA_34288
+.dw _DATA_34CDD
+.dw _DATA_34578
+.dw _DATA_35C42
+.dw _DATA_346C8
+.dw _DATA_3649D
+.dw _DATA_34988
+.dw _DATA_36C9B
+.dw _DATA_34C28
+.dw _DATA_34000
+.dw _DATA_34D80
+.dw _DATA_34D4C
+.dw _DATA_34F80
+.dw _DATA_35832
+.dw _DATA_35120
+.dw _DATA_35DCA
+.dw _DATA_351B0
 
 ; Pointer Table from 5546 to 5653 (135 entries, indexed by _RAM_CURRENT_MAP)
 MapMetadataPointers:
@@ -12129,7 +12140,7 @@ _LABEL_5F2A:
 	ld (_RAM_C504), hl
 	ld (iy+33), c
 	ld (iy+35), $40
-	ld (iy+24), b
+	ld (iy+object.hitbox_x_offset), b
 	ret
 
 _LABEL_5F9D:
@@ -12239,8 +12250,8 @@ HandleObject_Stone_Hammer:
 	ld d, $00
 +:
 	ld (_RAM_C504), hl
-	ld (iy+24), d
-	ld (iy+25), $18
+	ld (iy+object.hitbox_x_offset), d
+	ld (iy+object.hitbox_width), $18
 	ld (iy+33), c
 	ld (iy+13), $04
 	ld (iy+12), $05
@@ -12301,8 +12312,8 @@ _LABEL_60ED:
 	ld (_RAM_C504), hl
 	ex de, hl
 	ld (_RAM_C513), hl
-	ld (iy+24), $F4
-	ld (iy+25), $18
+	ld (iy+object.hitbox_x_offset), $F4
+	ld (iy+object.hitbox_width), $18
 	ld (iy+33), c
 	ld (iy+1), $00
 	ret
@@ -12451,8 +12462,8 @@ _LABEL_6245:
 	ld d, $00
 +:
 	ld (_RAM_C504), hl
-	ld (iy+24), d
-	ld (iy+25), $10
+	ld (iy+object.hitbox_x_offset), d
+	ld (iy+object.hitbox_width), $10
 	ld (iy+33), c
 	ld (iy+13), $06
 	ld (iy+12), $04
@@ -12921,16 +12932,16 @@ HandleObject_Paradin:
 	call _LABEL_6417
 	ld hl, $FE80
 	ld (_RAM_C513), hl
-	ld (iy+22), $DC
-	ld (iy+23), $20
+	ld (iy+object.hitbox_y_offset), $DC
+	ld (iy+object.hitbox_height), $20
 	ld de, $F810
 	ld bc, $0406
 	ld hl, $A105
 	xor a
 _LABEL_6660:
 	ld (_RAM_C504), hl
-	ld (iy+24), d
-	ld (iy+25), e
+	ld (iy+object.hitbox_x_offset), d
+	ld (iy+object.hitbox_width), e
 	ld (_RAM_C501), a
 	ld (iy+12), b
 	ld (iy+13), c
@@ -14115,7 +14126,7 @@ Bank2:
 
 ; Pointer Table from 8000 to 800D (7 entries, indexed by unknown)
 _DATA_8000:
-.dw _DATA_18008 _DATA_18008 _DATA_18008 _DATA_18008 $F801 _RAM_FFFC _DATA_1900
+.dw _DATA_18008 _DATA_18008 _DATA_18008 _DATA_18008 $F801 _RAM_FFFC $1900
 
 ; Data from 800E to 804E (65 bytes)
 .db $80 $36 $80 $36 $80 $19 $80 $36 $80 $36 $80 $07 $D0 $FC $FF $02
@@ -20261,7 +20272,7 @@ _DATA_28C8B:
 .db $0E $1F $70 $40 $FB $00
 
 ; Pointer Table from 28C91 to 28C96 (3 entries, indexed by unknown)
-.dw _DATA_2A015 $FBB0 _DATA_1900
+.dw _DATA_2A015 $FBB0 $1900
 
 ; Data from 28C97 to 28CD3 (61 bytes)
 .db $70 $20 $FC $00 $1F $70 $60 $FC $00 $15 $B0 $80 $FC $00 $18 $88

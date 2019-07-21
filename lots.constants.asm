@@ -112,7 +112,7 @@
 	type db
 	unknown_0x01 db
 	unknown_0x02 db
-	unknown_0x03 db
+	unknown_0x03 db ; Spawned flag? if 0, init the object, if 1, run normal behaviour
 	unknown_0x04 db ; Pointer, tiles?
 	unknown_0x05 db ; Pointer, tiles?
 	y_position_sub db   ; 6
@@ -131,10 +131,10 @@
 	x_velocity_sub db   ; 19
 	x_velocity_minor db ; 20
 	x_velocity_major db ; 21
-	unknown_0x16 db
-	unknown_0x17 db
-	unknown_0x18 db
-	unknown_0x19 db
+	hitbox_y_offset db  ; 22
+	hitbox_height db    ; 23
+	hitbox_x_offset db  ; 24
+	hitbox_width db     ; 25
 	unknown_0x1A db
 	unknown_0x1B db ; Upper 4 bits are score table index, not sure what lower 4 do
 	unknown_0x1C db
