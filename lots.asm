@@ -48,9 +48,9 @@ _NMI_HANDLER:
 	ld a, (_RAM_C13F)
 	or a
 	jr nz, +
-	ld a, (_RAM_C0A7)
+	ld a, (_RAM_GAME_IS_PAUSED)
 	cpl
-	ld (_RAM_C0A7), a
+	ld (_RAM_GAME_IS_PAUSED), a
 	ld a, Building_Status_Map_Screen
 	ld (_RAM_BUILDING_STATUS), a
 +:
@@ -172,7 +172,7 @@ HandleIRQ:
 	jp _LABEL_1A6
 
 +:
-	ld a, (_RAM_C0A7)
+	ld a, (_RAM_GAME_IS_PAUSED)
 	or a
 	jr nz, _LABEL_1A6
 	ld a, (_RAM_MAP_BACKGROUND_IS_SCROLLABLE)
@@ -199,7 +199,7 @@ HandleIRQ:
 	call _LABEL_543A
 	call _LABEL_69D4
 	call _LABEL_20A2
-	call _LABEL_218C
+	call DrawInventory
 	call _LABEL_60B
 _LABEL_1A6:
 	xor a
@@ -336,7 +336,7 @@ Handle_Building_Status_Boss_Fight:
 
 ; 4th entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
 Handle_Building_Status_Map_Screen:
-	call _LABEL_58B7
+	call DrawMapScreen
 	jp WaitForVerticalInterrupt
 
 ; 5th entry of Jump Table from 26E (indexed by _RAM_BUILDING_STATUS)
@@ -1251,13 +1251,13 @@ Handle_Map_Status_Start_Game:
 	ld a, Map_Status_Map
 	ld (_RAM_MAP_STATUS), a
 	xor a
-	ld (_RAM_SCORE_COUNTER_SHOULD_UPDATE), a
+	ld (_RAM_SCORE_COUNTER_NEEDS_REDRAW), a
 	ld (_RAM_SCORE_RIGHT_DIGIT), a
 	ld (_RAM_SCORE_MIDDLE_DIGIT), a
 	ld (_RAM_SCORE_LEFT_DIGIT), a
 	ld (_RAM_CURRENT_MAP), a
 	call _LABEL_3C2
-	ld a, $01
+	ld a, $01 ; Landau
 	ld (_RAM_C400), a
 	ld a, $A0
 	ld (_RAM_Y_POSITION_MINOR), a
@@ -3064,7 +3064,7 @@ _LABEL_173E:
 	ret
 
 AwardScore:
-	ld de, _RAM_SCORE_COUNTER_SHOULD_UPDATE
+	ld de, _RAM_SCORE_COUNTER_NEEDS_REDRAW
 	ld a, $01
 	ld (de), a
 	ld a, (_RAM_MAP_STATUS)
@@ -3113,11 +3113,11 @@ _DATA_1787:
 .db $00 $80 $00
 
 UpdateScoreCounter:
-	ld a, (_RAM_SCORE_COUNTER_SHOULD_UPDATE)
+	ld a, (_RAM_SCORE_COUNTER_NEEDS_REDRAW)
 	or a
 	ret z
 	xor a
-	ld (_RAM_SCORE_COUNTER_SHOULD_UPDATE), a
+	ld (_RAM_SCORE_COUNTER_NEEDS_REDRAW), a
 	ld hl, _RAM_SCORE_LEFT_DIGIT
 	ld de, $7846
 	ld bc, $0601
@@ -3987,7 +3987,7 @@ _LABEL_1D0B:
 	ret z
 	ld a, $01
 	ld (iy+29), a
-	ld (_RAM_C16D), a
+	ld (_RAM_INVENTORY_NEEDS_REDRAW), a
 	xor a
 	ld (_RAM_INVENTORY_BOOK), a
 	ld (_RAM_CCAD), a
@@ -4463,7 +4463,7 @@ _LABEL_20A2:
 	ret nz
 	ld a, $01
 	ld (_RAM_INVENTORY_HERB), a
-	ld (_RAM_C16D), a
+	ld (_RAM_INVENTORY_NEEDS_REDRAW), a
 	ld a, $93
 	ld (_RAM_SOUND_TO_PLAY), a
 	ret
@@ -4472,7 +4472,7 @@ _LABEL_20A2:
 	ld a, $01
 	ld (_RAM_INVENTORY_BOOK), a
 	ld (_RAM_CCAD), a
-	ld (_RAM_C16D), a
+	ld (_RAM_INVENTORY_NEEDS_REDRAW), a
 	ld a, $93
 	ld (_RAM_SOUND_TO_PLAY), a
 	ret
@@ -4558,12 +4558,12 @@ _LABEL_2151:
 	ld (_RAM_C135), a
 	ret
 
-_LABEL_218C:
-	ld a, (_RAM_C16D)
+DrawInventory:
+	ld a, (_RAM_INVENTORY_NEEDS_REDRAW)
 	or a
 	ret z
 	xor a
-	ld (_RAM_C16D), a
+	ld (_RAM_INVENTORY_NEEDS_REDRAW), a
 	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_EF2B
@@ -4768,7 +4768,7 @@ HandleBuildingExtraEffects_Pointers:
 
 ; 1st entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 HandleBuildingExtraEffects_Harfoot:
-	call _LABEL_2408
+	call StandardBuildingHeal
 	ld c, $30
 	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $07
@@ -4781,7 +4781,7 @@ HandleBuildingExtraEffects_Harfoot:
 
 ; 2nd entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 HandleBuildingExtraEffects_Amon:
-	call _LABEL_2408
+	call StandardBuildingHeal
 	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $01
 	jr z, +
@@ -4796,7 +4796,7 @@ HandleBuildingExtraEffects_Amon:
 	ld (_RAM_FLAG_ULMO_BUILDING_ENABLED), a
 	ld (_RAM_INVENTORY_BOOK), a
 	ld (_RAM_CCAD), a
-	ld (_RAM_C16D), a
+	ld (_RAM_INVENTORY_NEEDS_REDRAW), a
 	ld b, $08
 	ld hl, _RAM_FLAG_BUILDING_PROGRESS_HARFOOT_START
 	ld de, $0010
@@ -4826,7 +4826,7 @@ HandleBuildingExtraEffects_Amon:
 
 ; 3rd entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 HandleBuildingExtraEffects_Dwarle:
-	call _LABEL_2408
+	call StandardBuildingHeal
 	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $01
 	jr z, +
@@ -4849,7 +4849,7 @@ HandleBuildingExtraEffects_Dwarle:
 
 ; 4th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 HandleBuildingExtraEffects_Ithile:
-	call _LABEL_2408
+	call StandardBuildingHeal
 	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $04
 	jr z, +
@@ -4875,7 +4875,7 @@ HandleBuildingExtraEffects_Ithile:
 
 ; 5th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 HandleBuildingExtraEffects_Pharazon:
-	call _LABEL_2408
+	call StandardBuildingHeal
 	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $01
 	jr z, +
@@ -4917,7 +4917,7 @@ HandleBuildingExtraEffects_Shagart:
 
 ; 7th entry of Jump Table from 22E3 (indexed by _RAM_BUILDING_INDEX)
 HandleBuildingExtraEffects_Lindon:
-	call _LABEL_2408
+	call StandardBuildingHeal
 	ld a, (_RAM_BUILDING_FLAG_PROGRESS)
 	cp $05
 	jr z, +
@@ -4963,7 +4963,7 @@ HandleBuildingExtraEffects_Ulmo:
 	set 7, (hl)
 	ret
 
-_LABEL_2408:
+StandardBuildingHeal:
 	ld c, $08
 	jp ApplyLandauHealOrDamageFromC
 
@@ -4990,7 +4990,7 @@ _LABEL_2430:
 	ld a, Boss_Index_Baruga
 	ld (_RAM_BOSS_INDEX), a
 	ld a, $01
-	ld (_RAM_C16D), a
+	ld (_RAM_INVENTORY_NEEDS_REDRAW), a
 	ld a, $02
 	ld (_RAM_CCAD), a
 	xor a
@@ -5025,7 +5025,7 @@ _LABEL_2459:
 	ld (_RAM_C155), a
 	ld a, $01
 	ld (_RAM_CC17), a
-	ld (_RAM_C16D), a
+	ld (_RAM_INVENTORY_NEEDS_REDRAW), a
 	ld (_RAM_INVENTORY_HERB), a
 	ret
 
@@ -7959,7 +7959,7 @@ HandleObject_Damaged_0x27:
 	ld a, $01
 	ld (_RAM_INVENTORY_BOOK), a
 	ld (_RAM_CCAD), a
-	ld (_RAM_C16D), a
+	ld (_RAM_INVENTORY_NEEDS_REDRAW), a
 	ld a, $93
 	ld (_RAM_SOUND_TO_PLAY), a
 +:
@@ -10504,7 +10504,7 @@ _LABEL_52BC:
 	ld (hl), a
 	ldir
 	ld (_RAM_C14C), a
-	ld (_RAM_C0A7), a
+	ld (_RAM_GAME_IS_PAUSED), a
 	ld iy, _RAM_C400
 	ld a, (_RAM_C161)
 	or a
@@ -10512,8 +10512,8 @@ _LABEL_52BC:
 	call _LABEL_595A
 	call CheckVarlinDoor
 	call LoadMapEnemies
-	call _LABEL_535B ; Load Map Metadata (Warps, Starting Position etc.)?
-	call _LABEL_53D3 ; Load Map Layout?
+	call LoadMapMetadata ; Warps, Starting Position etc.
+	call LoadMapLayout
 	call _LABEL_5808
 	call _LABEL_1B1D
 	call _LABEL_5820
@@ -10525,20 +10525,20 @@ _LABEL_52BC:
 	call _LABEL_9F3
 	ld a, $01
 	ld (_RAM_C12A), a
-	ld (_RAM_C16D), a
-	ld (_RAM_SCORE_COUNTER_SHOULD_UPDATE), a
+	ld (_RAM_INVENTORY_NEEDS_REDRAW), a
+	ld (_RAM_SCORE_COUNTER_NEEDS_REDRAW), a
 	call _LABEL_5483
 	call _LABEL_586E
 	call _LABEL_544F
 	call _LABEL_550F ; Load some tiles, sword tip
 	xor a
-	ld (_RAM_C0A7), a
+	ld (_RAM_GAME_IS_PAUSED), a
 	ld bc, $7600
 	call SendVDPCommand
 	ld bc, $E201
 	jp SendVDPCommand
 
-_LABEL_535B:
+LoadMapMetadata:
 	ld c, :Bank11
 	ld a, (_RAM_CURRENT_MAP)
 	cp $44 ; Mountains (Amon +2UL) (Pharazon +2R) (L)
@@ -10607,7 +10607,7 @@ _LABEL_535B:
 	ld (_RAM_MAP_BACKGROUND_IS_SCROLLABLE), a
 	ret
 
-_LABEL_53D3:
+LoadMapLayout:
 	ld hl, (_RAM_C10C)
 	call _LABEL_1E50
 	ld c, :Bank13
@@ -11289,7 +11289,7 @@ _LABEL_589F:
 	ld de, $5A00
 	jp _LABEL_1DC8
 
-_LABEL_58B7:
+DrawMapScreen:
 	ld a, (_RAM_C16A)
 	or a
 	jp nz, _LABEL_5935
@@ -11337,7 +11337,7 @@ _LABEL_58B7:
 	jp SendVDPCommand
 
 _LABEL_5935:
-	ld a, (_RAM_C0A7)
+	ld a, (_RAM_GAME_IS_PAUSED)
 	or a
 	ret nz
 	ld a, Building_Status_Load_Map
@@ -12851,10 +12851,10 @@ _LABEL_6543:
 	add a, $EC
 	ld (_RAM_C547), a
 	ld ix, _RAM_C540
-	ld (ix+22), $F4
-	ld (ix+23), $08
-	ld (ix+24), $FC
-	ld (ix+25), $08
+	ld (ix+object.hitbox_y_offset), $F4
+	ld (ix+object.hitbox_height), $08
+	ld (ix+object.hitbox_x_offset), $FC
+	ld (ix+object.hitbox_width), $08
 	ld (ix+56), $04
 	ret
 
@@ -12871,7 +12871,7 @@ _LABEL_65C4:
 	ld a, (_RAM_C540)
 	or a
 	ret nz
-	ld a, $3C
+	ld a, $3C ; Projectile (Court Jester)
 	ld (_RAM_C540), a
 	ld a, $01
 	ld (_RAM_C543), a
@@ -13426,7 +13426,7 @@ _LABEL_6A47: ; Handle boss defeated flags
 ++:
 	ld a, $01
 	ld (_RAM_CC14), a
-	ld (_RAM_C16D), a
+	ld (_RAM_INVENTORY_NEEDS_REDRAW), a
 	ld (_RAM_INVENTORY_TREE_LIMB), a
 	ld hl, _RAM_FLAG_TREE_SPIRIT_DEFEATED
 	ld c, $04
@@ -18327,10 +18327,27 @@ _DATA_137E0:
 Bank5:
 
 ; Pointer Table from 14000 to 14027 (20 entries, indexed by _RAM_MOVEMENT_STATE)
-_DATA_14000:
-.dw _DATA_14028 _DATA_14034 _DATA_14040 _DATA_14042 _DATA_14044 _DATA_14046 _DATA_14048 _DATA_1404A
-.dw _DATA_1404C _DATA_14054 _DATA_1405C _DATA_14064 _DATA_1406C _DATA_14074 _DATA_1407C _DATA_14082
-.dw _DATA_14028 _DATA_14028 _DATA_14088 _DATA_14090
+_DATA_14000: ; TODO: Landau Movement Graphics?
+.dw _DATA_14028 ; Movement_Walking_Left
+.dw _DATA_14034 ; Movement_Walking_Right
+.dw _DATA_14040 ; Movement_Jumping_Left
+.dw _DATA_14042 ; Movement_Jumping_Right
+.dw _DATA_14044 ; Movement_Falling_Left
+.dw _DATA_14046 ; Movement_Falling_Right
+.dw _DATA_14048 ; Movement_Crouching_Left
+.dw _DATA_1404A ; Movement_Crouching_Right
+.dw _DATA_1404C ; Movement_Sword_Left
+.dw _DATA_14054 ; Movement_Sword_Right
+.dw _DATA_1405C ; Movement_Bow_Left
+.dw _DATA_14064 ; Movement_Bow_Right
+.dw _DATA_1406C ; Movement_Crouching_Bow_Left
+.dw _DATA_14074 ; Movement_Crouching_Bow_Right
+.dw _DATA_1407C ; Movement_Death
+.dw _DATA_14082 ; Movement_Death_0F
+.dw _DATA_14028 ; Movement_Damaged
+.dw _DATA_14028 ; Movement_Damaged_11
+.dw _DATA_14088 ; Movement_Crouching_Sword_Left
+.dw _DATA_14090 ; Movement_Crouching_Sword_Right
 
 ; 1st entry of Pointer Table from 14000 (indexed by _RAM_MOVEMENT_STATE)
 ; Data from 14028 to 14033 (12 bytes)

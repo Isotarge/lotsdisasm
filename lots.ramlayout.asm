@@ -3,7 +3,7 @@ _RAM_C000 db
 .ende
 
 .enum $C093 export
-_RAM_SCORE_COUNTER_SHOULD_UPDATE db
+_RAM_SCORE_COUNTER_NEEDS_REDRAW db
 _RAM_SCORE_RIGHT_DIGIT db
 _RAM_SCORE_MIDDLE_DIGIT db
 _RAM_SCORE_LEFT_DIGIT db
@@ -23,7 +23,7 @@ _RAM_MAP_BACKGROUND_IS_SCROLLABLE db
 _RAM_GAME_LOOP_IS_RUNNING db ; 1 on NMI boundaries for lag frames
 _RAM_CONTROLLER_INPUT db
 _RAM_NEW_CONTROLLER_INPUT db
-_RAM_C0A7 db
+_RAM_GAME_IS_PAUSED db
 _RAM_C0A8 dw
 _RAM_C0AA dw
 _RAM_C0AC dw
@@ -123,11 +123,11 @@ _RAM_C155 db
 .ende
 
 .enum $C161 export
-_RAM_C161 db
+_RAM_C161 db ; Boolean, whether the position is pulled from C164 and C165 on map load
 _RAM_C162 db
 _RAM_C163 db
-_RAM_C164 db
-_RAM_C165 db
+_RAM_C164 db ; Custom X position, read on map load
+_RAM_C165 db ; Custom Y position, read on map load
 .ende
 
 .enum $C169 export
@@ -137,7 +137,7 @@ _RAM_C16B db
 .ende
 
 .enum $C16D export
-_RAM_C16D db
+_RAM_INVENTORY_NEEDS_REDRAW db
 _RAM_C16E db
 _RAM_C16F db
 _RAM_C170 db

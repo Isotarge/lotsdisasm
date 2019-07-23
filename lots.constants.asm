@@ -123,7 +123,7 @@
 	x_position_major db ; 11
 	unknown_0x0C db
 	unknown_0x0D db
-	sign_index db       ; 14
+	sign_index db       ; 14 More general: Animation Frame?
 	sign_timer db       ; 15
 	y_velocity_sub db   ; 16
 	y_velocity_minor db ; 17
