@@ -990,7 +990,7 @@ HandleObject_Sword_Upgrade:
 	or a
 	jr nz, +
 	ld hl, $FC00
-	ld (_RAM_C490), hl
+	ld (_RAM_C480+object.y_velocity_sub), hl
 _LABEL_775:
 	ld hl, $85E7
 	ld (_RAM_C484), hl
@@ -1006,7 +1006,7 @@ _LABEL_775:
 	ld a, (_RAM_C481)
 	or a
 	jr nz, +
-	ld a, (_RAM_C487)
+	ld a, (_RAM_C480+object.y_position_minor)
 	cp $B0
 	ld de, $0040
 	jp c, _LABEL_869
@@ -1022,14 +1022,14 @@ _LABEL_775:
 	ld (_RAM_SWORD_DAMAGE), a
 	ld a, $95
 	ld (_RAM_SOUND_TO_PLAY), a
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 ; 4th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Bow_Upgrade:
 	ld a, (_RAM_C483)
 	or a
 	jr z, _LABEL_775
-	ld a, (_RAM_C48B)
+	ld a, (_RAM_C480+object.x_position_major)
 	or a
 	ret nz
 	ld ix, _RAM_C400
@@ -1039,7 +1039,7 @@ HandleObject_Bow_Upgrade:
 	ld (_RAM_BOW_DAMAGE), a
 	ld a, $95
 	ld (_RAM_SOUND_TO_PLAY), a
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 ; 5th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Sign:
@@ -1060,7 +1060,7 @@ HandleObject_Sign:
 	ld (iy+9), $00
 	dec (iy+15)
 	ret nz
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 ApplyObjectYVelocity:
 	ld d, (iy+object.y_velocity_minor)
@@ -1132,12 +1132,12 @@ _LABEL_880:
 	ld (iy+49), h
 	ret
 
-_LABEL_8A6:
+ClearObjectInIX:
 	push ix
 	pop hl
 	jp +
 
-_LABEL_8AC:
+ClearObjectInIY:
 	push iy
 	pop hl
 +:
@@ -1270,7 +1270,7 @@ Handle_Map_Status_Start_Game:
 	ld a, $30
 	ld (_RAM_HEALTH), a
 	ld a, $01
-	ld (_RAM_C12A), a
+	ld (_RAM_HEALTH_BAR_NEEDS_REDRAW), a
 	ld a, $01
 	ld (_RAM_FLAG_GAME_STARTED), a
 	call _LABEL_9DC
@@ -2968,7 +2968,7 @@ HandleObject_Landau_Arrow:
 	jp nz, ++
 	ld a, (_RAM_C44B)
 	or a
-	jp nz, _LABEL_8AC
+	jp nz, ClearObjectInIY
 	call ApplyObjectXVelocity
 	ld a, (_RAM_C44A)
 	cp $10
@@ -2999,7 +2999,7 @@ HandleObject_Landau_Arrow:
 	call _LABEL_869
 	ld a, (_RAM_C447)
 	cp $C0
-	jp nc, _LABEL_8AC
+	jp nc, ClearObjectInIY
 	ld de, $0000
 	call _LABEL_15E5
 	ret z
@@ -3009,7 +3009,7 @@ HandleObject_Landau_Arrow:
 +:
 	dec (iy+object.boss_teleport_timer)
 	ret nz
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 ++:
 	ld hl, $0080
@@ -3210,7 +3210,7 @@ _LABEL_17E6:
 
 ApplyLandauHealOrDamageFromC:
 	ld a, $01
-	ld (_RAM_C12A), a
+	ld (_RAM_HEALTH_BAR_NEEDS_REDRAW), a
 	ld a, (_RAM_HEALTH)
 	add a, c
 	ld (_RAM_HEALTH), a
@@ -3233,11 +3233,11 @@ ApplyLandauHealOrDamageFromC:
 	ret
 
 DrawHealthBar:
-	ld a, (_RAM_C12A)
+	ld a, (_RAM_HEALTH_BAR_NEEDS_REDRAW)
 	or a
 	ret z
 	xor a
-	ld (_RAM_C12A), a
+	ld (_RAM_HEALTH_BAR_NEEDS_REDRAW), a
 	ld de, $785A
 	ld a, (_RAM_HEALTH)
 	or a
@@ -3837,9 +3837,9 @@ _LABEL_1C59:
 	add a, (iy+object.hitbox_width)
 	ld l, a
 	ld a, (ix+object.x_position_minor)
-	add a, (ix+24)
+	add a, (ix+object.hitbox_x_offset)
 	ld d, a
-	add a, (ix+25)
+	add a, (ix+object.hitbox_width)
 	ld e, a
 	jp _LABEL_1DBE
 
@@ -4297,7 +4297,7 @@ _LABEL_1F39:
 	ld (_RAM_C109), a
 	ld (_RAM_C111), a
 	ld iy, _RAM_C400
-	call _LABEL_8AC
+	call ClearObjectInIY
 	ld a, $D0
 	ld (_RAM_C300), a
 	ld de, $7880
@@ -5498,7 +5498,7 @@ _LABEL_286D:
 	ret c
 	ld a, (iy+object.x_position_major)
 	or a
-	jp nz, _LABEL_8AC
+	jp nz, ClearObjectInIY
 	ld a, (iy+46)
 	cp $06
 	jp z, _LABEL_28DA
@@ -5506,14 +5506,14 @@ _LABEL_286D:
 	jp z, _LABEL_28DA
 	ld de, $0000
 	call _LABEL_15E5
-	jp nz, _LABEL_8AC
+	jp nz, ClearObjectInIY
 	ld de, $F808
 	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	ld de, $F8F8
 +:
 	call _LABEL_15E5
-	jp nz, _LABEL_8AC
+	jp nz, ClearObjectInIY
 	ld a, (iy+46)
 	cp $08
 	jp z, _LABEL_2909
@@ -5557,7 +5557,7 @@ _LABEL_28DA:
 +:
 	ld a, (iy+object.y_position_minor)
 	cp $C0
-	jp nc, _LABEL_8AC
+	jp nc, ClearObjectInIY
 	call ApplyObjectYVelocity
 	jp ApplyObjectXVelocity
 
@@ -7976,7 +7976,7 @@ HandleObject_Damaged_0x27:
 	ld a, (iy+object.type)
 	cp $11 ; Eye Part
 	jp z, +
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 +:
 	push iy
@@ -7987,7 +7987,7 @@ HandleObject_Damaged_0x27:
 -:
 	ld (hl), $00
 	djnz -
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 _LABEL_3EA3:
 	call _LABEL_524C
@@ -8036,22 +8036,22 @@ HandleObject_Tree_Spirit:
 	or a
 	jp nz, +
 	ld a, $A8
-	ld (_RAM_C507), a
+	ld (_RAM_C500+object.y_position_minor), a
 	ld a, $20
-	ld (_RAM_C50A), a
+	ld (_RAM_C500+object.x_position_minor), a
 	ld hl, $50B0
-	ld (_RAM_C516), hl
+	ld (_RAM_C500+object.hitbox_y_offset), hl
 	ld hl, $20F0
-	ld (_RAM_C518), hl
+	ld (_RAM_C500+object.hitbox_x_offset), hl
 	ld hl, $FF80
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld hl, $951F
 	ld (_RAM_C504), hl
 	ld a, $01
 	ld (_RAM_C503), a
 	ld a, $06
 	ld (_RAM_C538), a
-	ld a, $14 ; TREE BOSS NAMO HEALTH
+	ld a, $14 ; Tree Spirit Health
 	ld (_RAM_BOSS_HP), a
 	ret
 
@@ -8087,7 +8087,7 @@ _LABEL_3F46:
 	cp $34 ; Pirate
 	jr z, +
 	cp $37 ; Baruga
-	jp nz, _LABEL_8AC
+	jp nz, ClearObjectInIY
 +:
 	ld (iy+object.boss_defeated), $01
 	ld a, $A5
@@ -8102,7 +8102,7 @@ _LABEL_3F91:
 	cp $01
 	jr z, +
 	cp $05
-	jp c, _LABEL_8AC
+	jp c, ClearObjectInIY
 	push iy
 	pop hl
 	inc hl
@@ -8118,7 +8118,7 @@ _LABEL_3F91:
 	ld (_RAM_C501), a
 	xor a
 	ld (_RAM_C502), a
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 _LABEL_3FB9:
 	ld a, (_RAM_C52F)
@@ -8137,12 +8137,12 @@ _LABEL_3FB9:
 	ld (hl), $2C
 	ld de, $0007
 	add hl, de
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	add a, $B8
 	ld (hl), a
 	ld de, $0003
 	add hl, de
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	add a, $F0
 	ld (hl), a
 	ld de, $0035
@@ -8184,9 +8184,9 @@ _LABEL_400F:
 +:
 	call _LABEL_84C
 	call ApplyObjectXVelocity
-	ld hl, _RAM_C64A
+	ld hl, _RAM_C640+object.x_position_minor
 	ld b, $03
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	add a, $F0
 -:
 	ld (hl), a
@@ -8284,12 +8284,12 @@ _LABEL_40B7:
 	ld hl, _RAM_C540
 -:
 	ld (hl), $2D
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	add a, $E0
 	ld de, $0007
 	add hl, de
 	ld (hl), a
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	add a, $10
 	ld de, $0003
 	add hl, de
@@ -8349,11 +8349,11 @@ _LABEL_4178:
 	jr nz, +
 	dec (iy+26)
 	ret nz
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 +:
 	call _LABEL_1C8C
-	jp c, _LABEL_8AC
+	jp c, ClearObjectInIY
 	ld a, (iy+object.y_position_minor)
 	cp $A8
 	jr c, +
@@ -8404,14 +8404,14 @@ HandleObject_Projectile_Tree_Spirit_2:
 
 _LABEL_41FE:
 	call _LABEL_1C8C
-	jp c, _LABEL_8AC
+	jp c, ClearObjectInIY
 	call _LABEL_84C
 	ld a, (iy+1)
 	or a
 	jp z, +
 	ld a, (iy+object.x_position_major)
 	or a
-	jp nz, _LABEL_8AC
+	jp nz, ClearObjectInIY
 	jp ApplyObjectXVelocity
 
 +:
@@ -8428,17 +8428,17 @@ HandleObject_Necromancer:
 	or a
 	jp nz, _LABEL_4278
 	ld a, $30
-	ld (_RAM_C50A), a
+	ld (_RAM_C500+object.x_position_minor), a
 	ld a, $80
-	ld (_RAM_C507), a
+	ld (_RAM_C500+object.y_position_minor), a
 	ld hl, $0BF9
-	ld (_RAM_C518), hl
+	ld (_RAM_C500+object.hitbox_x_offset), hl
 	ld hl, $20D8
-	ld (_RAM_C516), hl
+	ld (_RAM_C500+object.hitbox_y_offset), hl
 	ld hl, $FF40
-	ld (_RAM_C510), hl
+	ld (_RAM_C500+object.y_velocity_sub), hl
 	ld hl, $00C0
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld hl, $0004
 	ld (_RAM_C530), hl
 	ld hl, $6060
@@ -8493,7 +8493,7 @@ _LABEL_4278:
 	call _LABEL_880
 	dec (iy+29)
 	jr z, +++
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	cp $08
@@ -8514,7 +8514,7 @@ _LABEL_4278:
 	jr z, +
 	ld hl, $FF40
 +:
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld a, $40
 	ld (_RAM_C51D), a
 ++++:
@@ -8710,7 +8710,7 @@ _LABEL_4498:
 	ret nz
 	ld a, (iy+29)
 	or a
-	jp nz, _LABEL_8AC
+	jp nz, ClearObjectInIY
 	ld (iy+1), $01
 	ld (iy+14), $00
 	ld hl, _DATA_995D
@@ -8809,13 +8809,13 @@ HandleObject_Baruga:
 	or a
 	jp nz, +
 	ld a, $A0
-	ld (_RAM_C50A), a
+	ld (_RAM_C500+object.x_position_minor), a
 	ld a, $70
-	ld (_RAM_C507), a
+	ld (_RAM_C500+object.y_position_minor), a
 	ld hl, $14F4
-	ld (_RAM_C518), hl
+	ld (_RAM_C500+object.hitbox_x_offset), hl
 	ld hl, $28F0
-	ld (_RAM_C516), hl
+	ld (_RAM_C500+object.hitbox_y_offset), hl
 	call _LABEL_24AE
 	ld a, $08
 	ld (_RAM_C538), a
@@ -8845,9 +8845,9 @@ HandleObject_Baruga:
 	jp _LABEL_4741
 
 +:
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	add a, $01
-	ld (_RAM_C507), a
+	ld (_RAM_C500+object.y_position_minor), a
 	inc (iy+38)
 	cp $70
 	ret c
@@ -8867,9 +8867,9 @@ HandleObject_Baruga:
 	ld hl, $0004
 	ld (_RAM_C530), hl
 	ld hl, $FF60
-	ld (_RAM_C510), hl
+	ld (_RAM_C500+object.y_velocity_sub), hl
 	ld hl, $FF80
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld a, $01
 	ld (_RAM_C502), a
 	ld a, r
@@ -8907,7 +8907,7 @@ _LABEL_461F:
 	ld a, $01
 	ld (_RAM_C502), a
 	ld hl, $FF60
-	ld (_RAM_C510), hl
+	ld (_RAM_C500+object.y_velocity_sub), hl
 	ld hl, $0004
 	ld (_RAM_C530), hl
 	ret
@@ -8916,7 +8916,7 @@ _LABEL_461F:
 	ld a, $04
 	ld (_RAM_C502), a
 	ld hl, $00A0
-	ld (_RAM_C510), hl
+	ld (_RAM_C500+object.y_velocity_sub), hl
 	ld hl, $FFFC
 	ld (_RAM_C530), hl
 	call _LABEL_24E0
@@ -8933,7 +8933,7 @@ _LABEL_461F:
 	ld a, $03
 	ld (_RAM_C502), a
 	ld hl, $FF60
-	ld (_RAM_C510), hl
+	ld (_RAM_C500+object.y_velocity_sub), hl
 	ld hl, $0004
 	ld (_RAM_C530), hl
 	ret
@@ -8942,7 +8942,7 @@ _LABEL_4698:
 	ld a, $02
 	ld (_RAM_C502), a
 	ld hl, $00A0
-	ld (_RAM_C510), hl
+	ld (_RAM_C500+object.y_velocity_sub), hl
 	ld hl, $FFFC
 	ld (_RAM_C530), hl
 	jp _LABEL_24E0
@@ -9074,9 +9074,9 @@ _LABEL_4741:
 
 ++:
 	call _LABEL_84C
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	add a, $FF
-	ld (_RAM_C507), a
+	ld (_RAM_C500+object.y_position_minor), a
 	dec (iy+38)
 	ret nz
 	xor a
@@ -9095,10 +9095,10 @@ HandleObject_Projectile_Baruga:
 	ld a, (iy+3)
 	or a
 	jp nz, +
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	add a, $F4
 	ld (iy+object.x_position_minor), a
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	add a, $10
 	ld (iy+object.y_position_minor), a
 	ld (iy+object.hitbox_x_offset), $FC
@@ -9115,7 +9115,7 @@ HandleObject_Projectile_Baruga:
 	jp z, +
 	dec (iy+26)
 	ret nz
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 +:
 	call _LABEL_1C8C
@@ -9141,13 +9141,13 @@ HandleObject_Pirate:
 	or a
 	jp nz, +
 	ld a, $F0
-	ld (_RAM_C50A), a
+	ld (_RAM_C500+object.x_position_minor), a
 	ld a, $88
-	ld (_RAM_C507), a
+	ld (_RAM_C500+object.y_position_minor), a
 	ld hl, $10FC
-	ld (_RAM_C518), hl
+	ld (_RAM_C500+object.hitbox_x_offset), hl
 	ld hl, $38B0
-	ld (_RAM_C516), hl
+	ld (_RAM_C500+object.hitbox_y_offset), hl
 	ld a, $1E
 	ld (_RAM_BOSS_HP), a
 	ld a, $08
@@ -9213,7 +9213,7 @@ _LABEL_48D4:
 	jp nz, _LABEL_493A
 	ld a, (_RAM_X_POSITION_MINOR)
 	ld b, a
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	sub b
 	jr c, +
 	sub $20
@@ -9230,7 +9230,7 @@ _LABEL_48D4:
 
 +:
 	ld hl, $0100
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld a, $03
 	ld (_RAM_C502), a
 	ret
@@ -9251,12 +9251,12 @@ _LABEL_48D4:
 	ld hl, _DATA_4934
 	add hl, de
 	ld a, (hl)
-	ld (_RAM_C510), a
+	ld (_RAM_C500+object.y_velocity_sub), a
 	inc hl
 	ld a, (hl)
-	ld (_RAM_C511), a
+	ld (_RAM_C500+object.y_velocity_minor), a
 	ld a, $FF
-	ld (_RAM_C514), a
+	ld (_RAM_C500+object.x_velocity_minor), a
 	ld a, $02
 	ld (_RAM_C502), a
 	ret
@@ -9282,11 +9282,11 @@ _LABEL_493A:
 	call ApplyObjectXVelocity
 	ld de, $0020
 	call _LABEL_869
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	cp $88
 	ret c
 	ld a, $88
-	ld (_RAM_C507), a
+	ld (_RAM_C500+object.y_position_minor), a
 	jp _LABEL_4990
 
 ++:
@@ -9300,7 +9300,7 @@ _LABEL_493A:
 	cp $02
 	jr nz, +
 	ld hl, $38E0
-	ld (_RAM_C518), hl
+	ld (_RAM_C500+object.hitbox_x_offset), hl
 +:
 	cp $05
 	ret nz
@@ -9325,7 +9325,7 @@ _LABEL_4998:
 	ld hl, $9F02
 	ld (_RAM_C504), hl
 	ld hl, $FF40
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld a, $01
 	ld (_RAM_C502), a
 	ld a, r
@@ -9352,9 +9352,9 @@ _LABEL_4998:
 	jp -
 
 +:
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	ld b, a
-	ld a, (_RAM_C514)
+	ld a, (_RAM_C500+object.x_velocity_minor)
 	bit 7, a
 	jr z, +
 	ld a, $A0
@@ -9375,21 +9375,21 @@ HandleObject_Pirate_Sword:
 	jp nz, +
 	ld a, $04
 	ld (_RAM_C578), a
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	add a, $F8
-	ld (_RAM_C54A), a
-	ld a, (_RAM_C507)
+	ld (_RAM_C540+object.x_position_minor), a
+	ld a, (_RAM_C500+object.y_position_minor)
 	add a, $D8
-	ld (_RAM_C547), a
+	ld (_RAM_C540+object.y_position_minor), a
 	call _LABEL_2C9A
 	ld a, $06
 	ld (_RAM_C54C), a
 	ld a, $06
 	ld (_RAM_C54D), a
 	ld hl, $18F4
-	ld (_RAM_C558), hl
+	ld (_RAM_C540+object.hitbox_x_offset), hl
 	ld hl, $10F0
-	ld (_RAM_C556), hl
+	ld (_RAM_C540+object.hitbox_y_offset), hl
 	ld hl, _DATA_A0B3
 	jp _LABEL_249F
 
@@ -9408,10 +9408,10 @@ HandleObject_Pirate_Sword:
 	ld a, (_RAM_C55A)
 	or a
 	jp nz, +++
-	ld a, (_RAM_C54B)
+	ld a, (_RAM_C540+object.x_position_major)
 	or a
 	jr nz, ++
-	ld a, (_RAM_C547)
+	ld a, (_RAM_C540+object.y_position_minor)
 	cp $B0
 	jr nc, ++
 	inc (iy+27)
@@ -9431,7 +9431,7 @@ HandleObject_Pirate_Sword:
 	ret nz
 	xor a
 	ld (_RAM_C51C), a
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 ; 48th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Dark_Suma:
@@ -9439,13 +9439,13 @@ HandleObject_Dark_Suma:
 	or a
 	jp nz, +
 	ld a, $18
-	ld (_RAM_C50A), a
+	ld (_RAM_C500+object.x_position_minor), a
 	ld a, $A0
-	ld (_RAM_C507), a
+	ld (_RAM_C500+object.y_position_minor), a
 	ld hl, $18F4
-	ld (_RAM_C518), hl
+	ld (_RAM_C500+object.hitbox_x_offset), hl
 	ld hl, $30D0
-	ld (_RAM_C516), hl
+	ld (_RAM_C500+object.hitbox_y_offset), hl
 	ld a, $08
 	ld (_RAM_C51A), a
 	ld a, $14
@@ -9572,7 +9572,7 @@ _LABEL_4B53:
 	ld a, r
 	and $7F
 ++:
-	ld (_RAM_C50A), a
+	ld (_RAM_C500+object.x_position_minor), a
 	jp _LABEL_4B53
 
 _LABEL_4BA0:
@@ -9591,7 +9591,7 @@ _LABEL_4BA0:
 	ld (_RAM_C502), a
 ++:
 	inc (iy+object.y_position_minor)
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	cp $B0
 	ret c
 	ld a, $03
@@ -9629,9 +9629,9 @@ _LABEL_4BD3:
 	ld (_RAM_C532), a
 	ld (_RAM_C533), a
 	ld hl, $0080
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld hl, $FF40
-	ld (_RAM_C510), hl
+	ld (_RAM_C500+object.y_velocity_sub), hl
 	ld hl, $AE42
 	ld (_RAM_C504), hl
 	ld a, $04
@@ -9652,7 +9652,7 @@ _LABEL_4C2A:
 	call _LABEL_84C
 	call ApplyObjectXVelocity
 	call _LABEL_880
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	cp $04
 	jr c, +
 	cp $FC
@@ -9677,7 +9677,7 @@ _LABEL_4C2A:
 	ld de, $0080
 +:
 	ld (_RAM_C504), hl
-	ld (_RAM_C513), de
+	ld (_RAM_C500+object.x_velocity_sub), de
 	ret
 
 _LABEL_4C7F:
@@ -9689,11 +9689,11 @@ _LABEL_4C7F:
 	ld a, $01
 	ld (_RAM_C502), a
 	ld hl, $FE80
-	ld (_RAM_C510), hl
+	ld (_RAM_C500+object.y_velocity_sub), hl
 	inc (iy+14)
 +:
 	call ApplyObjectYVelocity
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	cp $50
 	ret nc
 	ld a, $02
@@ -9857,11 +9857,11 @@ HandleObject_Projectile_Dark_Suma:
 	ld (_RAM_C578), a
 	ld a, $B0
 	add a, $E8
-	ld (_RAM_C547), a
+	ld (_RAM_C540+object.y_position_minor), a
 	ld c, $E8
 	ld hl, $B0B0
 	ld d, $FD
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	ld b, a
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp b
@@ -9872,14 +9872,14 @@ HandleObject_Projectile_Dark_Suma:
 +:
 	ld a, b
 	add a, c
-	ld (_RAM_C54A), a
+	ld (_RAM_C540+object.x_position_minor), a
 	ld (_RAM_C544), hl
 	ld a, d
-	ld (_RAM_C554), a
+	ld (_RAM_C540+object.x_velocity_minor), a
 	ld hl, $06FD
-	ld (_RAM_C558), hl
+	ld (_RAM_C540+object.hitbox_x_offset), hl
 	ld hl, $0AF3
-	ld (_RAM_C556), hl
+	ld (_RAM_C540+object.hitbox_y_offset), hl
 	ld a, $0A
 	ld (_RAM_C54F), a
 	ld a, $01
@@ -9887,9 +9887,9 @@ HandleObject_Projectile_Dark_Suma:
 _LABEL_4E4B:
 	call _LABEL_1C8C
 	call ApplyObjectXVelocity
-	ld a, (_RAM_C54B)
+	ld a, (_RAM_C540+object.x_position_major)
 	or a
-	jp nz, _LABEL_8AC
+	jp nz, ClearObjectInIY
 	ld a, (_RAM_C55A)
 	or a
 	ret nz
@@ -9913,13 +9913,13 @@ HandleObject_Ra_Goan:
 	or a
 	jp nz, +
 	ld a, $B0
-	ld (_RAM_C50A), a
+	ld (_RAM_C500+object.x_position_minor), a
 	ld a, $A0
-	ld (_RAM_C507), a
+	ld (_RAM_C500+object.y_position_minor), a
 	ld hl, $20F0
-	ld (_RAM_C518), hl
+	ld (_RAM_C500+object.hitbox_x_offset), hl
 	ld hl, $50B0
-	ld (_RAM_C516), hl
+	ld (_RAM_C500+object.hitbox_y_offset), hl
 	ld a, $01
 	ld (_RAM_C50C), a
 	ld a, $04
@@ -10069,7 +10069,7 @@ _LABEL_4F7E:
 +:
 	ld (_RAM_C504), hl
 	ld a, b
-	ld (_RAM_C50A), a
+	ld (_RAM_C500+object.x_position_minor), a
 	ret
 
 _LABEL_4FC8:
@@ -10145,18 +10145,18 @@ HandleObject_Projectile_Ra_Goan:
 	jp nz, _LABEL_5072
 	ld a, $01
 	ld (_RAM_C578), a
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	add a, $F4
-	ld (_RAM_C54A), a
+	ld (_RAM_C540+object.x_position_minor), a
 	ld a, $A0
 	add a, $CC
-	ld (_RAM_C547), a
+	ld (_RAM_C540+object.y_position_minor), a
 	call _LABEL_2C9A
 	call _LABEL_50BE
 	ld hl, $10F8
-	ld (_RAM_C558), hl
+	ld (_RAM_C540+object.hitbox_x_offset), hl
 	ld hl, $10F0
-	ld (_RAM_C556), hl
+	ld (_RAM_C540+object.hitbox_y_offset), hl
 	ld hl, _DATA_B35C
 	jp _LABEL_249F
 
@@ -10164,13 +10164,13 @@ _LABEL_5072:
 	call _LABEL_1C8C
 	call ApplyObjectXVelocity
 	call ApplyObjectYVelocity
-	ld a, (_RAM_C54B)
+	ld a, (_RAM_C540+object.x_position_major)
 	or a
-	jp nz, _LABEL_8AC
-	ld a, (_RAM_C547)
+	jp nz, ClearObjectInIY
+	ld a, (_RAM_C540+object.y_position_minor)
 	cp $A0
 	ret c
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 ; 65th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Projectile_Ra_Goan_2:
@@ -10179,18 +10179,18 @@ HandleObject_Projectile_Ra_Goan_2:
 	jp nz, _LABEL_5072
 	ld a, $01
 	ld (_RAM_C578), a
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	add a, $10
-	ld (_RAM_C54A), a
+	ld (_RAM_C540+object.x_position_minor), a
 	ld a, $A0
 	add a, $DC
-	ld (_RAM_C547), a
+	ld (_RAM_C540+object.y_position_minor), a
 	call _LABEL_2C9A
 	call _LABEL_50BE
 	ld hl, $20E0
-	ld (_RAM_C556), hl
+	ld (_RAM_C540+object.hitbox_y_offset), hl
 	ld hl, $10F8
-	ld (_RAM_C558), hl
+	ld (_RAM_C540+object.hitbox_x_offset), hl
 	ld hl, _DATA_B367
 	jp _LABEL_249F
 
@@ -10198,11 +10198,11 @@ _LABEL_50BE:
 	ld l, e
 	ld h, d
 	add hl, de
-	ld (_RAM_C550), hl
+	ld (_RAM_C540+object.y_velocity_sub), hl
 	ld l, c
 	ld h, b
 	add hl, bc
-	ld (_RAM_C553), hl
+	ld (_RAM_C540+object.x_velocity_sub), hl
 	ret
 
 ; 63rd entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -10213,23 +10213,23 @@ HandleObject_Shield_Ra_Goan:
 	ld a, $02
 	ld (_RAM_C5B8), a
 	ld hl, $08F8
-	ld (_RAM_C598), hl
+	ld (_RAM_C580+object.hitbox_x_offset), hl
 	ld hl, $30D0
-	ld (_RAM_C596), hl
+	ld (_RAM_C580+object.hitbox_y_offset), hl
 	ld a, $A0
-	ld (_RAM_C587), a
+	ld (_RAM_C580+object.y_position_minor), a
 	ld a, (_RAM_X_POSITION_MINOR)
 	ld b, a
 	ld c, $F8
 	ld hl, _DATA_B336
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	cp b
 	jr nc, +
 	ld c, $08
 	ld hl, _DATA_B34D
 +:
 	add a, c
-	ld (_RAM_C58A), a
+	ld (_RAM_C580+object.x_position_minor), a
 	ld a, $28
 	ld (_RAM_C59A), a
 	jp _LABEL_249F
@@ -10239,7 +10239,7 @@ HandleObject_Shield_Ra_Goan:
 	call _LABEL_1C8C
 	dec (iy+26)
 	ret nz
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 LoadMapEnemies:
 	ld a, :Bank10
@@ -10508,7 +10508,7 @@ _LABEL_52BC:
 	ld iy, _RAM_C400
 	ld a, (_RAM_C161)
 	or a
-	call z, _LABEL_8AC
+	call z, ClearObjectInIY
 	call _LABEL_595A
 	call CheckVarlinDoor
 	call LoadMapEnemies
@@ -10524,7 +10524,7 @@ _LABEL_52BC:
 	call _LABEL_54D5
 	call _LABEL_9F3
 	ld a, $01
-	ld (_RAM_C12A), a
+	ld (_RAM_HEALTH_BAR_NEEDS_REDRAW), a
 	ld (_RAM_INVENTORY_NEEDS_REDRAW), a
 	ld (_RAM_SCORE_COUNTER_NEEDS_REDRAW), a
 	call _LABEL_5483
@@ -10714,14 +10714,14 @@ _LABEL_5483:
 	ld a, (_RAM_CURRENT_MAP)
 	cp $82 ; Ra Goan's Dungeon Entrance
 	ret nz
-	ld a, $04
+	ld a, $04 ; Arrow Upgrade
 	ld (_RAM_C480), a
 	ld a, $40
-	ld (_RAM_C487), a
+	ld (_RAM_C480+object.y_position_minor), a
 	ld a, $10
-	ld (_RAM_C48A), a
+	ld (_RAM_C480+object.x_position_minor), a
 	ld a, $FF
-	ld (_RAM_C48B), a
+	ld (_RAM_C480+object.x_position_major), a
 	ld a, :Bank3
 	ld (_RAM_FFFF), a
 	ld hl, _DATA_EE5B
@@ -11311,7 +11311,7 @@ DrawMapScreen:
 	ld (_RAM_C109), a
 	ld (_RAM_C111), a
 	ld iy, _RAM_C400
-	call _LABEL_8AC
+	call ClearObjectInIY
 	ld de, $7800
 	ld hl, $2000
 	ld bc, $0300
@@ -11457,7 +11457,7 @@ _LABEL_59CF:
 	ld (hl), b
 	ldir
 	ld iy, _RAM_C400
-	call _LABEL_8AC
+	call ClearObjectInIY
 +:
 	xor a
 	ld hl, _RAM_C440
@@ -11582,7 +11582,7 @@ _LABEL_5ADA:
 	ld hl, _DATA_2624D
 	ld bc, $0000
 	ld a, :Bank9
-	ld e, $2B
+	ld e, $2B ; Tree Spirit
 	jp _LABEL_5BF6
 
 ; 3rd entry of Jump Table from 5AAC (indexed by _RAM_BOSS_INDEX)
@@ -11599,7 +11599,7 @@ _LABEL_5AFA:
 	ld hl, _DATA_26E3E
 	ld bc, $0000
 	ld a, :Bank9
-	ld e, $37
+	ld e, $37 ; Baruga
 	jp _LABEL_5BF6
 
 ; 4th entry of Jump Table from 5AAC (indexed by _RAM_BOSS_INDEX)
@@ -11610,7 +11610,7 @@ _LABEL_5B1C:
 	ld hl, _DATA_1C000
 	ld bc, $0000
 	ld a, :Bank7
-	ld e, $36
+	ld e, $36 ; Medusa
 	call _LABEL_5BF6
 	ld hl, _DATA_5B54
 	ld de, $C018
@@ -11643,7 +11643,7 @@ _LABEL_5B59:
 	ld hl, _DATA_1D1AC
 	ld bc, $6484
 	ld a, :Bank7
-	ld e, $2E
+	ld e, $2E ; Necromancer
 	jp _LABEL_5BF6
 
 ; 6th entry of Jump Table from 5AAC (indexed by _RAM_BOSS_INDEX)
@@ -11657,7 +11657,7 @@ _LABEL_5B74:
 	ld hl, _DATA_25AF3
 	ld bc, $4E6E
 	ld a, :Bank9
-	ld e, $3A
+	ld e, $3A ; The Ripper
 	jp _LABEL_5BF6
 
 ; 7th entry of Jump Table from 5AAC (indexed by _RAM_BOSS_INDEX)
@@ -11668,7 +11668,7 @@ _LABEL_5B8F:
 	ld hl, _DATA_24717
 	ld bc, $0000
 	ld a, :Bank9
-	ld e, $34
+	ld e, $34 ; Pirate
 	jp _LABEL_5BF6
 
 +:
@@ -11696,7 +11696,7 @@ _LABEL_5BA8:
 	ld hl, _DATA_29FDA
 	ld bc, $5C7C
 	ld a, :Bank10
-	ld e, $30
+	ld e, $30 ; Dark Suma
 	jp _LABEL_5BF6
 
 ; Data from 5BDD to 5BE1 (5 bytes)
@@ -11969,7 +11969,7 @@ _LABEL_5DA6:
 	ld (_RAM_FFFF), a
 	call _LABEL_C9C8
 	ld iy, _RAM_C400
-	call _LABEL_8AC
+	call ClearObjectInIY
 	ld a, $01
 	ld (_RAM_C400), a
 	ld a, $A0
@@ -11983,25 +11983,25 @@ _LABEL_5DA6:
 	ld hl, _DATA_1DBAF
 	ld bc, $7090
 	ld a, $07
-	ld e, $2F
+	ld e, $2F ; Stone Hammer
 	dec d
 	jr z, +
 	ld hl, _DATA_25328
 	ld bc, $4868
 	ld a, $09
-	ld e, $32
+	ld e, $32 ; Golden Guard
 	dec d
 	jr z, +
 	ld hl, _DATA_294FD
 	ld bc, $6C8E
 	ld a, $0A
-	ld e, $39
+	ld e, $39 ; Court Jester
 	dec d
 	jr z, +
 	ld hl, _DATA_2A731
 	ld bc, $5676
 	ld a, :Bank10
-	ld e, $33
+	ld e, $33 ; Paradin
 +:
 	call _LABEL_5BF6
 	ld a, $86
@@ -12074,7 +12074,7 @@ _LABEL_5E92:
 	ld hl, $0200
 	ld de, $AA2F
 +:
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ex de, hl
 	ld (_RAM_C504), hl
 	ld (iy+33), c
@@ -12091,7 +12091,7 @@ _LABEL_5E92:
 	ld (iy+1), $02
 	ld (iy+14), $01
 	ld hl, $FA00
-	ld (_RAM_C510), hl
+	ld (_RAM_C500+object.y_velocity_sub), hl
 	ret
 
 _LABEL_5F2A:
@@ -12099,11 +12099,11 @@ _LABEL_5F2A:
 	call _LABEL_634B
 	ld de, $0058
 	call _LABEL_869
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	cp $A0
 	ret c
 	ld hl, $A000
-	ld (_RAM_C506), hl
+	ld (_RAM_C500+object.y_position_sub), hl
 	ld (iy+1), $03
 	inc (iy+object.boss_teleport_timer)
 	ld hl, $A961
@@ -12171,7 +12171,7 @@ _LABEL_5FB9:
 	call ApplyLandauHealOrDamageFromC
 	ld c, $07
 	call AwardScore
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 ; 47th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Stone_Hammer:
@@ -12188,7 +12188,7 @@ HandleObject_Stone_Hammer:
 	ld hl, $9A40
 	ld (_RAM_C504), hl
 	ld hl, $FF80
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld (iy+12), $04
 	ld (iy+13), $0C
 	ld hl, $20D8
@@ -12225,10 +12225,10 @@ HandleObject_Stone_Hammer:
 	ld (iy+1), $01
 	ld (iy+14), $01
 	ld hl, $FA00
-	ld (_RAM_C510), hl
-	ld hl, (_RAM_C513)
+	ld (_RAM_C500+object.y_velocity_sub), hl
+	ld hl, (_RAM_C500+object.x_velocity_sub)
 	add hl, hl
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ret
 
 +:
@@ -12236,11 +12236,11 @@ HandleObject_Stone_Hammer:
 	call _LABEL_634B
 	ld de, $0060
 	call _LABEL_869
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	cp $A0
 	ret c
 	ld hl, $A000
-	ld (_RAM_C506), hl
+	ld (_RAM_C500+object.y_position_sub), hl
 	call _LABEL_6378
 	ld hl, $9AD7
 	ld d, $E8
@@ -12280,9 +12280,9 @@ _LABEL_60A8:
 	ld (iy+33), b
 	ld (_RAM_C504), hl
 	ex de, hl
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld hl, $FC00
-	ld (_RAM_C510), hl
+	ld (_RAM_C500+object.y_velocity_sub), hl
 	ld (iy+1), $03
 	ld (iy+13), $08
 	ld (iy+12), $04
@@ -12296,11 +12296,11 @@ _LABEL_60ED:
 	call _LABEL_634B
 	ld de, $0020
 	call _LABEL_869
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	cp $A0
 	ret c
 	ld hl, $A000
-	ld (_RAM_C506), hl
+	ld (_RAM_C500+object.y_position_sub), hl
 	call _LABEL_6378
 	ld hl, $9A40
 	ld de, $FF80
@@ -12311,7 +12311,7 @@ _LABEL_60ED:
 +:
 	ld (_RAM_C504), hl
 	ex de, hl
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld (iy+object.hitbox_x_offset), $F4
 	ld (iy+object.hitbox_width), $18
 	ld (iy+33), c
@@ -12361,7 +12361,7 @@ _LABEL_6177:
 	call ApplyLandauHealOrDamageFromC
 	ld c, $07
 	call AwardScore
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 ; 50th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Golden_Guard:
@@ -12374,7 +12374,7 @@ HandleObject_Golden_Guard:
 	ld hl, $9E30
 	ld (_RAM_C504), hl
 	ld hl, $FF00
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 _LABEL_61AD:
 	xor a
 	ld (_RAM_C501), a
@@ -12417,7 +12417,7 @@ _LABEL_61AD:
 	ld (iy+1), $01
 	ld (iy+14), $00
 	ld hl, $FC00
-	ld (_RAM_C510), hl
+	ld (_RAM_C500+object.y_velocity_sub), hl
 	ld hl, $9E97
 	bit 7, (iy+object.x_velocity_minor)
 	jr nz, +
@@ -12431,7 +12431,7 @@ _LABEL_61AD:
 	call _LABEL_634B
 	ld de, $0020
 	call _LABEL_869
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	cp $A0
 	jr nc, +
 	ld hl, $FC08
@@ -12439,7 +12439,7 @@ _LABEL_61AD:
 	ret c
 +:
 	ld hl, $0000
-	ld (_RAM_C510), hl
+	ld (_RAM_C500+object.y_velocity_sub), hl
 	ld (iy+1), $02
 	ret
 
@@ -12448,7 +12448,7 @@ _LABEL_6245:
 	call _LABEL_634B
 	ld de, $0040
 	call _LABEL_869
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	cp $A0
 	ret c
 	ld (iy+object.y_position_minor), $A0
@@ -12490,7 +12490,7 @@ _LABEL_6291:
 +:
 	ld (_RAM_C504), hl
 	ex de, hl
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld (iy+33), c
 	call _LABEL_61AD
 	ld (iy+1), $04
@@ -12508,7 +12508,7 @@ _LABEL_62C7:
 _LABEL_62D9:
 	call ApplyObjectXVelocity
 	call _LABEL_84C
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	bit 7, (iy+object.x_velocity_minor)
 	jr z, ++
 	cp $10
@@ -12531,7 +12531,7 @@ _LABEL_62D9:
 	ld (iy+9), $00
 	ld (iy+33), c
 	ex de, hl
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ret
 
 _LABEL_6312:
@@ -12546,10 +12546,10 @@ _LABEL_6312:
 	call ApplyLandauHealOrDamageFromC
 	ld c, $07
 	call AwardScore
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 _LABEL_632F:
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	add a, h
 	cp $E8
 	jr c, +
@@ -12574,13 +12574,13 @@ _LABEL_632F:
 	ret
 
 _LABEL_634B:
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
 	cp $10
 	ret nc
 	ld (iy+object.x_position_minor), $10
-	ld (iy+9), $00
+	ld (iy+object.x_position_sub), $00
 	ld (iy+33), $01
 	jp _LABEL_24E0
 
@@ -12612,10 +12612,10 @@ _LABEL_6388:
 	ld de, $0400
 	ld b, $01
 +:
-	ld hl, (_RAM_C513)
+	ld hl, (_RAM_C500+object.x_velocity_sub)
 	ld (_RAM_C525), hl
 	ex de, hl
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld (iy+object.boss_flash_timer), $01
 	ld (iy+33), b
 	ld (iy+53), $08
@@ -12631,7 +12631,7 @@ _LABEL_63B5:
 	ret nz
 	ld (iy+object.boss_flash_timer), $00
 	ld hl, (_RAM_C525)
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	call _LABEL_5268
 	ret nc
 	ld a, $A5
@@ -12682,9 +12682,9 @@ _LABEL_6417:
 	ret
 
 _LABEL_642E:
-	ld (_RAM_C516), hl
+	ld (_RAM_C500+object.hitbox_y_offset), hl
 	ex de, hl
-	ld (_RAM_C518), hl
+	ld (_RAM_C500+object.hitbox_x_offset), hl
 	ret
 
 ; Data from 6436 to 643C (7 bytes)
@@ -12731,7 +12731,7 @@ _LABEL_6459:
 	call _LABEL_65E4
 	call ApplyObjectXVelocity
 	call _LABEL_84C
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	ld bc, $18FF
 	cp b
 	jr c, +
@@ -12752,9 +12752,9 @@ _LABEL_6459:
 +:
 	ld (_RAM_C504), hl
 	ex de, hl
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld hl, $FE00
-	ld (_RAM_C510), hl
+	ld (_RAM_C500+object.y_velocity_sub), hl
 	ld (iy+12), $04
 	ld (iy+13), $06
 	xor a
@@ -12783,20 +12783,20 @@ _LABEL_64E2:
 	ret
 
 +:
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	add a, $E8
-	ld (_RAM_C507), a
+	ld (_RAM_C500+object.y_position_minor), a
 	ld a, $C8
 	bit 7, (iy+object.x_velocity_minor)
 	jr nz, +
 	ld a, $38
 +:
 	add a, (iy+object.x_position_minor)
-	ld (_RAM_C50A), a
+	ld (_RAM_C500+object.x_position_minor), a
 	ret
 
 ++:
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	cp $A0
 	ret c
 	ld (iy+object.y_position_minor), $A0
@@ -12837,19 +12837,19 @@ _LABEL_6543:
 	xor a
 	ld (_RAM_C50E), a
 	ld (_RAM_C50F), a
-	ld (_RAM_C513), a
-	ld (_RAM_C514), a
+	ld (_RAM_C500+object.x_velocity_sub), a
+	ld (_RAM_C500+object.x_velocity_minor), a
 	ld (iy+1), $02
 	ld (iy+47), $00
 	ex de, hl
-	ld (_RAM_C553), hl
+	ld (_RAM_C540+object.x_velocity_sub), hl
 	ld hl, $A812
 	ld (_RAM_C544), hl
-	ld a, (_RAM_C50A)
-	ld (_RAM_C54A), a
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.x_position_minor)
+	ld (_RAM_C540+object.x_position_minor), a
+	ld a, (_RAM_C500+object.y_position_minor)
 	add a, $EC
-	ld (_RAM_C547), a
+	ld (_RAM_C540+object.y_position_minor), a
 	ld ix, _RAM_C540
 	ld (ix+object.hitbox_y_offset), $F4
 	ld (ix+object.hitbox_height), $08
@@ -12883,7 +12883,7 @@ _LABEL_65E4:
 	jp z, +
 	ld hl, $0200
 +:
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ret
 
 _LABEL_65F5:
@@ -12898,7 +12898,7 @@ _LABEL_65F5:
 	call ApplyLandauHealOrDamageFromC
 	ld c, $07
 	call AwardScore
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 ; 60th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Projectile_Court_Jester:
@@ -12909,10 +12909,10 @@ HandleObject_Projectile_Court_Jester:
 	call _LABEL_1C8C
 	ld a, (iy+object.x_position_major)
 	or a
-	jp nz, _LABEL_8AC
+	jp nz, ClearObjectInIY
 	ld a, (iy+object.y_position_minor)
 	cp $C0
-	jp nc, _LABEL_8AC
+	jp nc, ClearObjectInIY
 	ret
 
 +:
@@ -12931,7 +12931,7 @@ HandleObject_Paradin:
 	ld c, $04
 	call _LABEL_6417
 	ld hl, $FE80
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld (iy+object.hitbox_y_offset), $DC
 	ld (iy+object.hitbox_height), $20
 	ld de, $F810
@@ -12969,7 +12969,7 @@ _LABEL_6660:
 	or a
 	ret nz
 	call _LABEL_1C8C
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	cp $40
 	ret c
 	cp $C0
@@ -13017,7 +13017,7 @@ _LABEL_66FA:
 	ld de, $A2F1
 	ld hl, $0180
 +:
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ex de, hl
 	ld de, $F810
 	ld bc, $0406
@@ -13025,7 +13025,7 @@ _LABEL_66FA:
 	jp _LABEL_6660
 
 _LABEL_671A:
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	bit 0, (iy+32)
 	jr nz, +
 	cp $10
@@ -13044,7 +13044,7 @@ _LABEL_671A:
 ++:
 	ld (_RAM_C504), hl
 	ex de, hl
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld (iy+32), c
 	ld (iy+object.boss_teleport_timer), $00
 	ret
@@ -13063,7 +13063,7 @@ _LABEL_674A:
 	call ApplyLandauHealOrDamageFromC
 	ld c, $07
 	call AwardScore
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 _LABEL_676B:
 	call _LABEL_63B5
@@ -13100,7 +13100,7 @@ HandleObject_Medusa:
 	ld de, $18F4
 	call _LABEL_642E
 	ld hl, $0000
-	ld (_RAM_C510), hl
+	ld (_RAM_C500+object.y_velocity_sub), hl
 	ld hl, $FFFC
 	ld (_RAM_C530), hl
 	ld (iy+50), $40
@@ -13166,7 +13166,7 @@ _LABEL_67F5:
 	ret
 
 +:
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	cp $A4
 	ret c
 	ld hl, $AB4F
@@ -13174,7 +13174,7 @@ _LABEL_67F5:
 	ld a, $01
 	call _LABEL_67E1
 	ld hl, $0100
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld (iy+44), $20
 	ld hl, $00D8
 	ld (_RAM_C528), hl
@@ -13216,20 +13216,20 @@ _LABEL_6893:
 	ld a, $01
 	ld (_RAM_C543), a
 	ld hl, $0400
-	ld (_RAM_C553), hl
+	ld (_RAM_C540+object.x_velocity_sub), hl
 	ld hl, $ADD9
 	ld (_RAM_C544), hl
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	add a, $10
-	ld (_RAM_C54A), a
-	ld a, (_RAM_C507)
+	ld (_RAM_C540+object.x_position_minor), a
+	ld a, (_RAM_C500+object.y_position_minor)
 	add a, $E8
-	ld (_RAM_C547), a
+	ld (_RAM_C540+object.y_position_minor), a
 	ld ix, _RAM_C540
-	ld (ix+22), $F8
-	ld (ix+23), $08
-	ld (ix+24), $FC
-	ld (ix+25), $08
+	ld (ix+object.hitbox_y_offset), $F8
+	ld (ix+object.hitbox_height), $08
+	ld (ix+object.hitbox_x_offset), $FC
+	ld (ix+object.hitbox_width), $08
 	ld (ix+56), $03
 	ret
 
@@ -13252,35 +13252,35 @@ _LABEL_68E7:
 	ld (_RAM_C583), a
 	ld hl, $ADA0
 	ld (_RAM_C584), hl
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	add a, $10
-	ld (_RAM_C58A), a
-	ld a, (_RAM_C507)
+	ld (_RAM_C580+object.x_position_minor), a
+	ld a, (_RAM_C500+object.y_position_minor)
 	add a, $D8
-	ld (_RAM_C587), a
+	ld (_RAM_C580+object.y_position_minor), a
 	ld ix, _RAM_C580
 	ld (ix+22), $F0
 	ld (ix+23), $08
 	ld (ix+24), $E8
 	ld (ix+25), $10
 	ld hl, $0400
-	ld (_RAM_C593), hl
+	ld (_RAM_C580+object.x_velocity_sub), hl
 	ld hl, $0200
-	ld (_RAM_C590), hl
+	ld (_RAM_C580+object.y_velocity_sub), hl
 	ld (ix+12), $04
 	ld (ix+13), $08
 	ld (ix+56), $06
 	ret
 
 _LABEL_6947:
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	cp $30
 	ret z
 	ld hl, $FF80
 	jp nc, +
 	ld hl, $0080
 +:
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	jp ApplyObjectXVelocity
 
 _LABEL_695C:
@@ -13289,7 +13289,7 @@ _LABEL_695C:
 _LABEL_6960:
 	ld (iy+47), $00
 	ld hl, $FC00
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ld (iy+32), $01
 	ld (iy+33), $08
 	ld a, $A3
@@ -13309,18 +13309,18 @@ _LABEL_698C:
 	call ApplyObjectXVelocity
 	dec (iy+33)
 	jr z, +
-	ld a, (_RAM_C50A)
+	ld a, (_RAM_C500+object.x_position_minor)
 	cp $10
 	ret nc
 	ld hl, $1000
-	ld (_RAM_C509), hl
+	ld (_RAM_C500+object.x_position_sub), hl
 +:
 	xor a
 	ld (_RAM_C520), a
 	ld (_RAM_C521), a
 	ld (iy+44), $01
 	ld hl, $0000
-	ld (_RAM_C513), hl
+	ld (_RAM_C500+object.x_velocity_sub), hl
 	ret
 
 _LABEL_69B2:
@@ -13337,7 +13337,7 @@ _LABEL_69B2:
 	call AwardScore
 	xor a
 	ld (_RAM_INVENTORY_HERB), a
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 _LABEL_69D4:
 	ld a, (_RAM_C500)
@@ -13397,7 +13397,7 @@ _LABEL_69D4:
 
 _LABEL_6A47: ; Handle boss defeated flags
 	call +
-	jp _LABEL_8AC
+	jp ClearObjectInIY
 
 +:
 	ld a, (iy+object.type)
@@ -13450,11 +13450,11 @@ _LABEL_6A9E:
 	jr _LABEL_6AC2
 
 _LABEL_6AA5:
-	ld a, (_RAM_C507)
+	ld a, (_RAM_C500+object.y_position_minor)
 	add a, $E0
-	ld (_RAM_C487), a
-	ld a, (_RAM_C50A)
-	ld (_RAM_C48A), a
+	ld (_RAM_C480+object.y_position_minor), a
+	ld a, (_RAM_C500+object.x_position_minor)
+	ld (_RAM_C480+object.x_position_minor), a
 	ld a, $03
 	ld (_RAM_C480), a
 	ld a, $01
@@ -13469,19 +13469,19 @@ _LABEL_6AC2:
 	ld c, $10
 	call ApplyLandauHealOrDamageFromC
 	ld ix, _RAM_C540
-	call _LABEL_8A6
+	call ClearObjectInIX
 	ld ix, _RAM_C580
-	call _LABEL_8A6
+	call ClearObjectInIX
 	ld ix, _RAM_C5C0
-	call _LABEL_8A6
+	call ClearObjectInIX
 	ld ix, _RAM_C600
-	call _LABEL_8A6
+	call ClearObjectInIX
 	ld ix, _RAM_C640
-	call _LABEL_8A6
+	call ClearObjectInIX
 	ld ix, _RAM_C680
-	call _LABEL_8A6
+	call ClearObjectInIX
 	ld ix, _RAM_C6C0
-	jp _LABEL_8A6
+	jp ClearObjectInIX
 
 _LABEL_6B01:
 	ld hl, _RAM_FLAG_GAME_STARTED
@@ -13629,7 +13629,7 @@ Handle_Map_Status_Demo:
 	ld a, $30
 	ld (_RAM_HEALTH), a
 	ld a, $01
-	ld (_RAM_C12A), a
+	ld (_RAM_HEALTH_BAR_NEEDS_REDRAW), a
 	call _LABEL_9DC
 	ld hl, _PALETTE_9BC
 	call _LABEL_3D1

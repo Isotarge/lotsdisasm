@@ -75,7 +75,7 @@ _RAM_C11D db
 
 .enum $C129 export
 _RAM_HEALTH db
-_RAM_C12A db
+_RAM_HEALTH_BAR_NEEDS_REDRAW db
 _RAM_RECOVERY_STATUS db
 _RAM_RECOVERY_TIMER dw
 _RAM_C12E db
@@ -248,19 +248,6 @@ _RAM_C483 db
 _RAM_C484 dw
 .ende
 
-.enum $C487 export
-_RAM_C487 db
-.ende
-
-.enum $C48A export
-_RAM_C48A db
-_RAM_C48B db
-.ende
-
-.enum $C490 export
-_RAM_C490 dw
-.ende
-
 .enum $C4C0 export
 _RAM_SIGN_OBJECT_BASE db
 .ende
@@ -284,13 +271,6 @@ _RAM_C501 db
 _RAM_C502 db
 _RAM_C503 db
 _RAM_C504 dw
-_RAM_C506 db
-_RAM_C507 db
-.ende
-
-.enum $C509 export
-_RAM_C509 db
-_RAM_C50A db
 .ende
 
 .enum $C50C export
@@ -298,18 +278,9 @@ _RAM_C50C db
 _RAM_C50D db
 _RAM_C50E db
 _RAM_C50F db
-_RAM_C510 db
-_RAM_C511 db
 .ende
 
-.enum $C513 export
-_RAM_C513 db
-_RAM_C514 db
-.ende
-
-.enum $C516 export
-_RAM_C516 dw
-_RAM_C518 dw
+.enum $C51A export
 _RAM_C51A db
 _RAM_C51B db
 _RAM_C51C db
@@ -346,28 +317,14 @@ _RAM_C543 db
 _RAM_C544 dw
 .ende
 
-.enum $C547 export
-_RAM_C547 db
-.ende
-
-.enum $C54A export
-_RAM_C54A db
-_RAM_C54B db
+.enum $C54C export
 _RAM_C54C db
 _RAM_C54D db
 _RAM_C54E db
 _RAM_C54F db
-_RAM_C550 dw
 .ende
 
-.enum $C553 export
-_RAM_C553 db
-_RAM_C554 db
-.ende
-
-.enum $C556 export
-_RAM_C556 dw
-_RAM_C558 dw
+.enum $C55A export
 _RAM_C55A db
 _RAM_C55B db
 .ende
@@ -382,25 +339,7 @@ _RAM_C583 db
 _RAM_C584 dw
 .ende
 
-.enum $C587 export
-_RAM_C587 db
-.ende
-
-.enum $C58A export
-_RAM_C58A db
-.ende
-
-.enum $C590 export
-_RAM_C590 dw
-.ende
-
-.enum $C593 export
-_RAM_C593 dw
-.ende
-
-.enum $C596 export
-_RAM_C596 dw
-_RAM_C598 dw
+.enum $C59A export
 _RAM_C59A db
 .ende
 
@@ -419,10 +358,6 @@ _RAM_C600 dsb $38
 .enum $C640 export
 _RAM_C640 db
 _RAM_C641 db
-.ende
-
-.enum $C64A export
-_RAM_C64A db
 .ende
 
 .enum $C680 export

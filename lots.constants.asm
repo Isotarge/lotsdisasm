@@ -119,22 +119,22 @@
 	y_position_minor db ; 7
 	unknown_0x08 db
 	x_position_sub db   ; 9
-	x_position_minor db ; 10
+	x_position_minor db ; 10, 0x0A
 	x_position_major db ; 11
 	unknown_0x0C db
 	unknown_0x0D db
 	sign_index db       ; 14 More general: Animation Frame?
 	sign_timer db       ; 15
-	y_velocity_sub db   ; 16
+	y_velocity_sub db   ; 16, 0x10
 	y_velocity_minor db ; 17
 	unknown_0x12 db
-	x_velocity_sub db   ; 19
-	x_velocity_minor db ; 20
-	x_velocity_major db ; 21
-	hitbox_y_offset db  ; 22
-	hitbox_height db    ; 23
-	hitbox_x_offset db  ; 24
-	hitbox_width db     ; 25
+	x_velocity_sub db   ; 19, 0x13
+	x_velocity_minor db ; 20, 0x14
+	x_velocity_major db ; 21, 0x15
+	hitbox_y_offset db  ; 22, 0x16
+	hitbox_height db    ; 23, 0x17
+	hitbox_x_offset db  ; 24, 0x18
+	hitbox_width db     ; 25, 0x19
 	unknown_0x1A db
 	unknown_0x1B db ; Upper 4 bits are score table index, not sure what lower 4 do
 	unknown_0x1C db
