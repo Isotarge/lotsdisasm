@@ -113,7 +113,7 @@
 	type db
 	unknown_0x01 db
 	unknown_0x02 db
-	is_initialised db
+	is_initialized db
 	unknown_0x04 db ; Pointer, tiles?
 	unknown_0x05 db ; Pointer, tiles?
 	y_position_sub db   ; 6
