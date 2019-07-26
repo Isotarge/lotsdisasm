@@ -608,11 +608,11 @@ _LABEL_467:
 	or a
 	jr z, _LABEL_492
 	ld iy, _RAM_C9C0
-	ld de, $FFC0
+	ld de, -_sizeof_object
 _LABEL_492:
 	push bc
 	push de
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	call nz, +
 	pop de
@@ -994,7 +994,7 @@ HandleObject_Sword_Upgrade:
 _LABEL_775:
 	ld hl, $85E7
 	ld (_RAM_C484), hl
-	ld (iy+3), $01
+	ld (iy+object.is_initialised), $01
 	ld (iy+object.hitbox_y_offset), $E0
 	ld (iy+object.hitbox_height), $20
 	ld (iy+object.hitbox_x_offset), $F8
@@ -1048,7 +1048,7 @@ HandleObject_Sign:
 	jr nz, +
 	ld (iy+object.y_position_minor), $38
 	ld (iy+object.x_position_minor), $80
-	ld (iy+3), $01
+	ld (iy+object.is_initialised), $01
 	ld hl, $B37A
 	ld (_RAM_C4C4), hl
 	ld (iy+15), $00
@@ -2016,7 +2016,7 @@ HandleObject_Landau:
 	jp nz, +
 	ld hl, _DATA_8000
 	ld (_RAM_C404), hl
-	ld (iy+3), $01
+	ld (iy+object.is_initialised), $01
 	ld (iy+object.hitbox_y_offset), $E0
 	ld (iy+object.hitbox_height), $20
 	ld (iy+object.hitbox_x_offset), $FC
@@ -2948,8 +2948,8 @@ _LABEL_161E:
 	ld (_RAM_C440+object.y_position_minor), a
 	ld hl, _DATA_85D1
 	ld (_RAM_C444), hl
-	ld (ix+0), $02
-	ld (ix+3), $01
+	ld (ix+object.type), $02 ; Arrow
+	ld (ix+object.is_initialised), $01
 	xor a
 	ld (_RAM_C460), a
 	ld (_RAM_C461), a
@@ -5049,7 +5049,7 @@ _LABEL_2494:
 	ret
 
 _LABEL_249F:
-	ld (iy+3), $01
+	ld (iy+object.is_initialised), $01
 _LABEL_24A3:
 	ld (iy+4), l
 	ld (iy+5), h
@@ -5116,7 +5116,7 @@ _LABEL_2505:
 	ld a, (hl)
 	or a
 	jr z, +
-	ld de, $0040
+	ld de, _sizeof_object
 	add hl, de
 	djnz -
 	ret
@@ -5161,7 +5161,7 @@ _LABEL_2542:
 
 ; 16th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Slime:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, +
 	ld (iy+object.hitbox_x_offset), $FA
@@ -5249,7 +5249,7 @@ _LABEL_25DC:
 
 ; 18th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Giant_Bat:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	ld (iy+object.hitbox_x_offset), $F8
@@ -5335,7 +5335,7 @@ HandleObject_Giant_Bat:
 
 ; 41st entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Projectile_Straw_Fly:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, _LABEL_286D
 	ld (iy+27), $01
@@ -5408,7 +5408,7 @@ _LABEL_2779:
 	ld (iy+object.y_position_minor), a
 	ld (iy+39), $00
 	ld (iy+40), $00
-	ld (iy+3), $01
+	ld (iy+object.is_initialised), $01
 	ld hl, _DATA_94C0
 	ld de, $0400
 	ld b, $0C
@@ -5466,7 +5466,7 @@ _LABEL_27F8:
 	ld a, (iy+object.y_position_minor)
 	add a, $E0
 	ld (iy+object.y_position_minor), a
-	ld (iy+3), $02
+	ld (iy+object.is_initialised), $02
 	ret
 
 _LABEL_2834:
@@ -5475,7 +5475,7 @@ _LABEL_2834:
 	ld (iy+object.hitbox_width), $08
 	ld (iy+object.hitbox_y_offset), $F0
 	ld (iy+object.hitbox_height), $10
-	ld (iy+3), $01
+	ld (iy+object.is_initialised), $01
 	ld a, (iy+46)
 	add a, a
 	ld e, a
@@ -5569,7 +5569,7 @@ _LABEL_2909:
 
 ; 19th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Bird:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	ld a, r
@@ -5717,7 +5717,7 @@ _LABEL_2A20:
 
 ; 20th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Killer_Fish:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jr nz, ++
 	ld (iy+object.hitbox_x_offset), $F4
@@ -5810,7 +5810,7 @@ _LABEL_2AE2:
 
 ; 22nd entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Knight:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	ld hl, _DATA_87A8
@@ -5979,7 +5979,7 @@ _LABEL_2C9A:
 
 ; 23rd entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Scorpion:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	call _LABEL_24B4
@@ -6077,7 +6077,7 @@ _DATA_2D84:
 
 ; 30th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Snake:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jr nz, ++
 	call _LABEL_24AE
@@ -6186,7 +6186,7 @@ HandleObject_Snake:
 
 ; 29th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Demon:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	call _LABEL_24AE
@@ -6292,7 +6292,7 @@ _LABEL_2EE9:
 
 ; 31st entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Giant_Bat_2:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, _LABEL_2F9F
 	ld (iy+object.hitbox_x_offset), $F8
@@ -6328,7 +6328,7 @@ _LABEL_2F9F:
 
 ; 24th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Spider:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	ld (iy+object.hitbox_x_offset), $F8
@@ -6427,7 +6427,7 @@ AddDEToYVelocity:
 
 ; 28th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Skeleton:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	ld (iy+object.hitbox_x_offset), $F8
@@ -6598,7 +6598,7 @@ _LABEL_31AE:
 
 ; 25th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_White_Wolf:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	ld (iy+object.hitbox_x_offset), $F4
@@ -6754,7 +6754,7 @@ _LABEL_3349:
 
 ; 33rd entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Book_Thief:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	call _LABEL_24AE
@@ -6826,7 +6826,7 @@ HandleObject_Book_Thief:
 	ld (iy+38), $28
 	ld (iy+1), $01
 	ld (iy+14), $02
-	ld (iy+3), $02
+	ld (iy+object.is_initialised), $02
 	ld (iy+object.hitbox_x_offset), $FC
 	ld (iy+object.hitbox_width), $08
 	ld (iy+object.hitbox_y_offset), $F0
@@ -6841,7 +6841,7 @@ _LABEL_344D:
 	jp nz, _LABEL_3493
 	dec (iy+38)
 	ret nz
-	ld (iy+3), $01
+	ld (iy+object.is_initialised), $01
 	ld (iy+2), $01
 	ld (iy+14), $00
 	ld (iy+object.hitbox_x_offset), $F0
@@ -6896,7 +6896,7 @@ _LABEL_3493:
 
 ; 35th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Dark_Shunaida:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	ld (iy+object.hitbox_x_offset), $F0
@@ -7043,7 +7043,7 @@ _LABEL_35F9:
 
 ; 37th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Dagon:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	call _LABEL_24AE
@@ -7191,7 +7191,7 @@ _LABEL_3778:
 
 ; 38th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Zombie:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	ld (iy+object.hitbox_x_offset), $F4
@@ -7278,7 +7278,7 @@ HandleObject_Zombie:
 
 ; 17th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Eye_Part:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, _LABEL_38A5
 	ld (iy+object.hitbox_x_offset), $F4
@@ -7312,7 +7312,7 @@ _LABEL_38A5:
 	jp nc, ++
 +:
 	push iy
-	ld de, $FFC0
+	ld de, -_sizeof_object
 	add iy, de
 	ld (iy+object.type), $27 ; Damaged (Knight)
 	pop iy
@@ -7364,7 +7364,7 @@ _LABEL_38A5:
 
 ; 27th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Eye_Part_2:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, +
 	ld hl, _DATA_8B2C
@@ -7383,7 +7383,7 @@ HandleObject_Eye_Part_2:
 
 ; 36th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Lizard_Man:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	ld (iy+object.hitbox_x_offset), $F0
@@ -7527,7 +7527,7 @@ _LABEL_3A0E:
 
 ; 34th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Dragon:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, _LABEL_3ADD
 	ld (iy+object.hitbox_x_offset), $F4
@@ -7603,7 +7603,7 @@ _LABEL_3ADD:
 	ret nc
 ++:
 	ld (iy+39), $01
-	ld (iy+3), $02
+	ld (iy+object.is_initialised), $02
 	ret
 
 _LABEL_3B39:
@@ -7635,7 +7635,7 @@ _LABEL_3B39:
 
 ; 32nd entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Straw_Fly:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, +
 	ld (iy+object.hitbox_x_offset), $F8
@@ -7699,7 +7699,7 @@ HandleObject_Straw_Fly:
 
 ; 21st entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Clown:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	ld (iy+object.hitbox_x_offset), $F4
@@ -7777,7 +7777,7 @@ HandleObject_Clown:
 
 ; 40th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Snake_2:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	ld (iy+object.hitbox_x_offset), $F0
@@ -7835,7 +7835,7 @@ HandleObject_Snake_2:
 
 ; 26th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Caterpillar:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, ++
 	ld (iy+object.hitbox_x_offset), $F0
@@ -7981,9 +7981,9 @@ HandleObject_Damaged_0x27:
 +:
 	push iy
 	pop hl
-	ld de, $FFC0
+	ld de, -_sizeof_object
 	add hl, de
-	ld b, $40
+	ld b, _sizeof_object
 -:
 	ld (hl), $00
 	djnz -
@@ -8032,7 +8032,7 @@ HandleObject_Damaged_0x2A:
 
 ; 43rd entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Tree_Spirit:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, +
 	ld a, $A8
@@ -8048,11 +8048,11 @@ HandleObject_Tree_Spirit:
 	ld hl, $951F
 	ld (_RAM_C504), hl
 	ld a, $01
-	ld (_RAM_C503), a
+	ld (_RAM_C500+object.is_initialised), a
 	ld a, $06
 	ld (_RAM_C538), a
 	ld a, $14 ; Tree Spirit Health
-	ld (_RAM_BOSS_HP), a
+	ld (_RAM_C500+object.boss_hp), a
 	ret
 
 +:
@@ -8134,7 +8134,7 @@ _LABEL_3FB9:
 	ld c, $00
 	ld hl, _RAM_C640
 -:
-	ld (hl), $2C
+	ld (hl), $2C ; Tree Spirit's Projectile
 	ld de, $0007
 	add hl, de
 	ld a, (_RAM_C500+object.y_position_minor)
@@ -8190,7 +8190,7 @@ _LABEL_400F:
 	add a, $F0
 -:
 	ld (hl), a
-	ld de, $0040
+	ld de, _sizeof_object
 	add hl, de
 	djnz -
 	dec (iy+32)
@@ -8283,7 +8283,7 @@ _LABEL_40B7:
 	ld c, $00
 	ld hl, _RAM_C540
 -:
-	ld (hl), $2D
+	ld (hl), $2D ; Tree Spirit's Projectile
 	ld a, (_RAM_C500+object.y_position_minor)
 	add a, $E0
 	ld de, $0007
@@ -8309,7 +8309,7 @@ _LABEL_40B7:
 
 ; 44th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Projectile_Tree_Spirit:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, _LABEL_4178
 	ld (iy+56), $08
@@ -8369,7 +8369,7 @@ _LABEL_4178:
 
 ; 45th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Projectile_Tree_Spirit_2:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, _LABEL_41FE
 	ld (iy+56), $04
@@ -8424,7 +8424,7 @@ _LABEL_41FE:
 
 ; 46th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Necromancer:
-	ld a, (_RAM_C503)
+	ld a, (_RAM_C500+object.is_initialised)
 	or a
 	jp nz, _LABEL_4278
 	ld a, $30
@@ -8448,7 +8448,7 @@ HandleObject_Necromancer:
 	ld a, $1D
 	ld (_RAM_C51D), a
 	ld a, $08
-	ld (_RAM_BOSS_HP), a
+	ld (_RAM_C500+object.boss_hp), a
 	ld a, $04
 	ld (_RAM_C538), a
 	call _LABEL_24AE
@@ -8568,7 +8568,7 @@ _LABEL_42FD:
 
 ; 49th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Necromancer_Clone:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, _LABEL_43A8
 	ld (iy+object.y_position_minor), $A0
@@ -8805,7 +8805,7 @@ _DATA_456E:
 
 ; 55th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Baruga:
-	ld a, (_RAM_C503)
+	ld a, (_RAM_C500+object.is_initialised)
 	or a
 	jp nz, +
 	ld a, $A0
@@ -8820,7 +8820,7 @@ HandleObject_Baruga:
 	ld a, $08
 	ld (_RAM_C538), a
 	ld a, $32
-	ld (_RAM_BOSS_HP), a
+	ld (_RAM_C500+object.boss_hp), a
 	ld hl, _DATA_A4DD
 	jp _LABEL_249F
 
@@ -9092,7 +9092,7 @@ _DATA_47C9:
 
 ; 59th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Projectile_Baruga:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, +
 	ld a, (_RAM_C500+object.x_position_minor)
@@ -9105,7 +9105,7 @@ HandleObject_Projectile_Baruga:
 	ld (iy+object.hitbox_width), $08
 	ld (iy+object.hitbox_y_offset), $FC
 	ld (iy+object.hitbox_height), $08
-	ld (iy+3), $01
+	ld (iy+object.is_initialised), $01
 	ld (iy+56), $02
 +:
 	ld a, (iy+1)
@@ -9137,7 +9137,7 @@ HandleObject_Projectile_Baruga:
 
 ; 52nd entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Pirate:
-	ld a, (_RAM_C503)
+	ld a, (_RAM_C500+object.is_initialised)
 	or a
 	jp nz, +
 	ld a, $F0
@@ -9149,7 +9149,7 @@ HandleObject_Pirate:
 	ld hl, $38B0
 	ld (_RAM_C500+object.hitbox_y_offset), hl
 	ld a, $1E
-	ld (_RAM_BOSS_HP), a
+	ld (_RAM_C500+object.boss_hp), a
 	ld a, $08
 	ld (_RAM_C538), a
 	ld hl, _DATA_9F02
@@ -9370,7 +9370,7 @@ _LABEL_4998:
 
 ; 53rd entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Pirate_Sword:
-	ld a, (_RAM_C543)
+	ld a, (_RAM_C540+object.is_initialised)
 	or a
 	jp nz, +
 	ld a, $04
@@ -9435,7 +9435,7 @@ HandleObject_Pirate_Sword:
 
 ; 48th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Dark_Suma:
-	ld a, (_RAM_C503)
+	ld a, (_RAM_C500+object.is_initialised)
 	or a
 	jp nz, +
 	ld a, $18
@@ -9449,7 +9449,7 @@ HandleObject_Dark_Suma:
 	ld a, $08
 	ld (_RAM_C51A), a
 	ld a, $14
-	ld (_RAM_BOSS_HP), a
+	ld (_RAM_C500+object.boss_hp), a
 	ld a, $04
 	ld (_RAM_C538), a
 	ld hl, _DATA_ADE8
@@ -9704,7 +9704,7 @@ _LABEL_4C7F:
 
 ; 61st entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Skull_Dark_Suma:
-	ld a, (iy+3)
+	ld a, (iy+object.is_initialised)
 	or a
 	jp nz, _LABEL_4D71
 	ld (iy+object.hitbox_y_offset), $F0
@@ -9850,7 +9850,7 @@ _LABEL_4DE8:
 
 ; 62nd entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Projectile_Dark_Suma:
-	ld a, (_RAM_C543)
+	ld a, (_RAM_C540+object.is_initialised)
 	or a
 	jp nz, _LABEL_4E4B
 	ld a, $06
@@ -9883,7 +9883,7 @@ HandleObject_Projectile_Dark_Suma:
 	ld a, $0A
 	ld (_RAM_C54F), a
 	ld a, $01
-	ld (_RAM_C543), a
+	ld (_RAM_C540+object.is_initialised), a
 _LABEL_4E4B:
 	call _LABEL_1C8C
 	call ApplyObjectXVelocity
@@ -9909,7 +9909,7 @@ _LABEL_4E4B:
 
 ; 66th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Ra_Goan:
-	ld a, (_RAM_C503)
+	ld a, (_RAM_C500+object.is_initialised)
 	or a
 	jp nz, +
 	ld a, $B0
@@ -9925,7 +9925,7 @@ HandleObject_Ra_Goan:
 	ld a, $04
 	ld (_RAM_C538), a
 	ld a, $3C
-	ld (_RAM_BOSS_HP), a
+	ld (_RAM_C500+object.boss_hp), a
 	ld hl, _DATA_B0CC
 	jp _LABEL_249F
 
@@ -10140,7 +10140,7 @@ _LABEL_502B:
 
 ; 64th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Projectile_Ra_Goan:
-	ld a, (_RAM_C543)
+	ld a, (_RAM_C540+object.is_initialised)
 	or a
 	jp nz, _LABEL_5072
 	ld a, $01
@@ -10174,7 +10174,7 @@ _LABEL_5072:
 
 ; 65th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Projectile_Ra_Goan_2:
-	ld a, (_RAM_C543)
+	ld a, (_RAM_C540+object.is_initialised)
 	or a
 	jp nz, _LABEL_5072
 	ld a, $01
@@ -10207,7 +10207,7 @@ _LABEL_50BE:
 
 ; 63rd entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Shield_Ra_Goan:
-	ld a, (_RAM_C583)
+	ld a, (_RAM_C580+object.is_initialised)
 	or a
 	jp nz, ++
 	ld a, $02
@@ -12020,7 +12020,7 @@ _LABEL_5DA6:
 
 ; 58th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_The_Ripper:
-	ld a, (_RAM_C503)
+	ld a, (_RAM_C500+object.is_initialised)
 	or a
 	jr nz, +
 	ld a, $10
@@ -12175,7 +12175,7 @@ _LABEL_5FB9:
 
 ; 47th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Stone_Hammer:
-	ld a, (_RAM_C503)
+	ld a, (_RAM_C500+object.is_initialised)
 	or a
 	jr nz, +
 	ld a, $10
@@ -12365,7 +12365,7 @@ _LABEL_6177:
 
 ; 50th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Golden_Guard:
-	ld a, (_RAM_C503)
+	ld a, (_RAM_C500+object.is_initialised)
 	or a
 	jr nz, +
 	ld a, $10
@@ -12673,9 +12673,9 @@ _LABEL_63F2:
 	ret
 
 _LABEL_6417:
-	ld (_RAM_BOSS_HP), a
+	ld (_RAM_C500+object.boss_hp), a
 	ld (iy+56), c
-	ld (iy+3), $01
+	ld (iy+object.is_initialised), $01
 	ld (iy+object.y_position_minor), $A0
 	ld (iy+object.x_position_minor), $D0
 	ld (iy+2), $00
@@ -12692,7 +12692,7 @@ _LABEL_642E:
 
 ; 57th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Court_Jester:
-	ld a, (_RAM_C503)
+	ld a, (_RAM_C500+object.is_initialised)
 	or a
 	jr nz, +
 	ld a, $10
@@ -12874,7 +12874,7 @@ _LABEL_65C4:
 	ld a, $3C ; Projectile (Court Jester)
 	ld (_RAM_C540), a
 	ld a, $01
-	ld (_RAM_C543), a
+	ld (_RAM_C540+object.is_initialised), a
 	ret
 
 _LABEL_65E4:
@@ -12924,7 +12924,7 @@ HandleObject_Projectile_Court_Jester:
 
 ; 51st entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Paradin:
-	ld a, (_RAM_C503)
+	ld a, (_RAM_C500+object.is_initialised)
 	or a
 	jr nz, +
 	ld a, $0A
@@ -13083,7 +13083,7 @@ _LABEL_676B:
 
 ; 54th entry of Jump Table from 6E4 (indexed by _RAM_C400)
 HandleObject_Medusa:
-	ld a, (_RAM_C503)
+	ld a, (_RAM_C500+object.is_initialised)
 	or a
 	jr nz, _LABEL_67F5
 	xor a
@@ -13093,7 +13093,7 @@ HandleObject_Medusa:
 	ld (iy+object.boss_flash_timer), $20
 	ld (iy+object.boss_hp), $64
 	ld (iy+56), $04
-	ld (iy+3), $01
+	ld (iy+object.is_initialised), $01
 	ld (iy+object.y_position_minor), $A8
 	ld (iy+object.x_position_minor), $30
 	ld hl, $30D0
@@ -13214,7 +13214,7 @@ _LABEL_6893:
 	ld a, $3C ; Court Jester's Projectile
 	ld (_RAM_C540), a
 	ld a, $01
-	ld (_RAM_C543), a
+	ld (_RAM_C540+object.is_initialised), a
 	ld hl, $0400
 	ld (_RAM_C540+object.x_velocity_sub), hl
 	ld hl, $ADD9
@@ -13249,7 +13249,7 @@ _LABEL_68E7:
 	ld a, $3C
 	ld (_RAM_C580), a
 	ld a, $01
-	ld (_RAM_C583), a
+	ld (_RAM_C580+object.is_initialised), a
 	ld hl, $ADA0
 	ld (_RAM_C584), hl
 	ld a, (_RAM_C500+object.x_position_minor)

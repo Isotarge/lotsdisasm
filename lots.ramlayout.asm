@@ -256,7 +256,9 @@ _RAM_C4E0 db
 _RAM_C500 db
 _RAM_C501 db
 _RAM_C502 db
-_RAM_C503 db
+.ende
+
+.enum $C504 export
 _RAM_C504 dw
 .ende
 
@@ -291,7 +293,6 @@ _RAM_C530 db
 _RAM_C531 db
 _RAM_C532 db
 _RAM_C533 db
-_RAM_BOSS_HP db
 .ende
 
 .enum $C538 export
@@ -300,7 +301,9 @@ _RAM_C538 db
 
 .enum $C540 export
 _RAM_C540 dsb $3
-_RAM_C543 db
+.ende
+
+.enum $C544 export
 _RAM_C544 dw
 .ende
 
@@ -322,7 +325,9 @@ _RAM_C578 db
 
 .enum $C580 export
 _RAM_C580 dsb $3
-_RAM_C583 db
+.ende
+
+.enum $C584 export
 _RAM_C584 dw
 .ende
 

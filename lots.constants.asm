@@ -113,7 +113,7 @@
 	type db
 	unknown_0x01 db
 	unknown_0x02 db
-	unknown_0x03 db ; Spawned flag? if 0, init the object, if 1, run normal behaviour
+	is_initialised db
 	unknown_0x04 db ; Pointer, tiles?
 	unknown_0x05 db ; Pointer, tiles?
 	y_position_sub db   ; 6
