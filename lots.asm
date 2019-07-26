@@ -599,9 +599,9 @@ _LABEL_467:
 	ld (_RAM_C0A8), hl
 	ld hl, _RAM_C360
 	ld (_RAM_C0AA), hl
-	ld b, $18
+	ld b, Max_Objects
 	ld iy, _RAM_C400
-	ld de, $0040
+	ld de, _sizeof_object
 	ld a, (_RAM_C106)
 	cpl
 	ld (_RAM_C106), a
@@ -882,7 +882,7 @@ _DATA_68C:
 
 ProcessObjects:
 	ld iy, _RAM_C400
-	ld b, $18
+	ld b, Max_Objects
 -:
 	ld a, (iy+object.type)
 	or a
@@ -1090,7 +1090,7 @@ ApplyObjectXVelocity:
 	ld (iy+object.x_position_major), a
 	ret
 
-_LABEL_84C:
+HandleObjectAnimation:
 	inc (iy+15)
 	ld a, (iy+15)
 	cp (iy+13)
@@ -2933,11 +2933,11 @@ _LABEL_161E:
 	ld e, $01
 +:
 	ld ix, _RAM_C440
-	ld (_RAM_C453), hl
-	ld (ix+21), b
+	ld (_RAM_C440+object.x_velocity_sub), hl
+	ld (ix+object.x_velocity_major), b
 	ld a, (_RAM_X_POSITION_MINOR)
 	add a, c
-	ld (_RAM_C44A), a
+	ld (_RAM_C440+object.x_position_minor), a
 	ld (ix+14), e
 	ld a, $DB
 	bit 0, (iy+35)
@@ -2945,7 +2945,7 @@ _LABEL_161E:
 	ld a, $E8
 +:
 	add a, (iy+object.y_position_minor)
-	ld (_RAM_C447), a
+	ld (_RAM_C440+object.y_position_minor), a
 	ld hl, _DATA_85D1
 	ld (_RAM_C444), hl
 	ld (ix+0), $02
@@ -2953,10 +2953,10 @@ _LABEL_161E:
 	xor a
 	ld (_RAM_C460), a
 	ld (_RAM_C461), a
-	ld (ix+22), $FC
-	ld (ix+23), $04
-	ld (ix+24), $F9
-	ld (ix+25), $0E
+	ld (ix+object.hitbox_y_offset), $FC
+	ld (ix+object.hitbox_height), $04
+	ld (ix+object.hitbox_x_offset), $F9
+	ld (ix+object.hitbox_width), $0E
 	ld a, $90
 	ld (_RAM_SOUND_TO_PLAY), a
 	ret
@@ -2966,11 +2966,11 @@ HandleObject_Landau_Arrow:
 	ld a, (_RAM_C460)
 	or a
 	jp nz, ++
-	ld a, (_RAM_C44B)
+	ld a, (_RAM_C440+object.x_position_major)
 	or a
 	jp nz, ClearObjectInIY
 	call ApplyObjectXVelocity
-	ld a, (_RAM_C44A)
+	ld a, (_RAM_C440+object.x_position_minor)
 	cp $10
 	ret c
 	cp $F0
@@ -2997,7 +2997,7 @@ HandleObject_Landau_Arrow:
 	call ApplyObjectXVelocity
 	ld de, $0040
 	call _LABEL_869
-	ld a, (_RAM_C447)
+	ld a, (_RAM_C440+object.y_position_minor)
 	cp $C0
 	jp nc, ClearObjectInIY
 	ld de, $0000
@@ -3017,7 +3017,7 @@ HandleObject_Landau_Arrow:
 	jp nz, +
 	ld hl, $FF80
 +:
-	ld (_RAM_C453), hl
+	ld (_RAM_C440+object.x_velocity_sub), hl
 	ld (iy+object.x_velocity_major), h
 	ld a, $A4
 	ld (_RAM_SOUND_TO_PLAY), a
@@ -3568,12 +3568,12 @@ _LABEL_1AB3:
 	ld hl, _RAM_C131
 	call ++
 	ld ix, _RAM_C440
-	ld b, $18
+	ld b, Max_Objects
 -:
-	ld a, (ix+0)
+	ld a, (ix+object.type)
 	or a
 	call nz, +
-	ld de, $0040
+	ld de, _sizeof_object
 	add ix, de
 	djnz -
 	ret
@@ -5193,7 +5193,7 @@ HandleObject_Slime:
 	ret
 
 +:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (iy+14)
 	cp $02
 	ret nz
@@ -5240,7 +5240,7 @@ _LABEL_25DC:
 	jp _LABEL_24A3
 
 +:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	dec (iy+40)
 	ret nz
@@ -5271,7 +5271,7 @@ HandleObject_Giant_Bat:
 
 ++:
 	call ApplyObjectXVelocity
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (iy+1)
 	dec a
 	jp z, +++
@@ -5598,7 +5598,7 @@ HandleObject_Bird:
 	ld a, (iy+2)
 	or a
 	jp z, +
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (iy+1)
 	or a
 	jp z, ++
@@ -5775,7 +5775,7 @@ HandleObject_Killer_Fish:
 	jp _LABEL_24AE
 
 _LABEL_2AE2:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	ld de, $F80C
 	bit 7, (iy+object.x_velocity_minor)
@@ -5841,7 +5841,7 @@ HandleObject_Knight:
 	jp _LABEL_2BF0
 
 +:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	ld a, (iy+38)
 	or a
@@ -5919,7 +5919,7 @@ _LABEL_2BF0:
 	ret
 
 +:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	ld de, $0040
 	call AddDEToYVelocity
@@ -6007,7 +6007,7 @@ HandleObject_Scorpion:
 	call _LABEL_173E
 	ret c
 	call ApplyObjectXVelocity
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (iy+object.x_position_minor)
 	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
@@ -6102,7 +6102,7 @@ HandleObject_Snake:
 	ld a, (iy+2)
 	or a
 	jr nz, ++
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld de, $0200
 	ld hl, _DATA_8D5A
 	ld a, (_RAM_X_POSITION_MINOR)
@@ -6146,7 +6146,7 @@ HandleObject_Snake:
 	ret
 
 ++:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (_RAM_X_POSITION_MINOR)
 	ld b, a
 	ld c, $0C
@@ -6207,7 +6207,7 @@ HandleObject_Demon:
 	ret c
 	call _LABEL_173E
 	ret c
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (iy+1)
 	dec a
 	jp z, _LABEL_2EE9
@@ -6322,7 +6322,7 @@ _LABEL_2F9F:
 	ret c
 	call _LABEL_173E
 	ret c
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call _LABEL_880
 	jp ApplyObjectXVelocity
 
@@ -6363,7 +6363,7 @@ HandleObject_Spider:
 	jp _LABEL_3072
 
 +:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	ld de, $0020
 	call _LABEL_869
@@ -6470,7 +6470,7 @@ HandleObject_Skeleton:
 	ld a, (_RAM_C440)
 	or a
 	jp z, ++
-	ld a, (_RAM_C44A)
+	ld a, (_RAM_C440+object.x_position_minor)
 	sub (iy+object.x_position_minor)
 	bit 7, a
 	jp z, +
@@ -6482,7 +6482,7 @@ HandleObject_Skeleton:
 	ret
 
 ++:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	ld de, $F80C
 	bit 7, (iy+object.x_velocity_minor)
@@ -6529,7 +6529,7 @@ _LABEL_3152:
 
 +:
 	call ApplyObjectXVelocity
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld de, $0040
 	call AddDEToYVelocity
 	call ApplyObjectYVelocity
@@ -6573,7 +6573,7 @@ _LABEL_31AE:
 	jp _LABEL_24A3
 
 ++:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp $30
@@ -6642,7 +6642,7 @@ HandleObject_White_Wolf:
 	ret
 
 +:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	ld de, $F820
 	bit 7, (iy+object.x_velocity_minor)
@@ -6782,7 +6782,7 @@ HandleObject_Book_Thief:
 	ld a, (iy+1)
 	or a
 	jp nz, _LABEL_344D
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	ld de, $F80C
 	bit 7, (iy+object.x_velocity_minor)
@@ -6863,7 +6863,7 @@ _LABEL_344D:
 	jp _LABEL_24A3
 
 _LABEL_3493:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld de, $0030
 	call _LABEL_869
 	ld de, $0000
@@ -6950,7 +6950,7 @@ HandleObject_Dark_Shunaida:
 	jp _LABEL_252E
 
 ++:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call _LABEL_24BD
 	cp $14
 	jr nc, +
@@ -7019,7 +7019,7 @@ _LABEL_35F9:
 	jp z, ++
 	dec a
 	jp z, +
-	call _LABEL_84C
+	call HandleObjectAnimation
 +:
 	ld e, (iy+42)
 	ld d, $00
@@ -7076,7 +7076,7 @@ HandleObject_Dagon:
 	jp z, _LABEL_3732
 	dec a
 	jp z, _LABEL_3778
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	ld a, (_RAM_X_POSITION_MINOR)
 	bit 7, (iy+object.x_velocity_minor)
@@ -7158,7 +7158,7 @@ _LABEL_3732:
 	ret
 
 +:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	ld de, $0000
 	call _LABEL_15E5
@@ -7232,7 +7232,7 @@ HandleObject_Zombie:
 
 +:
 	call ApplyObjectXVelocity
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call _LABEL_2C82
 	ld de, $F8F8
 	bit 7, (iy+object.x_velocity_minor)
@@ -7322,7 +7322,7 @@ _LABEL_38A5:
 	call ++
 	call ApplyObjectXVelocity
 	call +
-	call _LABEL_84C
+	call HandleObjectAnimation
 	jp _LABEL_880
 
 +:
@@ -7429,7 +7429,7 @@ HandleObject_Lizard_Man:
 	jr nz, ++
 	ld (iy+39), $00
 ++:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld de, $F808
 	bit 7, (iy+object.x_velocity_minor)
 	jr z, +
@@ -7562,7 +7562,7 @@ _LABEL_3ADD:
 	ret c
 	call _LABEL_173E
 	ret c
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (iy+1)
 	dec a
 	jp z, _LABEL_3B39
@@ -7811,7 +7811,7 @@ HandleObject_Snake_2:
 	ret
 
 +:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	ld a, (iy+object.x_position_minor)
 	bit 7, (iy+object.x_velocity_minor)
@@ -7880,7 +7880,7 @@ HandleObject_Caterpillar:
 	ret
 
 ++:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	ld a, (iy+41)
 	or a
@@ -8168,7 +8168,7 @@ _LABEL_400F:
 	jp z, +
 	dec a
 	jp z, _LABEL_406B
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	dec (iy+33)
 	ret nz
@@ -8182,7 +8182,7 @@ _LABEL_400F:
 	ret
 
 +:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	ld hl, _RAM_C640+object.x_position_minor
 	ld b, $03
@@ -8276,7 +8276,7 @@ _LABEL_40B7:
 	ret
 
 +:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	dec (iy+26)
 	ret nz
 	ld b, $04
@@ -8405,7 +8405,7 @@ HandleObject_Projectile_Tree_Spirit_2:
 _LABEL_41FE:
 	call _LABEL_1C8C
 	jp c, ClearObjectInIY
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (iy+1)
 	or a
 	jp z, +
@@ -8476,7 +8476,7 @@ _LABEL_4278:
 	xor a
 	ld (_RAM_C52F), a
 +:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (_RAM_C501)
 	dec a
 	jp z, _LABEL_42FD
@@ -8606,7 +8606,7 @@ _LABEL_43A8:
 	ld a, (iy+1)
 	or a
 	jp z, _LABEL_4498
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld h, (iy+26)
 	ld l, (iy+27)
 	dec hl
@@ -8891,7 +8891,7 @@ _LABEL_461F:
 	ret
 
 +:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	call _LABEL_880
 	ld a, (_RAM_C532)
@@ -8967,13 +8967,13 @@ _LABEL_46AC:
 	add hl, de
 	ld b, $08
 	ld ix, _RAM_C540
-	ld de, $0040
+	ld de, _sizeof_object
 -:
-	ld (ix+0), $3B
-	ld (ix+16), l
-	ld (ix+17), h
-	ld (ix+19), c
-	ld (ix+20), a
+	ld (ix+object.type), $3B ; Projectile Baruga
+	ld (ix+object.y_velocity_sub), l
+	ld (ix+object.y_velocity_minor), h
+	ld (ix+object.x_velocity_sub), c
+	ld (ix+object.x_velocity_minor), a
 	add ix, de
 	djnz -
 	ld b, $04
@@ -9073,7 +9073,7 @@ _LABEL_4741:
 	ret
 
 ++:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (_RAM_C500+object.y_position_minor)
 	add a, $FF
 	ld (_RAM_C500+object.y_position_minor), a
@@ -9203,7 +9203,7 @@ HandleObject_Pirate:
 +:
 	ld a, $01
 	ld (_RAM_C51C), a
-	ld a, $35
+	ld a, $35 ; Pirate's Sword
 	ld (_RAM_C540), a
 	ret
 
@@ -9270,7 +9270,7 @@ _LABEL_493A:
 	jr z, ++
 	dec a
 	jr z, +
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	ld a, (_RAM_X_POSITION_MINOR)
 	add a, $08
@@ -9333,7 +9333,7 @@ _LABEL_4998:
 	or $40
 	ld (_RAM_C51A), a
 +:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	ld a, (_RAM_X_POSITION_MINOR)
 	cp $88
@@ -9402,7 +9402,7 @@ HandleObject_Pirate_Sword:
 	rrc b
 	jp c, ++
 +:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	call ApplyObjectYVelocity
 	ld a, (_RAM_C55A)
@@ -9504,7 +9504,7 @@ HandleObject_Dark_Suma:
 	jr nz, +
 	ld a, $18
 	ld (_RAM_C50F), a
-	ld a, $3E
+	ld a, $3E ; Dark Suma's Projectile
 	ld (_RAM_C540), a
 	ret
 
@@ -9545,7 +9545,7 @@ _LABEL_4B53:
 	ret
 
 ++:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	dec (iy+object.boss_teleport_timer)
 	ret nz
 	ld a, (_RAM_C523)
@@ -9649,7 +9649,7 @@ _LABEL_4C2A:
 	ret
 
 +:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	call _LABEL_880
 	ld a, (_RAM_C500+object.x_position_minor)
@@ -9825,7 +9825,7 @@ _LABEL_4D71:
 	jp _LABEL_24AE
 
 ++:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	call _LABEL_880
 	ld a, (iy+50)
@@ -9945,7 +9945,7 @@ HandleObject_Ra_Goan:
 	ld a, (_RAM_C501)
 	cp $03
 	jr z, +
-	ld a, (_RAM_C44A)
+	ld a, (_RAM_C440+object.x_position_minor)
 	cp $30
 	jr c, +
 	cp $E0
@@ -10016,11 +10016,11 @@ HandleObject_Ra_Goan:
 	ld a, (_RAM_C501)
 	cp $03
 	jr z, ++
-	ld b, $40
+	ld b, $40 ; Ra Goan's Projectile
 	ld a, (_RAM_C51C)
 	or a
 	jr z, +
-	ld b, $41
+	ld b, $41 ; Ra Goan's Projectile
 +:
 	ld a, b
 	ld (_RAM_C540), a
@@ -10029,7 +10029,7 @@ HandleObject_Ra_Goan:
 	ret
 
 ++:
-	ld a, $3F
+	ld a, $3F ; Ra Goan's Shield
 	ld (_RAM_C580), a
 	ld a, $20
 	ld (_RAM_C50F), a
@@ -10073,7 +10073,7 @@ _LABEL_4F7E:
 	ret
 
 _LABEL_4FC8:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	dec (iy+26)
 	ret nz
 	inc (iy+27)
@@ -12062,7 +12062,7 @@ _LABEL_5E92:
 	jp z, _LABEL_5F2A
 	dec a
 	jp z, _LABEL_5F9D
-	call _LABEL_84C
+	call HandleObjectAnimation
 	dec (iy+32)
 	ret nz
 	ld (iy+1), $01
@@ -12082,7 +12082,7 @@ _LABEL_5E92:
 	ret
 
 ++:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	call _LABEL_634B
 	ld hl, $D060
@@ -12144,7 +12144,7 @@ _LABEL_5F2A:
 	ret
 
 _LABEL_5F9D:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (_RAM_C50C)
 	cp $08
 	jr z, +
@@ -12216,7 +12216,7 @@ HandleObject_Stone_Hammer:
 	jp z, _LABEL_60A8
 	dec a
 	jp z, _LABEL_60ED
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	call _LABEL_634B
 	ld hl, $D060
@@ -12262,7 +12262,7 @@ HandleObject_Stone_Hammer:
 	ret
 
 _LABEL_60A8:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (_RAM_C50E)
 	inc a
 	cp $05
@@ -12474,7 +12474,7 @@ _LABEL_6245:
 	ret
 
 _LABEL_6291:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (_RAM_C50E)
 	cp $03
 	ret nz
@@ -12507,7 +12507,7 @@ _LABEL_62C7:
 
 _LABEL_62D9:
 	call ApplyObjectXVelocity
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (_RAM_C500+object.x_position_minor)
 	bit 7, (iy+object.x_velocity_minor)
 	jr z, ++
@@ -12730,7 +12730,7 @@ _LABEL_6459:
 	jp nz, _LABEL_6388
 	call _LABEL_65E4
 	call ApplyObjectXVelocity
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (_RAM_C500+object.x_position_minor)
 	ld bc, $18FF
 	cp b
@@ -12773,7 +12773,7 @@ _LABEL_64E2:
 	ld a, (_RAM_C50E)
 	cp $03
 	jr nc, ++
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (_RAM_C50E)
 	cp $03
 	jr z, +
@@ -12859,7 +12859,7 @@ _LABEL_6543:
 	ret
 
 _LABEL_65C4:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (_RAM_C50E)
 	cp $02
 	jr z, +
@@ -12919,7 +12919,7 @@ HandleObject_Projectile_Court_Jester:
 	call ApplyObjectYVelocity
 	ld a, (iy+14)
 	cp $02
-	jp c, _LABEL_84C
+	jp c, HandleObjectAnimation
 	ret
 
 ; 51st entry of Jump Table from 6E4 (indexed by _RAM_C400)
@@ -12959,7 +12959,7 @@ _LABEL_6660:
 	ld a, (_RAM_C501)
 	dec a
 	jp z, _LABEL_66EE
-	call _LABEL_84C
+	call HandleObjectAnimation
 	call ApplyObjectXVelocity
 	call _LABEL_671A
 	ld a, (_RAM_Y_POSITION_MINOR)
@@ -13005,7 +13005,7 @@ _LABEL_6660:
 
 _LABEL_66EE:
 	call _LABEL_1C8C
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (_RAM_C50E)
 	cp $03
 	ret c
@@ -13190,7 +13190,7 @@ _LABEL_67F5:
 
 _LABEL_687E:
 	call ApplyObjectXVelocity
-	call _LABEL_84C
+	call HandleObjectAnimation
 	dec (iy+44)
 	ret nz
 	ld hl, $AC0A
@@ -13199,7 +13199,7 @@ _LABEL_687E:
 	jp _LABEL_67E1
 
 _LABEL_6893:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (_RAM_C50E)
 	cp $03
 	jr z, +
@@ -13211,7 +13211,7 @@ _LABEL_6893:
 	ld a, (_RAM_C540)
 	or a
 	ret nz
-	ld a, $3C
+	ld a, $3C ; Court Jester's Projectile
 	ld (_RAM_C540), a
 	ld a, $01
 	ld (_RAM_C543), a
@@ -13234,7 +13234,7 @@ _LABEL_6893:
 	ret
 
 _LABEL_68E7:
-	call _LABEL_84C
+	call HandleObjectAnimation
 	ld a, (_RAM_C50E)
 	dec a
 	jr z, +

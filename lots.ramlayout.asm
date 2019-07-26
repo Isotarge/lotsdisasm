@@ -220,19 +220,6 @@ _RAM_C440 dsb $4
 _RAM_C444 dw
 .ende
 
-.enum $C447 export
-_RAM_C447 db
-.ende
-
-.enum $C44A export
-_RAM_C44A db
-_RAM_C44B db
-.ende
-
-.enum $C453 export
-_RAM_C453 dw
-.ende
-
 .enum $C460 export
 _RAM_C460 db
 _RAM_C461 db

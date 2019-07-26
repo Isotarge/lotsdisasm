@@ -108,6 +108,7 @@
 .define	Map_Type_Dungeon_Suma $09
 .define	Map_Type_Dungeon_Ra_Goan $0A
 
+.define Max_Objects $18
 .struct object
 	type db
 	unknown_0x01 db
