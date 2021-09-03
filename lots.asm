@@ -1258,7 +1258,7 @@ Handle_Map_Status_Start_Game:
 	ld (_RAM_CURRENT_MAP), a
 	call _LABEL_3C2
 	ld a, $01 ; Landau
-	ld (_RAM_C400), a
+	ld (_RAM_C400+object.type), a
 	ld a, $A0
 	ld (_RAM_Y_POSITION_MINOR), a
 	ld a, $80
@@ -4367,7 +4367,7 @@ _LABEL_201D:
 	ld (_RAM_CURRENT_MAP), a
 	ld a, $01
 	ld (_RAM_BUILDING_STATUS), a ; Building_Status_Load_Map
-	ld (_RAM_C400), a
+	ld (_RAM_C400), a ; Landau
 	ld (_RAM_C161), a
 	ld a, h
 	ld (_RAM_C163), a
@@ -10558,7 +10558,7 @@ LoadMapMetadata:
 	ld h, (hl)
 	ld l, a
 	ld a, $01
-	ld (_RAM_C400), a
+	ld (_RAM_C400), a ; Landau
 	ld a, (hl)
 	ld (_RAM_Y_POSITION_MINOR), a
 	inc hl
@@ -11340,9 +11340,9 @@ _LABEL_5935:
 	ld a, (_RAM_GAME_IS_PAUSED)
 	or a
 	ret nz
-	ld a, Building_Status_Load_Map
-	ld (_RAM_BUILDING_STATUS), a
-	ld (_RAM_C400), a
+	ld a, $01
+	ld (_RAM_BUILDING_STATUS), a ; Building_Status_Load_Map
+	ld (_RAM_C400+object.type), a ; Landau
 	ld (_RAM_C161), a
 	ld a, (_RAM_SCREEN_X_TILE)
 	ld (_RAM_C163), a
@@ -11475,8 +11475,8 @@ _LABEL_59CF:
 	ld a, (_RAM_C162)
 	or a
 	ret nz
-	ld a, $01
-	ld (_RAM_C400), a
+	ld a, $01 ; Landau
+	ld (_RAM_C400+object.type), a
 	ld a, (_RAM_BOSS_INDEX)
 	and $7F
 	ld l, a
@@ -11970,8 +11970,8 @@ _LABEL_5DA6:
 	call _LABEL_C9C8
 	ld iy, _RAM_C400
 	call ClearObjectInIY
-	ld a, $01
-	ld (_RAM_C400), a
+	ld a, $01 ; Landau
+	ld (_RAM_C400+object.type), a
 	ld a, $A0
 	ld (_RAM_Y_POSITION_MINOR), a
 	ld a, $40

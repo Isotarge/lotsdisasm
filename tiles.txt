@@ -1,0 +1,3 @@
+b603 SEGA
+eaed Inventory/HUD
+ed05 ??? Projectile of some kind ???
